@@ -1,0 +1,13 @@
+{% extends "student/layout.html" %} {% block content %}
+<h2>Incident Reports</h2>
+<ul>
+  {% for report in reports %}
+  <li>
+    Date: {{ report.date }}, Time: {{ report.time }}, Location: {{
+    report.location }}
+    <br />
+    Description: {{ report.description }}
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

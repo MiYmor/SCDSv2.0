@@ -1,0 +1,150 @@
+{% extends "faculty/layout.html" %}
+<!----------------- TITLE ----------------->
+{% block title %} SPS - Dashboard {% endblock title %} {% block styles %}
+<style>
+  /* Set the chart container to 100% width */
+  #containerChart {
+    width: 100%;
+  }
+</style>
+{% endblock styles %}
+
+<!----------------- CONTENT ----------------->
+{% block content %}
+<div class="p-4 md:ml-72">
+  <div class="border-2 border-gray-200 border-dashed rounded-lg">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4 lg:grid-cols-3">
+      <!-- 1st GRID -->
+      <div
+        class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
+      >
+        <div class="flex items-end justify-between">
+          <div>
+            <h3 class="mb-4 text-4xl font-bold text-c1" id="high-average">1</h3>
+            <div>
+              <p class="text-base font-semibold">Highest Violation Average</p>
+              <div class="flex gap-2">
+                <img
+                  src="{{ url_for('static', filename='images/faculty/trend.png') }}"
+                  alt=""
+                  class="w-10 h-5 opacity-80"
+                />
+                <p class="text-sm font-semibold" id="high-class">COURSE 1-1</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <img
+              src="{{ url_for('static', filename='images/faculty/circle.png') }}"
+              alt=""
+              class="w-[50px] h-[50px] opacity-80 lg:mt-auto"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
+      >
+        <div class="flex items-end justify-between">
+          <div>
+            <h3 class="mb-4 text-4xl font-bold text-c1" id="low-average">1</h3>
+            <div>
+              <p class="text-base font-semibold">Lowest Violation Average</p>
+              <div class="flex gap-2">
+                <img
+                  src="{{ url_for('static', filename='images/faculty/bear.png') }}"
+                  alt=""
+                  class="w-10 h-5 opacity-80"
+                />
+                <p class="text-sm font-semibold" id="low-class">COURSE 1-1</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <img
+              src="{{ url_for('static', filename='images/faculty/circle.png') }}"
+              alt=""
+              class="w-[50px] h-[50px] opacity-80 lg:mt-auto"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div
+        class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
+      >
+        <div class="flex items-end justify-between">
+          <div>
+            <h3 class="mb-4 text-4xl font-bold text-c1" id="subject-count">
+              1
+            </h3>
+            <div>
+              <p class="text-base font-semibold">Pending Cases</p>
+              <div class="flex gap-2">
+                <img
+                  src="{{ url_for('static', filename='images/faculty/trend.png') }}"
+                  alt=""
+                  class="w-10 h-5 opacity-80"
+                />
+                <p class="text-sm font-semibold" id="current-year">Year</p>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <img
+              src="{{ url_for('static', filename='images/faculty/circle.png') }}"
+              alt=""
+              class="w-[50px] h-[50px] opacity-80 lg:mt-auto"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- CONTAINER -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div class="col-span-1 mt-4 shadow-sm h-max p-4 bg-white">
+        <div id="containerChart" class="w-full"></div>
+      </div>
+      <div class="col-span-1 mt-4 shadow-sm h-max p-4 bg-white">
+        <div id="columnChartContainer"></div>
+      </div>
+    </div>
+
+    <div class="w-full bg-white p-4 mt-4">
+      <h1 class="text-2xl font-bold p-4 text-c1">Top Resolved Cases</h1>
+      <div id="Grid" class="p-4"></div>
+    </div>
+  </div>
+</div>
+{% endblock content %}
+
+<!----------------- SCRIPTS ----------------->
+{% block script %}
+
+<!-- STATISTICS DATA FETCHING (COUNT) -->
+<script>
+  async function fetchStatistics() {
+    try {
+      const response = await fetch(`${api_base_url}/class-statistics`);
+
+      if (!response.ok) {
+        throw new Error(
+          `Failed to fetch data. Try to contact the admin to resolve the issue.`
+        );
+      }
+
+      const json_statistics = await response.json();
+      displayStatistics(json_statistics);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  fetchStatistics();
+</script>
+
+{% endblock script %}

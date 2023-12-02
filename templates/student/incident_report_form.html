@@ -1,0 +1,310 @@
+{% extends "student/layout.html" %} {% block style %}
+<style>
+  /* Apply bold style to the header cells */
+  .e-headertext {
+    color: white;
+    font-weight: bolder !important;
+    font-size: 16px !important;
+  }
+
+  th.e-headercell {
+    background-color: #6376eb !important;
+    color: white;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="lg:px-40 md:px-16 py-4 w-screen px-8 mb-8">
+  <h3 class="text-3xl font-bold text-c4 mb-4">Personal Data</h3>
+  <div class="flex gap-3">
+    <div class="bg-white w-screen shadow-md rounded-lg flex p-4">
+      <div class="w-full lg:w-full md:w-full p-2">
+        <h3 class="text-2xl font-bold text-c4 mb-3" id="name"></h3>
+        <hr />
+
+        <form class="w-full mt-4" method="POST" onsubmit="submitForm(event)">
+          <div class="grid gap-6 mb-6 md:grid-cols-2">
+            <!-- INPUTS HERE -->
+            <div>
+              <label for="date-input" class="block mb-2 text-c1 font-extrabold"
+                >Date</label
+              >
+              <input
+                type="date"
+                id="date-input"
+                name="date"
+                class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+              />
+              <p id="error-date" class="text-c4 text-sm"></p>
+            </div>
+
+            <div>
+              <label for="time-input" class="block mb-2 text-c1 font-extrabold"
+                >Time</label
+              >
+              <input
+                type="time"
+                id="time-input"
+                name="time"
+                class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+              />
+              <p id="error-time" class="text-c4 text-sm"></p>
+            </div>
+
+            <div>
+              <label for="incident-input" class="block mb-2 text-c1 font-extrabold">Incident Type</label>
+              <select
+                  id="incident-input"
+                  name="incident"
+                  class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+              >
+                  {% for incident_type in incident_types %}
+                      <option value="{{ incident_type.IncidentTypeId }}">{{ incident_type.Name }}</option>
+                  {% endfor %}
+              </select>
+              <p id="error-incident" class="text-c4 text-sm"></p>
+            </div>
+            
+          
+          <div>
+              <label for="location-input" class="block mb-2 text-c1 font-extrabold">Location</label>
+              <select
+                  id="location-input"
+                  name="location"
+                  class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+              >
+                  {% for location in locations %}
+                      <option value="{{ location.LocationId }}">{{ location.Name }}</option>
+                  {% endfor %}
+              </select>
+              <p id="error-location" class="text-c4 text-sm"></p>
+          </div>
+          
+
+            <div>
+              <label for="student-input" class="block mb-2 text-c1 font-extrabold">Select Student</label>
+              <select
+                  id="student-input"
+                  name="student"
+                  class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+              >
+                  {% for Student in students %}
+                      <option value="{{ Student.StudentId }}">{{ Student.Name }}</option>
+                  {% endfor %}
+              </select>
+              <p id="error-student" class="text-c4 text-sm"></p>
+          </div>
+          
+          
+            
+            <div>
+              <label for="description-input" class="block mb-2 text-c1 font-extrabold"
+                >Description</label
+              >
+              <input
+                type="description"
+                id="description-input"
+                name="description"
+                class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+              />
+              <p id="error-description" class="text-c4 text-sm"></p>
+            </div>
+
+          <button
+            type="submit"
+            class="text-white bg-c4 hover:bg-c5 transition duration-300 font-bold text-sm sm:w-auto px-5 px-5 py-2 text-center"
+          >
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bg-white lg:px-40">
+  <footer class="items-center justify-between mx-auto px-8 py-8">
+    <h1 class="text-c1 text-2xl mb-2 font-bold">Contact Information</h1>
+    <div class="flex flex-wrap lg:flex-nowrap gap-4">
+      <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
+        <h5 class="text-lg font-semibold md:font-bold">Email:</h5>
+        <p class="text-lg">quezoncity@pup.edu.ph</p>
+      </div>
+      <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
+        <h5 class="text-lg font-semibold md:font-bold">Postal Mail:</h5>
+        <p class="text-lg">PUP Quezon City Branch</p>
+        <p class="text-lg">Don Fabian St., Commonwealth</p>
+        <p class="text-lg">Quezon City Philippines</p>
+      </div>
+      <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
+        <h5 class="text-lg font-semibold md:font-bold">Telephone:</h5>
+        <p class="text-lg">(632) 8952-7818</p>
+        <p class="text-lg">(632) 8287-8204</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+{% endblock %} {% block script %}
+<!-- Include Notyf script -->
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+
+<script>
+  // Initialize Notyf for notifications
+  const notyf = new Notyf({
+    duration: 5000,
+    position: {
+      x: 'right',
+      y: 'top',
+    },
+    types: [
+      {
+        type: 'success',
+        background: '#5EEE82',
+        duration: 5000,
+        dismissible: true,
+      },
+      {
+        type: 'error',
+        background: '#ef233c',
+        duration: 5000,
+        dismissible: true,
+      },
+    ],
+  });
+
+  // Function to handle form submission
+  async function submitForm(event) {
+    event.preventDefault();
+    
+    // Gather form data
+    const email = document.getElementById('email-input').value;
+    const number = document.getElementById('number-input').value;
+    const residentialAddress = document.getElementById('residential-input').value;
+
+    // Send data to the API
+    const response = await fetch(`${api_base_url}/details/update`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, number, residentialAddress }),
+    });
+
+    // Handle the API response
+    handleApiResponse(await response.json());
+  }
+
+  // Function to handle API response
+  function handleApiResponse(data_student_details) {
+    const errorDetails = {
+      email: { id: 'error-email', message: 'Please provide a valid email address' },
+      mobile: { id: 'error-mobile', message: 'Mobile must be in "09XXXXXXXXX" format' },
+      residential: { id: 'error-residential', message: 'Residential address must not be empty' },
+    };
+
+    const status = data_student_details.status;
+    const errorType = data_student_details.type;
+
+    // Handle different response statuses
+    if (status === 400 || status === 404 || status === 500) {
+      handleError(status, errorType, errorDetails, data_student_details);
+    } else if (status === 200) {
+      clearErrorMessages(errorDetails);
+      notyf.success(data_student_details.message);
+      updateDetails(data_student_details);
+    } else {
+      notyf.error('Something went wrong');
+    }
+  }
+
+  // Function to handle errors
+  function handleError(status, errorType, errorDetails, data_student_details) {
+    if (errorDetails[errorType]) {
+      const { id, message } = errorDetails[errorType];
+      const errorElement = document.getElementById(id);
+      errorElement.innerText = message;
+      errorElement.classList.add('mt-2');
+    } else {
+      notyf.error(data_student_details.message);
+    }
+  }
+
+  // Function to clear error messages
+  function clearErrorMessages(errorDetails) {
+    for (const key in errorDetails) {
+      const { id } = errorDetails[key];
+      const errorElement = document.getElementById(id);
+      errorElement.innerText = '';
+      errorElement.classList.remove('mt-2');
+    }
+  }
+
+  // Function to update details on the page
+  function updateDetails(data_student_details) {
+    const input_email = document.getElementById('email-input');
+    const input_number = document.getElementById('number-input');
+    const input_residential = document.getElementById('residential-input');
+
+    input_email.value = data_student_details.email;
+    input_number.value = data_student_details.number;
+    input_residential.value = data_student_details.residentialAddress;
+  }
+</script>
+
+<!-- FETCHING USER DETAILS -->
+<script>
+  // Variables to store location and incident types
+  let locationDetails = {};
+  let incidentTypes = {};
+
+  // Fetch location and incident types
+  async function fetchLocation() {
+    try {
+      // Fetch location data
+      const locationResponse = await fetch(`${api_base_url}/location`);
+
+      if (!locationResponse.ok) {
+        throw new Error('Failed to fetch location data');
+      }
+
+      locationDetails = await locationResponse.json();
+      
+      updateDropdowns();
+      // Fetch incident types
+      const incidentResponse = await fetch(`${api_base_url}/incident_types`);
+      if (!incidentResponse.ok) {
+        throw new Error('Failed to fetch incident types data');
+      }
+      incidentTypes = await incidentResponse.json();
+      updateDropdowns();
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
+  // Function to update dropdowns with location and incident types
+  function updateDropdowns() {
+    const incidentDropdown = document.getElementById('incident-input');
+    incidentDropdown.innerHTML = '';
+    for (const incidentType of incidentTypes) {
+      const option = document.createElement('option');
+      option.value = incidentType.IncidentTypeId;
+      option.text = incidentType.Name;
+      incidentDropdown.appendChild(option);
+    }
+
+    const locationDropdown = document.getElementById('location-input');
+    locationDropdown.innerHTML = '';
+    for (const location of locationDetails) {
+      const option = document.createElement('option');
+      option.value = location.LocationId;
+      option.text = location.Name;
+      locationDropdown.appendChild(option);
+    }
+  }
+
+  // Initial fetch when the page loads
+  fetchLocation();
+</script>
+
+{% endblock script %}

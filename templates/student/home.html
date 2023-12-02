@@ -1,0 +1,117 @@
+{% extends "student/layout.html" %} {% block title %} Student - Home Page {%
+endblock title %} {% block style %}
+<style>
+  /* Apply bold style to the header cells */
+  .e-headertext {
+    color: white;
+    font-weight: bolder !important;
+    font-size: 16px !important;
+  }
+
+  th.e-headercell {
+    background-color: #6376eb !important;
+    color: white;
+  }
+
+  #response {
+    position: relative;
+    width: 100%; /* Set the width of the parent */
+    height: auto; /* Let the height adjust based on content */
+  }
+
+  #columnChartContainer {
+    position: relative;
+    width: 100%; /* Inherit the width of the parent */
+    height: 100%; /* Inherit the height of the parent */
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="lg:px-40 md:px-16 py-4 w-screen px-8">
+  <h3 class="text-3xl font-bold text-c4 mb-4">Dashboard</h3>
+
+  <div class="flex flex-wrap lg:flex-wrap md:flex-no-wrap md:gap-4 lg:gap-4">
+    <div
+      class="bg-white lg:w-4/12 md:w-6/12 md:flex-1 w-screen md:mb-0 mb-4 rounded-lg p-6 shadow-md"
+    >
+      <p class="font-bold text-c1 opacity-80">Previous Semester</p>
+      <div class="flex justify-between">
+        <p id="gpa" class="font-bold text-c1 text-4xl"></p>
+        <p class="bg-primary mt-2 text-white px-2 py-1 rounded-md font-bold">
+          Latest Case
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="bg-white lg:w-4/12 md:w-6/12 md:flex-1 w-screen md:mb-0 mb-4 rounded-lg p-6 shadow-md"
+    >
+      <p class="font-bold text-c1 opacity-80">Total Cases Pending</p>
+      <div class="flex justify-between">
+        <p id="overall-gpa" class="font-bold text-c1 text-4xl"></p>
+        <p class="bg-success mt-2 text-white px-2 py-1 rounded-md font-bold">
+          Overall Resolved Cases
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="bg-white lg:w-4/12 md:w-6/12 md:flex-1 w-screen md:mb-0 mb-4 rounded-lg p-6 shadow-md"
+    >
+      <p class="font-bold text-c1 opacity-80">Risk of Expulsion</p>
+      <div class="flex justify-between">
+        <p class="font-bold text-c1 text-4xl">
+          7% <span class="text-c1 text-base">Percent</span>
+        </p>
+        <p class="bg-info mt-2 text-white px-2 py-1 rounded-md font-bold">
+          Percentage
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="hidden md:flex md:flex-1 lg:hidden md:w-6/12 w-screen md:mb-4 rounded-lg p-6"
+    ></div>
+  </div>
+
+  <div class="flex lg:flex-nowrap flex-wrap gap-4 md:mt-4">
+    <div class="lg:w-9/12 w-screen rounded-lg bg-white p-6 shadow-md">
+      <div id="response" class="rounded-lg text-black">
+        <p class="text-2xl font-bold text-c1">Cases Overview Report</p>
+        <div id="columnChartContainer" class=""></div>
+      </div>
+    </div>
+    <div class="lg:w-3/12 lg:grow w-screen rounded-lg p-6 shadow-md bg-white">
+      <h3 class="text-2xl text-c1 font-bold mb-3">Previous Case</h3>
+      <div id="grid"></div>
+    </div>
+  </div>
+
+  <div class="bg-white mt-4 p-8 rounded-lg shadow-md">
+    <div id="CourseLineChartPerformance"></div>
+  </div>
+</div>
+
+<div class="bg-white lg:px-40 shadow-md">
+  <footer class="items-center justify-between mx-auto px-8 py-8">
+    <h1 class="text-c1 text-2xl mb-2 font-bold">Contact Information</h1>
+    <div class="flex flex-wrap lg:flex-nowrap gap-4">
+      <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
+        <h5 class="text-lg font-semibold md:font-bold">Email:</h5>
+        <p class="text-lg">quezoncity@pup.edu.ph</p>
+      </div>
+      <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
+        <h5 class="text-lg font-semibold md:font-bold">Postal Mail:</h5>
+        <p class="text-lg">PUP Quezon City Branch</p>
+        <p class="text-lg">Don Fabian St., Commonwealth</p>
+        <p class="text-lg">Quezon City Philippines</p>
+      </div>
+      <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
+        <h5 class="text-lg font-semibold md:font-bold">Telephone:</h5>
+        <p class="text-lg">(632) 8952-7818</p>
+        <p class="text-lg">(632) 8287-8204</p>
+      </div>
+    </div>
+  </footer>
+</div>
+
+{% endblock %} {% block script %} {% endblock script %}
