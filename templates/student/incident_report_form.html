@@ -14,7 +14,7 @@
 </style>
 {% endblock %} {% block content %}
 <div class="lg:px-40 md:px-16 py-4 w-screen px-8 mb-8">
-  <h3 class="text-3xl font-bold text-c4 mb-4">Personal Data</h3>
+  <h3 class="text-3xl font-bold text-c4 mb-4">Report Submission</h3>
   <div class="flex gap-3">
     <div class="bg-white w-screen shadow-md rounded-lg flex p-4">
       <div class="w-full lg:w-full md:w-full p-2">
@@ -177,9 +177,12 @@
     event.preventDefault();
     
     // Gather form data
-    const email = document.getElementById('email-input').value;
-    const number = document.getElementById('number-input').value;
-    const residentialAddress = document.getElementById('residential-input').value;
+    const date = document.getElementById('date-input').value;
+    const time = document.getElementById('time-input').value;
+    const incident_type_id = document.getElementById('incident-input').value;
+    const location_id = document.getElementById('location-input').value;
+    const parties_involved = document.getElementById('student-input').value;
+    const description = document.getElementById('description-input').value;
 
     // Send data to the API
     const response = await fetch(`${api_base_url}/details/update`, {
@@ -187,7 +190,7 @@
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ email, number, residentialAddress }),
+      body: JSON.stringify({ date, time, incident_type_id, location_id, parties_involved, description }),
     });
 
     // Handle the API response
@@ -195,37 +198,40 @@
   }
 
   // Function to handle API response
-  function handleApiResponse(data_student_details) {
+  function handleApiResponse(incident_report_details) {
     const errorDetails = {
-      email: { id: 'error-email', message: 'Please provide a valid email address' },
-      mobile: { id: 'error-mobile', message: 'Mobile must be in "09XXXXXXXXX" format' },
-      residential: { id: 'error-residential', message: 'Residential address must not be empty' },
+      date: { id: 'error-date', message: 'Please select the exact date of the incident' },
+      time: { id: 'error-time', message: 'Adjust the time to the exact time of incident' },
+      incident: { id: 'error-incident', message: 'Please select a Incident Type' },
+      location: { id: 'error-location', message: 'Please select a location' },
+      student: { id: 'error-student', message: 'Please select a student' },
+      description: { id: 'error-description', message: 'Please provide a valid description of the incident' },
     };
 
-    const status = data_student_details.status;
-    const errorType = data_student_details.type;
+    const status = incident_report_details.status;
+    const errorType = incident_report_details.type;
 
     // Handle different response statuses
     if (status === 400 || status === 404 || status === 500) {
-      handleError(status, errorType, errorDetails, data_student_details);
+      handleError(status, errorType, errorDetails, incident_report_details);
     } else if (status === 200) {
       clearErrorMessages(errorDetails);
-      notyf.success(data_student_details.message);
-      updateDetails(data_student_details);
+      notyf.success(incident_report_details.message);
+      updateDetails(incident_report_details);
     } else {
       notyf.error('Something went wrong');
     }
   }
 
   // Function to handle errors
-  function handleError(status, errorType, errorDetails, data_student_details) {
+  function handleError(status, errorType, errorDetails, incident_report_details) {
     if (errorDetails[errorType]) {
       const { id, message } = errorDetails[errorType];
       const errorElement = document.getElementById(id);
       errorElement.innerText = message;
       errorElement.classList.add('mt-2');
     } else {
-      notyf.error(data_student_details.message);
+      notyf.error(incident_report_details.message);
     }
   }
 
@@ -237,17 +243,6 @@
       errorElement.innerText = '';
       errorElement.classList.remove('mt-2');
     }
-  }
-
-  // Function to update details on the page
-  function updateDetails(data_student_details) {
-    const input_email = document.getElementById('email-input');
-    const input_number = document.getElementById('number-input');
-    const input_residential = document.getElementById('residential-input');
-
-    input_email.value = data_student_details.email;
-    input_number.value = data_student_details.number;
-    input_residential.value = data_student_details.residentialAddress;
   }
 </script>
 

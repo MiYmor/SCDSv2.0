@@ -106,3 +106,24 @@ def getLocation():
     except Exception as e:
         # Handle the exception here, e.g., log it or return an error response
         return None
+
+def submitIncidentReport(student_id, date, time, location_id, incident_type_id, parties_involved, description):
+    try:
+        # Update the student data in the database
+        data_student = db.session.query(Student).filter(
+            Student.StudentId == student_id).first()
+        
+        if data_student:
+            incident = IncidentReport(date=date, time=time, location_id=location_id, student_id=student_id, incident_type_id=incident_type_id, parties_involved=parties_involved, description=description)
+            db.session.add(incident)
+            db.session.commit()
+                        
+            return {"message": "Incident reported successfully", "status": 200}
+        else:
+            return {"message": "Something went wrong", "status": 404}
+
+    except Exception as e:
+        # Handle the exception here, e.g., log it or return an error response
+        db.session.rollback()  # Rollback the transaction in case of an error
+        return {"message": "An error occurred", "status": 500}
+
