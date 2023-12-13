@@ -16,8 +16,8 @@ db = SQLAlchemy()
 class Location(db.Model):
     __tablename__ = 'Location'
     
-    LocationId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Name = db.Column(db.String(100), nullable=False)
+    LocationId = db.Column(db.Integer, primary_key=True, autoincrement=True) #LocationID
+    Name = db.Column(db.String(100), nullable=False) #LocationName
     
     def to_dict(self):
         return {
@@ -27,8 +27,8 @@ class Location(db.Model):
 class IncidentType(db.Model):
     __tablename__ = 'IncidentType'
     
-    IncidentTypeId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    Name = db.Column(db.String(100), nullable=False)
+    IncidentTypeId = db.Column(db.Integer, primary_key=True, autoincrement=True) #IncidentTypeID
+    Name = db.Column(db.String(100), nullable=False) #IncidentName
     
     def to_dict(self):
         return {
@@ -37,23 +37,26 @@ class IncidentType(db.Model):
         }
 
 class IncidentReport(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    date = db.Column(db.String(20), nullable=False)
-    time = db.Column(db.String(20), nullable=False)
-    IncidentId = db.Column(db.Integer, db.ForeignKey('IncidentType.IncidentTypeId', ondelete="CASCADE"))
-    LocationId = db.Column(db.Integer, db.ForeignKey('Location.LocationId', ondelete="CASCADE"))
-    StudentId = db.Column(db.Integer, db.ForeignKey('Students.StudentId', ondelete="CASCADE"))
-    description = db.Column(db.Text, nullable=False)
-    status = db.Column(db.String(20), nullable=False, default='pending')
-    is_accessible = db.Column(db.Boolean, nullable=False, default=False)
+    id = db.Column(db.Integer, primary_key=True) #ReportID
+    date = db.Column(db.String(20), nullable=False) #Date
+    time = db.Column(db.String(20), nullable=False) #Time
+    IncidentId = db.Column(db.Integer, db.ForeignKey('IncidentType.IncidentTypeId', ondelete="CASCADE")) #IncidentTypeID
+    LocationId = db.Column(db.Integer, db.ForeignKey('Location.LocationId', ondelete="CASCADE")) #LocationID
+    StudentId = db.Column(db.Integer, db.ForeignKey('Students.StudentId', ondelete="CASCADE")) #StudentID
+    description = db.Column(db.Text, nullable=False) #Description
+    status = db.Column(db.String(20), nullable=False, default='pending') #Status
+    is_accessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
     
     def to_dict(self):
         return {
             'date': self.date,
             'time': self.time,
-            'location': self.location,
-            'parties_involved': self.parties_involved,
+            'IncidentId': self.IncidentId,
+            'LocationId': self.LocationId,
+            'StudentId': self.StudentId,
             'description': self.description,
+            'status': self.status,
+            'is_accessible': self.is_accessible
         }
 
 

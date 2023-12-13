@@ -3,7 +3,7 @@ from flask import jsonify
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
 from sqlalchemy import desc
 from werkzeug.security import check_password_hash
-from models import Student, db
+from models import Student, db, IncidentReport
 import os
 
 from decorators.auth_decorators import role_required
@@ -96,6 +96,7 @@ def resetPassword(token):
             return jsonify({'message': 'Password reset successfully', 'status': 200})
         else:
             return jsonify({'message': 'Invalid or expired token', 'status': 400})
+
 
 
 # ===================================================
@@ -194,18 +195,25 @@ def changePassword():
     else:
         return render_template('404.html'), 404
 
-@student_api.route('/location', methods=['GET'])
-@role_required('student')
-def fetchLocation():
-    student = getCurrentUser()
-    if student:
-        json_location_data = getLocation()
-        print("LOCATION DATA: ", json_location_data)
-        if json_location_data:
-            return jsonify({"message": "Location fetched successfully", "data": json_location_data})
-        else:
-            return jsonify(message="No data available")
-    else:
-        return render_template('404.html'), 404
-
+@student_api.route('/reporting', methods=['POST'])
+def reporting():
+   if request.method == 'POST':
+        # Handle form submission logic here
+        date = request.form['date']
+        print('date', date)
+        time = request.form['time']
+        print('time', time)
+        location_id = request.form['location']  # Use the selected location ID
+        print('location_id', location_id)
+        student_id = request.form['student']
+        print('student_id', student_id)
+        incident_type_id = request.form['incident']  # Use the selected incident type ID
+        print('incident_type_id', incident_type_id)
+        description = request.form['description']
+        print('description', description)
+        incident = IncidentReport(date=date, time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, description=description)
+        db.session.add(incident)
+        db.session.commit()
+        flash('Incident reported successfully', 'success')
+        return redirect(url_for('studentHome'))
 

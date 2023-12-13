@@ -96,3 +96,5 @@ def updatePassword(str_teacher_id, password, new_password, confirm_password):
         # Handle the exception here, e.g., log it or return an error response
         db.session.rollback()  # Rollback the transaction in case of an error
         return {"message": "An error occurred", "status": 500}
+
+        

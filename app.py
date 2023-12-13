@@ -153,30 +153,13 @@ def create_app():
         return render_template('student/view_reports.html', reports=reports, student_api_base_url=student_api_base_url,  current_page="view-reports")
 
     
-    @app.route('/student/incident-report', methods=['GET', 'POST'])
+    @app.route('/student/incident-report', methods=['GET'])
     def studentIncidentReport():
         # Fetch incident types and locations from the database
         incident_types = IncidentType.query.all()
         locations = Location.query.all()
-
         # Fetch the list of students (modify the query based on your data model)
         students = Student.query.all()
-
-        if request.method == 'POST':
-            # Handle form submission logic here
-            date = request.form['date']
-            time = request.form['time']
-            location_id = request.form['location']  # Use the selected location ID
-            student_id = request.form['student']
-            incident_type_id = request.form['incident']  # Use the selected incident type ID
-            parties_involved = request.form.getlist('parties_involved')
-            description = request.form['description']
-
-            incident = IncidentReport(date=date, time=time, location_id=location_id, student_id=student_id, incident_type_id=incident_type_id, parties_involved=parties_involved, description=description)
-            db.session.add(incident)
-            db.session.commit()
-            flash('Incident reported successfully', 'success')
-
         # Pass the 'authenticated' variable, students, incident types, and locations to the template context
         return render_template('student/incident_report_form.html', authenticated=True, students=students, incident_types=incident_types, locations=locations, current_page="incident-report")
 
@@ -200,12 +183,18 @@ def create_app():
     @role_required('faculty')
     def facultyProfile():
         return render_template('faculty/profile.html', faculty_api_base_url=faculty_api_base_url, current_page="profile")
-
+    
+    @app.route('/faculty/manage-reports')
+    @role_required('faculty')
+    def reportManagement():
+        return render_template('faculty/manage_report.html', faculty_api_base_url=faculty_api_base_url, current_page="manage-reports")
 
     @app.route('/faculty/change-password')
     @role_required('faculty')
     def facultyChangePassword():
         return render_template('faculty/change_password.html', faculty_api_base_url=faculty_api_base_url, current_page="change-password")
+    
+    
 
     # ========================================================================
     # ALL SYSTEM ADMIN ROUTES HERE

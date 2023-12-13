@@ -21,7 +21,7 @@
         <h3 class="text-2xl font-bold text-c4 mb-3" id="name"></h3>
         <hr />
 
-        <form class="w-full mt-4" method="POST" onsubmit="submitForm(event)">
+        <form class="w-full mt-4" method="POST" id="submitReport" action="{{ url_for('student_api.reporting') }}">
           <div class="grid gap-6 mb-6 md:grid-cols-2">
             <!-- INPUTS HERE -->
             <div>
@@ -101,7 +101,7 @@
                 >Description</label
               >
               <input
-                type="description"
+                type="text"
                 id="description-input"
                 name="description"
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
@@ -172,81 +172,48 @@
     ],
   });
 
-  // Function to handle form submission
-  async function submitForm(event) {
-    event.preventDefault();
-    
-    // Gather form data
-    const date = document.getElementById('date-input').value;
-    const time = document.getElementById('time-input').value;
-    const incident_type_id = document.getElementById('incident-input').value;
-    const location_id = document.getElementById('location-input').value;
-    const parties_involved = document.getElementById('student-input').value;
-    const description = document.getElementById('description-input').value;
-
-    // Send data to the API
-    const response = await fetch(`${api_base_url}/details/update`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ date, time, incident_type_id, location_id, parties_involved, description }),
-    });
-
-    // Handle the API response
-    handleApiResponse(await response.json());
-  }
-
-  // Function to handle API response
-  function handleApiResponse(incident_report_details) {
-    const errorDetails = {
-      date: { id: 'error-date', message: 'Please select the exact date of the incident' },
-      time: { id: 'error-time', message: 'Adjust the time to the exact time of incident' },
-      incident: { id: 'error-incident', message: 'Please select a Incident Type' },
-      location: { id: 'error-location', message: 'Please select a location' },
-      student: { id: 'error-student', message: 'Please select a student' },
-      description: { id: 'error-description', message: 'Please provide a valid description of the incident' },
-    };
-
-    const status = incident_report_details.status;
-    const errorType = incident_report_details.type;
-
-    // Handle different response statuses
-    if (status === 400 || status === 404 || status === 500) {
-      handleError(status, errorType, errorDetails, incident_report_details);
-    } else if (status === 200) {
-      clearErrorMessages(errorDetails);
-      notyf.success(incident_report_details.message);
-      updateDetails(incident_report_details);
-    } else {
-      notyf.error('Something went wrong');
-    }
-  }
-
-  // Function to handle errors
-  function handleError(status, errorType, errorDetails, incident_report_details) {
-    if (errorDetails[errorType]) {
-      const { id, message } = errorDetails[errorType];
-      const errorElement = document.getElementById(id);
-      errorElement.innerText = message;
-      errorElement.classList.add('mt-2');
-    } else {
-      notyf.error(incident_report_details.message);
-    }
-  }
-
-  // Function to clear error messages
-  function clearErrorMessages(errorDetails) {
-    for (const key in errorDetails) {
-      const { id } = errorDetails[key];
-      const errorElement = document.getElementById(id);
-      errorElement.innerText = '';
-      errorElement.classList.remove('mt-2');
-    }
-  }
+  // Get the form
+    // Add event listener to the form submission
+    document
+      .getElementById('submitReport')
+      .addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+  
+        // Get the form data
+        const formData = new FormData(event.target);
+  
+        // Define the API URL for the login endpoint
+        const apiUrl = "{{ url_for('student_api.reporting') }}";
+  
+        // Make a POST request to the login API
+        fetch(apiUrl, {
+          method: 'POST',
+          body: formData,
+          credentials: 'include', // Include credentials (cookies) in the request
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error('Failed to submit report');
+            }
+            return response.json(); // Parse the JSON response
+          })
+          .then((data) => {
+            // If the API returned a success message, display it and redirect to the dashboard
+            if (data.message) {
+              notyf.success(data.message);
+              setTimeout(() => {
+                window.location.href = "{{ url_for('studentHome') }}";
+              }, 5000);
+            }
+          .catch((error) => {
+            // Handle errors
+            console.error('Error submitting report:', error.message);
+            notyf.error('Failed to submit report');
+          });
+      });
 </script>
 
-<!-- FETCHING USER DETAILS -->
+//<!-- FETCHING USER DETAILS -->
 <script>
   // Variables to store location and incident types
   let locationDetails = {};
