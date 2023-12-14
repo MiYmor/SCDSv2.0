@@ -1,4 +1,4 @@
-﻿blinker==1.6.2
+blinker==1.6.2
 cachelib==0.9.0
 click==8.1.7
 colorama==0.4.6
@@ -11,6 +11,7 @@ Flask-Login==0.6.2
 Flask-Mail==0.9.1
 Flask-Script==2.0.6
 Flask-SQLAlchemy==3.0.5
+Flask-WTF==1.2.1
 greenlet==2.0.2
 gunicorn==21.2.0
 itsdangerous==2.1.2
