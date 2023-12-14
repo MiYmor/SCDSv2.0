@@ -4,11 +4,11 @@ from flask_login import UserMixin
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.dialects.postgresql import ARRAY
 
-from data.admins import faculty_data
-from data.users import student_data
-from data.superadmin import admin_data
-from data.incidenttype import incidenttype_data
-from data.location import location_data
+# from data.admins import faculty_data
+# from data.users import student_data
+# from data.superadmin import admin_data
+# from data.incidenttype import incidenttype_data
+# from data.location import location_data
 
 
 db = SQLAlchemy()
@@ -168,32 +168,32 @@ class SystemAdmin(db.Model, UserMixin):
 
 def init_db(app):
     db.init_app(app)
-    with app.app_context():
-        inspector = inspect(db.engine)
-        if not inspector.has_table('Students'):
-            db.create_all()
-            create_sample_data()
+#     with app.app_context():
+#         inspector = inspect(db.engine)
+#         if not inspector.has_table('Students'):
+#             db.create_all()
+#             create_sample_data()
 
 
-def create_sample_data():
-    for data in student_data:
-        student = Student(**data)
-        db.session.add(student)
+# def create_sample_data():
+#     for data in student_data:
+#         student = Student(**data)
+#         db.session.add(student)
 
-    for data in faculty_data:
-        faculty = Faculty(**data)
-        db.session.add(faculty)
+#     for data in faculty_data:
+#         faculty = Faculty(**data)
+#         db.session.add(faculty)
         
-    for data in admin_data:
-        admin = SystemAdmin(**data)
-        db.session.add(admin)
+#     for data in admin_data:
+#         admin = SystemAdmin(**data)
+#         db.session.add(admin)
         
-    for data in incidenttype_data:
-        incidenttype = IncidentType(**data)
-        db.session.add(incidenttype)
+#     for data in incidenttype_data:
+#         incidenttype = IncidentType(**data)
+#         db.session.add(incidenttype)
         
-    for data in location_data:
-        location = Location(**data)
-        db.session.add(location)
+#     for data in location_data:
+#         location = Location(**data)
+#         db.session.add(location)
 
-    db.session.commit()
+#     db.session.commit()
