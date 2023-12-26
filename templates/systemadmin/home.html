@@ -1,4 +1,4 @@
-{% extends "faculty/layout.html" %}
+{% extends "systemadmin/layout.html" %}
 
 <!----------------- TITLE ----------------->
 {% block title %} SPS - Dashboard {% endblock title %} {% block styles %}
@@ -23,7 +23,7 @@
           <div>
             <h3 class="mb-4 text-4xl font-bold text-c1" id="high-average">1</h3>
             <div>
-              <p class="text-base font-semibold">Highest Class Average</p>
+              <p class="text-base font-semibold">Case</p>
               <div class="flex gap-2">
                 <img
                   src="{{ url_for('static', filename='images/faculty/trend.png') }}"

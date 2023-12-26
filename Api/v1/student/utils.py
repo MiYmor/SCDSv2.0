@@ -1,10 +1,8 @@
-from models import Faculty, Student, db, Location
+from models import Student, db, Location
 from sqlalchemy import desc
 import re
 from werkzeug.security import check_password_hash, generate_password_hash
 from flask import session
-
-from static.js.utils import convertGradeToPercentage, checkStatus
 
 def getCurrentUser():
     current_user_id = session.get('user_id')

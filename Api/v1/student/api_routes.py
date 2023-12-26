@@ -3,7 +3,7 @@ from flask import jsonify
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
 from sqlalchemy import desc
 from werkzeug.security import check_password_hash
-from models import Student, db, IncidentReport
+from models import Student, db, IncidentReport, Location, IncidentType
 import os
 
 from decorators.auth_decorators import role_required
@@ -216,4 +216,38 @@ def reporting():
         db.session.commit()
         flash('Incident reported successfully', 'success')
         return redirect(url_for('studentHome'))
+    
+# fetch approved reports for student
+@student_api.route('/fetch/approved/reports', methods=['GET'])
+def approvedReports():
+    if request.method == 'GET':
+        # Handle form submission logic here
+        student_id = session.get('user_id')
+        print('student_id', student_id)
+        allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.StudentId==student_id,IncidentReport.is_accessible=='accessible', IncidentReport.status=='approved').order_by(IncidentReport.date).all()
+        list_reports=[]
+        print('allReports', allReports)
+        if allReports:
+            for report in allReports:
+                # make a dictionary for reports
+                dict_reports = {
+                    'IncidentId': report.IncidentReport.id,
+                    'Date': report.IncidentReport.date,
+                    'Time': report.IncidentReport.time,
+                    'IncidentName': report.IncidentType.Name,
+                    'LocationName': report.Location.Name,
+                    'StudentName': report.Student.Name,
+                    'Description': report.IncidentReport.description,
+                    'Status': report.IncidentReport.status,
+                    'Acessibility': report.IncidentReport.is_accessible
 
+                }
+                # append the dictionary to the list
+                list_reports.append(dict_reports)
+                print('list_reports', list_reports)
+            return jsonify({'result': list_reports})
+        else :
+            return jsonify({'message': 'No reports found'}), 404
+            
+        
+            

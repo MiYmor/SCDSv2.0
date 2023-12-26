@@ -208,7 +208,10 @@ def create_app():
     def systemAdminHome():
         return render_template('systemadmin/home.html', system_admin_api_base_url=system_admin_api_base_url, current_page="home")
     
-    
+    @app.route('/systemadmin/manage-reports')
+    @role_required('systemAdmin')
+    def reportManagementAdmin():
+        return render_template('systemadmin/manage_report.html', system_admin_api_base_url=system_admin_api_base_url, current_page="manage-reports")
     # ========================================================================
     # Register the API blueprint
     app.register_blueprint(system_admin_api, url_prefix=system_admin_api_base_url)

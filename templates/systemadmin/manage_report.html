@@ -1,5 +1,5 @@
-{% extends "faculty/layout.html" %} {% block title %}SCDS - Profile{% endblock
-title %} {% block styles %}
+{% extends "systemadmin/layout.html" %} {% block title %} SCDS - Profile {%
+endblock title %} {% block styles %}
 <style>
   /* Set the chart container to 100% width */
   #containerChart {
@@ -113,7 +113,7 @@ title %} {% block styles %}
               <!-- Add other details as needed -->
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <button class="bg-red-600 p-2 text-white" onclick="approveReport(${report.IncidentId})">Aprrove Case</button>
+              <button class="bg-red-600 p-2 text-white" onclick="approveReport(${report.IncidentId})">Open Case</button>
               <button class="bg-blue-600 p-2 text-white" onclick="editReport(${report.IncidentId})">Manage Case</button>
             </td>
           `;
@@ -126,10 +126,10 @@ title %} {% block styles %}
     }
   }
   // Make a approved report function
-  async function approveReport(IncidentId) {
-    console.log('approveReport', IncidentId);
+  async function accessReports(IncidentId) {
+    console.log('accessReports', IncidentId);
     try {
-      const response = await fetch(`${api_base_url}/approve-report`, {
+      const response = await fetch(`${api_base_url}/access-report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -138,15 +138,16 @@ title %} {% block styles %}
       });
 
       if (!response.ok) {
-        throw new Error('Failed to approve report');
+        throw new Error('Failed to make accesible report');
       }
 
       const data = await response.json();
       console.log(data);
 
       if (data.result) {
-        notyf.success('Report approved successfully');
-        document.getElementById(`status-${IncidentId}`).innerHTML = 'Approved';
+        notyf.success('Report is now accessible');
+        document.getElementById(`status-${IncidentId}`).innerHTML =
+          'accessible';
       } else if (data.error) {
         notyf.error('Failed to approve report');
       }

@@ -1,11 +1,11 @@
 # api/api_routes.py
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
-from models import Faculty, db, IncidentReport
+from models import Faculty, db, IncidentReport, Student, Location, IncidentType
 import pandas as pd
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash
 from decorators.auth_decorators import role_required
-
+import logging
 from .utils import updateFacultyData, getFacultyData, updatePassword, getCurrentUser
 
 import os
@@ -107,6 +107,7 @@ def changePassword():
     else:
         return render_template('404.html'), 404
 
+#manage cases for faculty
 @faculty_api.route('/faculty/manage-reports', methods={'GET', 'POST'})
 def manage_reports():
     if request.method == 'POST':
@@ -149,17 +150,54 @@ def manage_reports():
         # Save the DataFrame to a CSV file
         df.to_csv('static/csv/reports.csv', index=False)
 
-        return render_template('faculty/manage_reports.html', reports=reports)
+        return render_template('faculty/manage_report.html', reports=reports)
     except Exception as e:
         return {"message": "An error occurred", "status": 500}
-    
-@faculty_api.route('/faculty/all-reports', methods={'GET', 'POST'})
+
+@faculty_api.route('/all-reports', methods={'GET'})
 def allReports():
     print("Hello")
-    #fetch all the incident reports
-    incident_reports = IncidentReport.query.all()
-    #convert the incident report to .to_dict()
-    dict_incident_reports = [incident_report.to_dict() for incident_report in incident_reports]
-    #return the incident reports
-    return jsonify(dict_incident_reports)
+     #.filter = multiple queries .filter_by = single query
+    allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter_by(IncidentReport.is_accessible=='accessible').order_by(IncidentReport.date).all()
+    list_reports=[]
+    if allReports:
+        for report in allReports:
+            # make a dictionary for reports
+            dict_reports = {
+                'IncidentId': report.IncidentReport.id,
+                'Date': report.IncidentReport.date,
+                'Time': report.IncidentReport.time,
+                'IncidentName': report.IncidentType.Name,
+                'LocationName': report.Location.Name,
+                'StudentName': report.Student.Name,
+                'Description': report.IncidentReport.description,
+                'Status': report.IncidentReport.status,
+                'Acessibility': report.IncidentReport.is_accessible
+            }
+            # append the dictionary to the list
+            list_reports.append(dict_reports)
+        return jsonify({'result': list_reports})
+    
+@faculty_api.route('/approve-report', methods={'POST'})
+def approveReports():
+     # Assuming the incoming data is JSON
+    data = request.get_json()
+    # Extract incidentId from the JSON payload
+    incident_id = data.get('IncidentId')
+    # Your logic to handle the incidentId
+    print('Received incidentId:', incident_id)
+    # make a querry calling the incidentreport table
+    incident = IncidentReport.query.filter_by(id=incident_id).first()
+    # if the incident is found
+    if incident:
+        # change the status to approved
+        incident.status = 'approved'
+        # commit the changes
+        db.session.commit()
+        # return a message
+        return jsonify({'result': 'success', 'message': 'Report approved'})
+    else:
+        # return a message
+        return jsonify({'error': 'failed', 'message': 'Report not found'})
+
     
