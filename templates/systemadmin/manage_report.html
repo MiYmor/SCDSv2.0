@@ -113,8 +113,8 @@ endblock title %} {% block styles %}
               <!-- Add other details as needed -->
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <button class="bg-red-600 p-2 text-white" onclick="approveReport(${report.IncidentId})">Open Case</button>
-              <button class="bg-blue-600 p-2 text-white" onclick="editReport(${report.IncidentId})">Manage Case</button>
+              <button class="bg-red-600 p-2 text-white" onclick="accessReports(${report.IncidentId})">Open Case</button>
+              <button class="bg-blue-600 p-2 text-white" onclick="editReport(${report.IncidentId})">Close Case</button>
             </td>
           `;
 
@@ -146,8 +146,7 @@ endblock title %} {% block styles %}
 
       if (data.result) {
         notyf.success('Report is now accessible');
-        document.getElementById(`status-${IncidentId}`).innerHTML =
-          'accessible';
+        document.getElementById(`status-${IncidentId}`).innerHTML = 'true';
       } else if (data.error) {
         notyf.error('Failed to approve report');
       }

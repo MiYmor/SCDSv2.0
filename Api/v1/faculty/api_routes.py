@@ -26,7 +26,7 @@ def login():
         teacher = Faculty.query.filter_by(Email=email).first()
         if teacher and check_password_hash(teacher.Password, password):
             # Successfully authenticated
-            session['user_id'] = teacher.TeacherId
+            session['user_id'] = teacher.FacultyId
             session['user_role'] = 'faculty'
             return redirect(url_for('facultyHome'))
         else:
@@ -54,7 +54,7 @@ def profile():
 def facultyData():
     faculty = getCurrentUser()
     if faculty:
-        json_faculty_data = getFacultyData(faculty.TeacherId)
+        json_faculty_data = getFacultyData(faculty.FacultyId)
         if json_faculty_data:
             return (json_faculty_data)
         else:
@@ -63,10 +63,10 @@ def facultyData():
         return render_template('404.html'), 404
 
 
-# Update the details of the faculty
-@faculty_api.route('/details/update', methods=['GET', 'POST'])
+# UpDate the details of the faculty
+@faculty_api.route('/details/upDate', methods=['GET', 'POST'])
 @role_required('faculty')
-def updateDetails():
+def upDateDetails():
     faculty = getCurrentUser()
     if faculty:
         if request.method == 'POST':
@@ -74,8 +74,8 @@ def updateDetails():
             number = request.json.get('number')
             residential_address = request.json.get('residential_address')
 
-            json_result = updateFacultyData(
-                faculty.TeacherId, email, number, residential_address)
+            json_result = upDateFacultyData(
+                faculty.FacultyId, email, number, residential_address)
 
             return json_result
 
@@ -97,7 +97,7 @@ def changePassword():
             new_password = request.json.get('new_password')
             confirm_password = request.json.get('confirm_password')
 
-            json_result = updatePassword(faculty.TeacherId, password, new_password, confirm_password)
+            json_result = upDatePassword(faculty.FacultyId, password, new_password, confirm_password)
 
             return json_result
 
@@ -135,7 +135,7 @@ def manage_reports():
         # Convert the reports data to a DataFrame
         df = pd.DataFrame([{
             'Report ID': report.id,
-            'Date': report.date,
+            'Date': report.Date,
             'Time': report.time,
             'Incident Type': report.incident_type,
             'Location': report.location,
@@ -158,28 +158,29 @@ def manage_reports():
 def allReports():
     print("Hello")
      #.filter = multiple queries .filter_by = single query
-    allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter_by(IncidentReport.is_accessible=='accessible').order_by(IncidentReport.date).all()
+    allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.IsAccessible == True).order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
         for report in allReports:
             # make a dictionary for reports
+            FullName= report.Student.LastName + ", " + report.Student.FirstName 
             dict_reports = {
-                'IncidentId': report.IncidentReport.id,
-                'Date': report.IncidentReport.date,
-                'Time': report.IncidentReport.time,
+                'IncidentId': report.IncidentReport.Id,
+                'Date': report.IncidentReport.Date,
+                'Time': report.IncidentReport.Time,
                 'IncidentName': report.IncidentType.Name,
                 'LocationName': report.Location.Name,
-                'StudentName': report.Student.Name,
-                'Description': report.IncidentReport.description,
-                'Status': report.IncidentReport.status,
-                'Acessibility': report.IncidentReport.is_accessible
+                'StudentName': FullName,
+                'Description': report.IncidentReport.Description,
+                'Status': report.IncidentReport.Status,
+                'Acessibility': report.IncidentReport.IsAccessible
             }
             # append the dictionary to the list
             list_reports.append(dict_reports)
         return jsonify({'result': list_reports})
     
 @faculty_api.route('/approve-report', methods={'POST'})
-def approveReports():
+def approveReport():
      # Assuming the incoming data is JSON
     data = request.get_json()
     # Extract incidentId from the JSON payload
@@ -187,11 +188,11 @@ def approveReports():
     # Your logic to handle the incidentId
     print('Received incidentId:', incident_id)
     # make a querry calling the incidentreport table
-    incident = IncidentReport.query.filter_by(id=incident_id).first()
+    incident = IncidentReport.query.filter_by(Id=incident_id).first()
     # if the incident is found
     if incident:
         # change the status to approved
-        incident.status = 'approved'
+        incident.Status = 'approved'
         # commit the changes
         db.session.commit()
         # return a message

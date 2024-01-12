@@ -13,18 +13,19 @@ def getCurrentUser():
     current_user_id = session.get('user_id')
     return Faculty.query.get(current_user_id)
 
-def getFacultyData(str_teacher_id):
+def getFacultyData(str_faculty_id):
     try:
         data_faculty = (
             db.session.query(Faculty).filter(
-                Faculty.TeacherId == str_teacher_id).first()
+                Faculty.FacultyId == str_faculty_id).first()
         )
 
         if data_faculty:
+            FullName= report.Student.LastName + ", " + report.Student.FirstName 
             dict_faculty_data = {
-                "TeacherId": data_faculty.TeacherId,
+                "FacultyId": data_faculty.FacultyId,
                 "TeacherNumber": data_faculty.TeacherNumber,
-                "Name": data_faculty.Name,
+                "Name": FullName,
                 "ResidentialAddress": data_faculty.ResidentialAddress,
                 "Email": data_faculty.Email,
                 "MobileNumber": data_faculty.MobileNumber,
@@ -39,7 +40,7 @@ def getFacultyData(str_teacher_id):
         return None
 
 
-def updateFacultyData(str_teacher_id, email, number, residential_address):
+def updateFacultyData(str_faculty_id, email, number, residential_address):
     try:
         if not re.match(r'^[\w\.-]+@[\w\.-]+$', email):
             return {"type": "email", "status": 400}
@@ -52,7 +53,7 @@ def updateFacultyData(str_teacher_id, email, number, residential_address):
         
         # Update the student data in the database
         data_faculty = db.session.query(Faculty).filter(
-            Faculty.TeacherId == str_teacher_id).first()
+            Faculty.FacultyId == str_faculty_id).first()
         
         if data_faculty:
             data_faculty.Email = email
@@ -70,10 +71,10 @@ def updateFacultyData(str_teacher_id, email, number, residential_address):
         return {"message": "An error occurred", "status": 500}
 
 
-def updatePassword(str_teacher_id, password, new_password, confirm_password):
+def updatePassword(str_faculty_id, password, new_password, confirm_password):
     try:
         data_faculty = db.session.query(Faculty).filter(
-            Faculty.TeacherId == str_teacher_id).first()
+            Faculty.FacultyId == str_faculty_id).first()
 
         if data_faculty:
             # Assuming 'password' is the hashed password stored in the database

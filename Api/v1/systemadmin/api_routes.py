@@ -11,7 +11,8 @@ from .utils import getCurrentUser
 
 import os
 
-system_admin_api = Blueprint('system_admin_api', __name__)
+system_admin_api = Blueprint('system_admin_api',__name__)
+system_admin_api_base_url = os.getenv("SYSTEM_ADMIN_API_BASE_URL")
 
 @system_admin_api.route('/login2', methods=['POST'])
 def login2():
@@ -89,21 +90,22 @@ def manage_reports():
 def allReports():
     print("Hello")
      #.filter = multiple queries .filter_by = single query
-    allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).order_by(IncidentReport.date).all()
+    allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
         for report in allReports:
             # make a dictionary for reports
+            FullName= report.Student.LastName + ", " + report.Student.FirstName 
             dict_reports = {
-                'IncidentId': report.IncidentReport.id,
-                'Date': report.IncidentReport.date,
-                'Time': report.IncidentReport.time,
+                'IncidentId': report.IncidentReport.Id,
+                'Date': report.IncidentReport.Date,
+                'Time': report.IncidentReport.Time,
                 'IncidentName': report.IncidentType.Name,
                 'LocationName': report.Location.Name,
-                'StudentName': report.Student.Name,
-                'Description': report.IncidentReport.description,
-                'Status': report.IncidentReport.status,
-                'Acessibility': report.IncidentReport.is_accessible
+                'StudentName': FullName,
+                'Description': report.IncidentReport.Description,
+                'Status': report.IncidentReport.Status,
+                'Acessibility': report.IncidentReport.IsAccessible
 
             }
             # append the dictionary to the list
@@ -119,11 +121,11 @@ def accessReports():
     # Your logic to handle the incidentId
     print('Received incidentId:', incident_id)
     # make a querry calling the incidentreport table
-    incident = IncidentReport.query.filter_by(id=incident_id).first()
+    incident = IncidentReport.query.filter_by(Id=incident_id).first()
     # if the incident is found
     if incident:
         # change the status to approved
-        incident.is_accessible = 'accessible'
+        incident.IsAccessible = True
         # commit the changes
         db.session.commit()
         # return a message

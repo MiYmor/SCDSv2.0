@@ -211,7 +211,7 @@ def reporting():
         print('incident_type_id', incident_type_id)
         description = request.form['description']
         print('description', description)
-        incident = IncidentReport(date=date, time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, description=description)
+        incident = IncidentReport(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, Description=description)
         db.session.add(incident)
         db.session.commit()
         flash('Incident reported successfully', 'success')
@@ -224,22 +224,23 @@ def approvedReports():
         # Handle form submission logic here
         student_id = session.get('user_id')
         print('student_id', student_id)
-        allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.StudentId==student_id,IncidentReport.is_accessible=='accessible', IncidentReport.status=='approved').order_by(IncidentReport.date).all()
+        allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.StudentId==student_id,IncidentReport.IsAccessible== True, IncidentReport.Status=='approved').order_by(IncidentReport.Date).all()
         list_reports=[]
         print('allReports', allReports)
         if allReports:
             for report in allReports:
                 # make a dictionary for reports
+                FullName= report.Student.LastName + ", " + report.Student.FirstName
                 dict_reports = {
-                    'IncidentId': report.IncidentReport.id,
-                    'Date': report.IncidentReport.date,
-                    'Time': report.IncidentReport.time,
+                    'IncidentId': report.IncidentReport.Id,
+                    'Date': report.IncidentReport.Date,
+                    'Time': report.IncidentReport.Time,
                     'IncidentName': report.IncidentType.Name,
                     'LocationName': report.Location.Name,
-                    'StudentName': report.Student.Name,
-                    'Description': report.IncidentReport.description,
-                    'Status': report.IncidentReport.status,
-                    'Acessibility': report.IncidentReport.is_accessible
+                    'StudentName': FullName,
+                    'Description': report.IncidentReport.Description,
+                    'Status': report.IncidentReport.Status,
+                    'Acessibility': report.IncidentReport.IsAccessible
 
                 }
                 # append the dictionary to the list

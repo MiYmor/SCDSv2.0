@@ -88,7 +88,7 @@
                   class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
               >
                   {% for Student in students %}
-                      <option value="{{ Student.StudentId }}">{{ Student.Name }}</option>
+                      <option value="{{ Student.StudentId }}">{{ Student.LastName }}, {{ Student.FirstName }} {{ Student.MiddleName }}</option>
                   {% endfor %}
               </select>
               <p id="error-student" class="text-c4 text-sm"></p>

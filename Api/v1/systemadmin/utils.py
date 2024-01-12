@@ -6,7 +6,6 @@ from collections import defaultdict
 import datetime
 
 from flask import session
-from static.js.utils import convertGradeToPercentage, checkStatus
 
 from collections import defaultdict
 

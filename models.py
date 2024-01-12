@@ -3,10 +3,17 @@ from sqlalchemy import inspect
 from flask_login import UserMixin
 from sqlalchemy.ext.mutable import MutableList
 from sqlalchemy.dialects.postgresql import ARRAY
+import os
+
+import time
+from datetime import datetime
+from sqlalchemy import text
+
+from flask_sqlalchemy import SQLAlchemy
 
 # from data.admins import faculty_data
 # from data.users import student_data
-# from data.superadmin import admin_data
+# from data.superadmin import system_admin_data
 # from data.incidenttype import incidenttype_data
 # from data.location import location_data
 
@@ -14,7 +21,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 db = SQLAlchemy()
 
 class Location(db.Model):
-    __tablename__ = 'Location'
+    __tablename__ = 'SCDSLocation'
     
     LocationId = db.Column(db.Integer, primary_key=True, autoincrement=True) #LocationID
     Name = db.Column(db.String(100), nullable=False) #LocationName
@@ -25,7 +32,7 @@ class Location(db.Model):
         }
         
 class IncidentType(db.Model):
-    __tablename__ = 'IncidentType'
+    __tablename__ = 'SCDSIncidentType'
     
     IncidentTypeId = db.Column(db.Integer, primary_key=True, autoincrement=True) #IncidentTypeID
     Name = db.Column(db.String(100), nullable=False) #IncidentName
@@ -37,53 +44,61 @@ class IncidentType(db.Model):
         }
 
 class IncidentReport(db.Model):
-    id = db.Column(db.Integer, primary_key=True) #ReportID
-    date = db.Column(db.String(20), nullable=False) #Date
-    time = db.Column(db.String(20), nullable=False) #Time
-    IncidentId = db.Column(db.Integer, db.ForeignKey('IncidentType.IncidentTypeId', ondelete="CASCADE")) #IncidentTypeID
-    LocationId = db.Column(db.Integer, db.ForeignKey('Location.LocationId', ondelete="CASCADE")) #LocationID
-    StudentId = db.Column(db.Integer, db.ForeignKey('Students.StudentId', ondelete="CASCADE")) #StudentID
-    description = db.Column(db.Text, nullable=False) #Description
-    status = db.Column(db.String(20), nullable=False, default='pending') #Status
-    is_accessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
+    __tablename__ = 'SCDSIncidentReport'
+    
+    Id = db.Column(db.Integer, primary_key=True) #ReportID
+    Date = db.Column(db.String(20), nullable=False) #Date
+    Time = db.Column(db.String(20), nullable=False) #Time
+    IncidentId = db.Column(db.Integer, db.ForeignKey('SCDSIncidentType.IncidentTypeId', ondelete="CASCADE")) #IncidentTypeID
+    LocationId = db.Column(db.Integer, db.ForeignKey('SCDSLocation.LocationId', ondelete="CASCADE")) #LocationID
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #StudentID
+    Description = db.Column(db.Text, nullable=False) #Description
+    Status = db.Column(db.String(20), nullable=False, default='pending') #Status
+    IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
     
     def to_dict(self):
         return {
-            'date': self.date,
-            'time': self.time,
+            'Date': self.Date,
+            'Time': self.Time,
             'IncidentId': self.IncidentId,
             'LocationId': self.LocationId,
             'StudentId': self.StudentId,
-            'description': self.description,
-            'status': self.status,
-            'is_accessible': self.is_accessible
+            'Description': self.Description,
+            'Status': self.Status,
+            'IsAccessible': self.IsAccessible
         }
 
 
-class Student(db.Model, UserMixin):
-    __tablename__ = 'Students'
+# Student Users
+class Student(db.Model): # (class SPSStudent) In DJANGO you must set the name directly here 
+    __tablename__ = 'SPSStudent' # Set the name of table in database (Available for FLASK framework)
 
     StudentId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    StudentNumber = db.Column(db.String(30), unique=True)  # UserID
-    Name = db.Column(db.String(256), nullable=False)  # Name
-    Email = db.Column(db.String(256), unique=True, nullable=False)  # Email
+    StudentNumber = db.Column(db.String(30), unique=True, nullable=False)  # UserID
+    FirstName = db.Column(db.String(50), nullable=False)  # First Name
+    LastName = db.Column(db.String(50), nullable=False)  # Last Name
+    MiddleName = db.Column(db.String(50))  # Middle Name
+    Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
     Password = db.Column(db.String(256), nullable=False)  # Password
-    Gender = db.Column(db.Integer)  # Gender
+    Gender = db.Column(db.Integer, nullable=True)  # Gender
     DateOfBirth = db.Column(db.Date)  # DateOfBirth
-    PlaceOfBirth = db.Column(db.String(256))  # PlaceOfBirth
-    ResidentialAddress = db.Column(db.String(256))  # ResidentialAddress
+    PlaceOfBirth = db.Column(db.String(50))  # PlaceOfBirth
+    ResidentialAddress = db.Column(db.String(50))  # ResidentialAddress
     MobileNumber = db.Column(db.String(11))  # MobileNumber
-    Dropout = db.Column(db.Boolean)  # Dropout
-    IsGraduated = db.Column(db.Boolean, default=True)
-    Token = db.Column(db.String(256))  # This field will store the reset token
-    TokenExpiration = db.Column(db.DateTime)
+    IsOfficer = db.Column(db.Boolean, default=False)
+    Token = db.Column(db.String(128))  # This is for handling reset password 
+    TokenExpiration = db.Column(db.DateTime) # This is for handling reset password 
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     # IsBridging
     
     def to_dict(self):
         return {
             'StudentId': self.StudentId,
             'StudentNumber': self.StudentNumber,
-            'Name': self.Name,
+            'FirstName': self.FirstName,
+            'LastName': self.LastName,
+            'MiddleName': self.MiddleName,
             'Email': self.Email,
             'Password': self.Password,
             'Gender': self.Gender,
@@ -91,61 +106,93 @@ class Student(db.Model, UserMixin):
             'PlaceOfBirth': self.PlaceOfBirth,
             'ResidentialAddress': self.ResidentialAddress,
             'MobileNumber': self.MobileNumber,
-            'Dropout': self.Dropout,
-            'IsGraduated': self.IsGraduated
+            'IsOfficer': self.IsOfficer
         }
 
     def get_id(self):
         return str(self.StudentId)  # Convert to string to ensure compatibility
 
+    def get_user_id(self):
+        return self.StudentId
 
-class Faculty(db.Model, UserMixin):
-    __tablename__ = 'Faculties'
 
-    TeacherId = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    TeacherNumber = db.Column(db.String(30), unique=True)  # UserID
-    Name = db.Column(db.String(256), nullable=False)  # Name
-    Email = db.Column(db.String(256), unique=True, nullable=False)  # Email
-    Password = db.Column(db.String(256), nullable=False)  # Password
-    Gender = db.Column(db.Integer)  # Gender
-    DateOfBirth = db.Column(db.Date)  # DateOfBirth
-    PlaceOfBirth = db.Column(db.String(256))  # PlaceOfBirth
-    ResidentialAddress = db.Column(db.String(256))  # ResidentialAddress
+# Faculty Users
+class Faculty(db.Model):
+    __tablename__ = 'FISFaculty' # Set the name of table in database
+    FacultyId = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    FacultyType = db.Column(db.String(50), nullable=False)  # Faculty Type
+    Rank = db.Column(db.String(50))  # Faculty Rank
+    Units = db.Column(db.Numeric, nullable=False)  # Faculty Unit
+    FirstName = db.Column(db.String(50), nullable=False)  # First Name
+    LastName = db.Column(db.String(50), nullable=False)  # Last Name
+    MiddleName = db.Column(db.String(50))  # Middle Name
+    MiddleInitial = db.Column(db.String(50))  # Middle Initial
+    NameExtension = db.Column(db.String(50))  # Name Extension
+    BirthDate = db.Column(db.Date, nullable=False)  # Birthdate
+    DateHired = db.Column(db.Date, nullable=False)  # Date Hired
+    Degree = db.Column(db.String)  # Degree
+    Remarks = db.Column(db.String)  # Remarks
+    FacultyCode = db.Column(db.Integer, nullable=False)  # Faculty Code
+    Honorific = db.Column(db.String(50))  # Honorific
+    Age = db.Column(db.Numeric, nullable=False)  # Age
+    
+    Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
+    ResidentialAddress = db.Column(db.String(50))  # ResidentialAddress
     MobileNumber = db.Column(db.String(11))  # MobileNumber
+    Gender = db.Column(db.Integer) # Gender # 1 if Male 2 if Female
+    
+    Password = db.Column(db.String(256), nullable=False)  # Password
+    ProfilePic= db.Column(db.String(50),default="14wkc8rPgd8NcrqFoRFO_CNyrJ7nhmU08")  # Profile Pic
     IsActive = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    # FOREIGN TABLES
+    
 
     def to_dict(self):
         return {
-            'TeacherId': self.TeacherId,
-            'TeacherNumber': self.TeacherNumber,
-            'Name': self.Name,
-            'Email': self.Email,
-            'Password': self.Password,
-            'Gender': self.Gender,
-            'DateOfBirth': self.DateOfBirth,
-            'PlaceOfBirth': self.PlaceOfBirth,
-            'ResidentialAddress': self.ResidentialAddress,
-            'MobileNumber': self.MobileNumber,
-            'IsActive': self.IsActive
+            'faculty_account_id': self.FacultyId,
+            'faculty_type': self.FacultyType,
+            'rank': self.Rank,
+            'units': self.Units,
+            'first_name': self.FirstName,
+            'last_name': self.LastName,
+            'middle_name': self.MiddleName,
+            'middle_initial': self.MiddleInitial,
+            'name_extension': self.NameExtension,
+            'birth_date': self.BirthDate,
+            'date_hired': self.DateHired,
+            'degree': self.Degree,
+            'remarks': self.Remarks,
+            'faculty_code': self.FacultyCode,
+            'honorific': self.Honorific,
+            'age': self.Age,
+            'email': self.Email,
+            # 'password': self.password,
+            'profile_pic': self.ProfilePic,
+            'is_active': self.IsActive,
         }
-
+        
     def get_id(self):
-        return str(self.TeacherId)  # Convert to string to ensure compatibility
+        return str(self.faculty_account_id)  # Convert to string to ensure compatibility
 
-class SystemAdmin(db.Model, UserMixin):
-    __tablename__ = 'SystemAdmins'
+# System Admins Users
+class SystemAdmin(db.Model):
+    __tablename__ = 'SPSSystemAdmin'
 
     SysAdminId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     SysAdminNumber = db.Column(db.String(30), unique=True)  # UserID
-    Name = db.Column(db.String(256), nullable=False)  # Name
-    Email = db.Column(db.String(256), unique=True, nullable=False)  # Email
+    Name = db.Column(db.String(50), nullable=False)  # Name
+    Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
     Password = db.Column(db.String(256), nullable=False)  # Password
     Gender = db.Column(db.Integer)  # Gender
     DateOfBirth = db.Column(db.Date)  # DateOfBirth
-    PlaceOfBirth = db.Column(db.String(256))  # PlaceOfBirth
-    ResidentialAddress = db.Column(db.String(256))  # ResidentialAddress
+    PlaceOfBirth = db.Column(db.String(50))  # PlaceOfBirth
+    ResidentialAddress = db.Column(db.String(50))  # ResidentialAddress
     MobileNumber = db.Column(db.String(11))  # MobileNumber
     IsActive = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
 
     def to_dict(self):
         return {
@@ -162,9 +209,8 @@ class SystemAdmin(db.Model, UserMixin):
             'IsActive': self.IsActive
         }
 
-    def get_id(self):
-        # Convert to string to ensure compatibility
-        return str(self.SysAdminId)
+    def get_user_id(self):
+        return self.SysAdminId
 
 def init_db(app):
     db.init_app(app)
@@ -184,7 +230,7 @@ def init_db(app):
 #         faculty = Faculty(**data)
 #         db.session.add(faculty)
         
-#     for data in admin_data:
+#     for data in system_admin_data:
 #         admin = SystemAdmin(**data)
 #         db.session.add(admin)
         

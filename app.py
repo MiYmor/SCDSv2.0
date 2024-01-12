@@ -73,9 +73,10 @@ def create_app():
     # system_admin_api_key = os.getenv('SYSTEM_ADMIN_API_KEY')
 
     # The api base url for api endpoints
-    student_api_base_url = os.getenv("STUDENT_API_BASE_URL")
-    faculty_api_base_url = os.getenv("FACULTY_API_BASE_URL")
-    system_admin_api_base_url = os.getenv("SYSTEM_ADMIN_API_BASE_URL")
+    student_api_base_url = os.getenv('STUDENT_API_BASE_URL')
+    faculty_api_base_url = os.getenv('FACULTY_API_BASE_URL')
+    system_admin_api_base_url = os.getenv('SYSTEM_ADMIN_API_BASE_URL')
+    
 
     @app.context_processor
     def custom_context_processor():
@@ -215,7 +216,6 @@ def create_app():
     # ========================================================================
     # Register the API blueprint
     app.register_blueprint(system_admin_api, url_prefix=system_admin_api_base_url)
-
     app.register_blueprint(faculty_api, url_prefix=faculty_api_base_url)
     app.register_blueprint(student_api, url_prefix=student_api_base_url)
 
