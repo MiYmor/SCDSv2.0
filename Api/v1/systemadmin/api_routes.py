@@ -88,8 +88,7 @@ def manage_reports():
 
 @system_admin_api.route('/all-reports', methods={'GET'})
 def allReports():
-    print("Hello")
-     #.filter = multiple queries .filter_by = single query
+    #.filter = multiple queries .filter_by = single query
     allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
@@ -133,3 +132,49 @@ def accessReports():
     else:
         # return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
+
+@system_admin_api.route('/remove-access-report', methods={'POST'})
+def removeAccessReports():
+     # Assuming the incoming data is JSON
+    data = request.get_json()
+    # Extract incidentId from the JSON payload
+    incident_id = data.get('IncidentId')
+    # Your logic to handle the incidentId
+    print('Received incidentId:', incident_id)
+    # make a querry calling the incidentreport table
+    incident = IncidentReport.query.filter_by(Id=incident_id).first()
+    # if the incident is found
+    if incident:
+        # change the status to approved
+        incident.IsAccessible = False
+        # commit the changes
+        db.session.commit()
+        # return a message
+        return jsonify({'result': 'success', 'message': 'Report approved'})
+    else:
+        # return a message
+        return jsonify({'error': 'failed', 'message': 'Report not found'})
+    
+@system_admin_api.route('/closed-case', methods=['GET'])
+def closedCase():
+    closedCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.IsAccessible == False).order_by(IncidentReport.Date).all()
+    list_reports=[]
+    if allReports:
+            for report in allReports:
+                # make a dictionary for reports
+                FullName= report.Student.LastName + ", " + report.Student.FirstName 
+                dict_reports = {
+                    'IncidentId': report.IncidentReport.Id,
+                    'Date': report.IncidentReport.Date,
+                    'Time': report.IncidentReport.Time,
+                    'IncidentName': report.IncidentType.Name,
+                    'LocationName': report.Location.Name,
+                    'StudentName': FullName,
+                    'Description': report.IncidentReport.Description,
+                    'Status': report.IncidentReport.Status,
+                    'Acessibility': report.IncidentReport.IsAccessible
+
+                }
+                # append the dictionary to the list
+                list_reports.append(dict_reports)
+            return jsonify({'result': list_reports})

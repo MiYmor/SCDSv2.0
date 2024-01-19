@@ -148,11 +148,15 @@ def create_app():
     #     return render_template('student/incident_report_form.html', student_api_base_url=student_api_base_url,  current_page="incident-report")
 
 
-    @app.route('/student/view-reports')
-    def studentViewReports():
+    @app.route('/student/view-cases')
+    def studentViewCases():
         reports = IncidentReport.query.all()
-        return render_template('student/view_reports.html', reports=reports, student_api_base_url=student_api_base_url,  current_page="view-reports")
+        return render_template('student/view_reports.html', reports=reports, student_api_base_url=student_api_base_url,  current_page="view-cases")
 
+    @app.route('/student/view-violations')
+    def studentViewViolations():
+        reports = IncidentReport.query.all()
+        return render_template('student/view_violations.html', reports=reports, student_api_base_url=student_api_base_url,  current_page="view-violations")
     
     @app.route('/student/incident-report', methods=['GET'])
     def studentIncidentReport():
@@ -163,6 +167,18 @@ def create_app():
         students = Student.query.all()
         # Pass the 'authenticated' variable, students, incident types, and locations to the template context
         return render_template('student/incident_report_form.html', authenticated=True, students=students, incident_types=incident_types, locations=locations, current_page="incident-report")
+    
+    @app.route('/student/violation-form', methods=['GET'])
+    def violationFOrm():
+        # Fetch incident types and locations from the database
+        incident_types = IncidentType.query.all()
+        locations = Location.query.all()
+        # Fetch the list of students (modify the query based on your data model)
+        students = Student.query.all()
+        # Pass the 'authenticated' variable, students, incident types, and locations to the template context
+        return render_template('student/violation_form.html', authenticated=True, students=students, incident_types=incident_types, locations=locations, current_page="violation-form")
+    
+    
 
     # ========================================================================
 
@@ -213,6 +229,21 @@ def create_app():
     @role_required('systemAdmin')
     def reportManagementAdmin():
         return render_template('systemadmin/manage_report.html', system_admin_api_base_url=system_admin_api_base_url, current_page="manage-reports")
+    
+    @app.route('/systemadmin/manage-violations')
+    @role_required('systemAdmin')
+    def violationManagementAdmin():
+        return render_template('systemadmin/manage_violation.html', system_admin_api_base_url=system_admin_api_base_url, current_page="manage-violations")
+    
+    @app.route('/systemadmin/close-case')
+    @role_required('systemAdmin')
+    def closedCase():
+        return render_template('systemadmin/closed_case.html', system_admin_api_base_url=system_admin_api_base_url, current_page="close-case")
+    
+    @app.route('/systemadmin/close-violation')
+    @role_required('systemAdmin')
+    def closedViolation():
+        return render_template('systemadmin/closed_violation.html', system_admin_api_base_url=system_admin_api_base_url, current_page="close-violation")
     # ========================================================================
     # Register the API blueprint
     app.register_blueprint(system_admin_api, url_prefix=system_admin_api_base_url)

@@ -91,15 +91,34 @@
                     href="{{ url_for('studentIncidentReport') }}"
                     class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'incident_report_form' else 'hover:text-c4' }}"
                   >
-                    Incident Report Form
+                    Case Form
                   </a>
                 </li>
+
                 <li>
                   <a
-                    href="{{ url_for('studentViewReports') }}"
+                    href="{{ url_for('violationFOrm') }}"
+                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'violationFOrm' else 'hover:text-c4' }}"
+                  >
+                    Violation Form
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="{{ url_for('studentViewCases') }}"
                     class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'view_reports' else 'hover:text-c4' }}"
                   >
                     My Cases
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="{{ url_for('studentViewViolations') }}"
+                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'view_violations' else 'hover:text-c4' }}"
+                  >
+                    My Violations
                   </a>
                 </li>
 
