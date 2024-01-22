@@ -140,6 +140,7 @@ def manage_reports():
             'Incident Type': report.incident_type,
             'Location': report.location,
             'Student': report.student,
+            'Complainant': report.complainant,
             'Description': report.description,
             'Status': report.status,
             # Add other fields as needed
@@ -171,6 +172,7 @@ def allReports():
                 'IncidentName': report.IncidentType.Name,
                 'LocationName': report.Location.Name,
                 'StudentName': FullName,
+                'Complainant': report.IncidentReport.ComplainantId,
                 'Description': report.IncidentReport.Description,
                 'Status': report.IncidentReport.Status,
                 'Acessibility': report.IncidentReport.IsAccessible

@@ -39,7 +39,7 @@
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Report Details
+                    violation Details
                   </th>
                 </tr>
               </thead>
@@ -56,49 +56,50 @@
 
 <script>
   // Fetch location and incident types
-  async function fetchReport() {
+  async function fetchViolation() {
     try {
       // Fetch location data
-      const reportResponse = await fetch(
-        `${api_base_url}/fetch/approved/reports`
+      const violationResponse = await fetch(
+        `${api_base_url}/fetch/approved/violations`
       );
 
-      if (!reportResponse.ok) {
-        throw new Error('Failed to fetch report data');
+      if (!violationResponse.ok) {
+        throw new Error('Failed to fetch violation data');
       }
 
-      const reportDetails = await reportResponse.json();
-      console.log(reportDetails);
+      const violationDetails = await violationResponse.json();
+      console.log(violationDetails);
 
       // Get the container element where you want to render the data
       const outputContainer = document.getElementById('output-container');
 
       // Loop through the consoleResponse array and create HTML elements for each object
-      reportDetails.result.forEach(async (report) => {
-        // Create a tr element for each report
-        const reportRow = document.createElement('tr');
-        reportRow.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <p><strong>Report ID:</strong> ${report.IncidentId}</p>
-              <p><strong>Time:</strong> ${report.Time}</p>
-              <p><strong>Incident Type:</strong> ${report.IncidentName}</p>
-              <p><strong>Location:</strong> ${report.LocationName}</p>
-              <p><strong>Student:</strong> ${report.StudentName}</p>
-              <p><strong>Description:</strong> ${report.Description}</p>
-              <strong>Status:</strong>
-              <p id='status-${report.IncidentId}'> ${report.Status}</p>
-              <!-- Add other details as needed -->
-            </td>
+      violationDetails.result.forEach(async (violation) => {
+        // Create a tr element for each violation
+        const violationRow = document.createElement('tr');
+        violationRow.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <p><strong>Violation ID:</strong> ${violation.ViolationId}</p>
+            <p><strong>Time:</strong> ${violation.Time}</p>
+            <p><strong>Incident Type:</strong> ${violation.IncidentName}</p>
+            <p><strong>Location:</strong> ${violation.LocationName}</p>
+            <p><strong>Student:</strong> ${violation.StudentName}</p>
+            <p><strong>Submitted by:</strong> ${violation.Complainant}</p>
+            <p><strong>Description:</strong> ${violation.Description}</p>
+            <strong>Status:</strong>
+            <p id='status-${violation.ViolationId}'> ${violation.Status}</p>
+            <!-- Add other details as needed -->
+          </td>
           `;
 
-        // Append the reportRow to the outputContainer
-        outputContainer.appendChild(reportRow);
+        // Append the violationRow to the outputContainer
+        outputContainer.appendChild(violationRow);
       });
     } catch (error) {
       console.error(error.message);
     }
   }
-  fetchReport();
+  fetchViolation();
 </script>
 {% endblock script %}

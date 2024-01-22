@@ -57,6 +57,10 @@ endblock title %} {% block styles %}
                       <strong>Incident Type:</strong> {{ report.incident_type }}
                     </p>
                     <p><strong>Location:</strong> {{ report.location }}</p>
+                    <p>
+                      <strong>Submitted by:</strong> {{ report.complainant }}
+                    </p>
+
                     <!-- Add other details as needed -->
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -107,6 +111,7 @@ endblock title %} {% block styles %}
                 <p><strong>Incident Type:</strong> ${report.IncidentName}</p>
                 <p><strong>Location:</strong> ${report.LocationName}</p>
                 <p><strong>Student:</strong> ${report.StudentName}</p>
+                <p><strong>Submitted by:</strong> ${report.Complainant}</p>
                 <p><strong>Description:</strong> ${report.Description}</p>
                 <strong>Status:</strong>
                 <p id='status-${report.IncidentId}'> ${report.Status}</p>

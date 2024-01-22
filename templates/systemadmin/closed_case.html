@@ -83,7 +83,7 @@ endblock title %} {% block styles %}
   async function fetchReport() {
     try {
       // Fetch location data
-      const reportResponse = await fetch(`${api_base_url}/closed-cases`);
+      const reportResponse = await fetch(`${api_base_url}/closed-case`);
 
       if (!reportResponse.ok) {
         throw new Error('Failed to fetch report data');

@@ -42,43 +42,46 @@ class IncidentType(db.Model):
             'IncidentTypeId': self.IncidentTypeId,
             'Name': self.name,
         }
-# class ViolationForm(db.Model):
-#     __tablename__ = 'SCDSViolationForm'
-    
-#     ViolationId = db.Column(db.Integer, primary_key=True, autoincrement=True) #ViolationFormID
-#     Date = db.Column(db.String(20), nullable=False) #Date
-#     Time = db.Column(db.String(20), nullable=False) #Time
-#     LocationId = db.Column(db.Integer, db.ForeignKey('SCDSLocation.LocationId', ondelete="CASCADE")) #LocationID
-#     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #StudentID
-#     IncidentID = db.Column(db.Integer, db.ForeignKey('SCDSIncidentType.IncidentTypeId', ondelete="CASCADE")) #IncidentTypeID
-#     Description = db.Column(db.Text, nullable=False) #Description
-#     Status = db.Column(db.String(20), nullable=False, default='pending') #Status
-#     IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
         
-#     def to_dict(self):
-#         return {
-#             'ViolationId': self.ViolationId,
-#             'Date': self.Date,
-#             'Time': self.Time,
-#             'LocationId': self.LocationId,
-#             'StudentId': self.StudentId,
-#             'IncidentID': self.IncidentID,
-#             'Description': self.Description,
-#             'Status': self.Status,
-#             'IsAccessible': self.IsAccessible
-#         }
+class ViolationForm(db.Model):
+    __tablename__ = 'SCDSViolationForm'
+    
+    ViolationId = db.Column(db.Integer, primary_key=True, autoincrement=True) #ViolationFormID
+    Date = db.Column(db.String(20), nullable=False) #Date
+    Time = db.Column(db.String(20), nullable=False) #Time
+    LocationId = db.Column(db.Integer, db.ForeignKey('SCDSLocation.LocationId', ondelete="CASCADE")) #LocationID
+    StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #StudentID
+    IncidentId = db.Column(db.Integer, db.ForeignKey('SCDSIncidentType.IncidentTypeId', ondelete="CASCADE")) #IncidentTypeID
+    ComplainantId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #ComplainantID
+    Description = db.Column(db.Text, nullable=False) #Description
+    Status = db.Column(db.String(20), nullable=False, default='pending') #Status
+    IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
+        
+    def to_dict(self):
+        return {
+            'ViolationId': self.ViolationId,
+            'Date': self.Date,
+            'Time': self.Time,
+            'LocationId': self.LocationId,
+            'StudentId': self.StudentId,
+            'IncidentID': self.IncidentID,
+            'ComplainantID': self.ComplainantID,
+            'Description': self.Description,
+            'Status': self.Status,
+            'IsAccessible': self.IsAccessible
+        }
         
 class IncidentReport(db.Model):
     __tablename__ = 'SCDSIncidentReport'
     
-    Id = db.Column(db.Integer, primary_key=True) #ReportID
+    Id = db.Column(db.Integer, primary_key=True, nullable=False) #ReportID
     Date = db.Column(db.String(20), nullable=False) #Date
     Time = db.Column(db.String(20), nullable=False) #Time
     IncidentId = db.Column(db.Integer, db.ForeignKey('SCDSIncidentType.IncidentTypeId', ondelete="CASCADE")) #IncidentTypeID
     LocationId = db.Column(db.Integer, db.ForeignKey('SCDSLocation.LocationId', ondelete="CASCADE")) #LocationID
     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #StudentID
-    # # ComplainantID = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #ComplainantID
-    # InvestigatorId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE", nullable=True)) #InvestigatorID
+    ComplainantId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #ComplainantID
+    InvestigatorId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE"), nullable=True) #InvestigatorID
     Description = db.Column(db.Text, nullable=False) #Description
     Status = db.Column(db.String(20), nullable=False, default='pending') #Status
     IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
@@ -90,8 +93,8 @@ class IncidentReport(db.Model):
             'IncidentId': self.IncidentId,
             'LocationId': self.LocationId,
             'StudentId': self.StudentId,
-            # 'ComplainantID': self.ComplainantID,
-            # 'InvestigatorId': self.InvestigatorId,
+            'ComplainantID': self.ComplainantID,
+            'InvestigatorId': self.InvestigatorId,
             'Description': self.Description,
             'Status': self.Status,
             'IsAccessible': self.IsAccessible
@@ -197,7 +200,7 @@ class Faculty(db.Model):
             'honorific': self.Honorific,
             'age': self.Age,
             'email': self.Email,
-            # 'password': self.password,
+            'password': self.password,
             'profile_pic': self.ProfilePic,
             'is_active': self.IsActive,
         }

@@ -21,7 +21,7 @@
         <h3 class="text-2xl font-bold text-c4 mb-3" id="name"></h3>
         <hr />
 
-        <form class="w-full mt-4" method="POST" id="submitReport" action="{{ url_for('student_api.reporting') }}">
+        <form class="w-full mt-4" method="POST" id="submitReport" action="{{ url_for('student_api.reporting_violation') }}">
           <div class="grid gap-6 mb-6 md:grid-cols-2">
             <!-- INPUTS HERE -->
             <div>
@@ -184,7 +184,7 @@
         const formData = new FormData(event.target);
   
         // Define the API URL for the login endpoint
-        const apiUrl = "{{ url_for('student_api.reporting') }}";
+        const apiUrl = "{{ url_for('student_api.reporting_violation') }}";
   
         // Make a POST request to the login API
         fetch(apiUrl, {

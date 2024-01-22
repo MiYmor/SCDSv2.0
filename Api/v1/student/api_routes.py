@@ -3,7 +3,7 @@ from flask import jsonify
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
 from sqlalchemy import desc
 from werkzeug.security import check_password_hash
-from models import Student, db, IncidentReport, Location, IncidentType
+from models import Student, db, IncidentReport, Location, IncidentType , ViolationForm
 import os
 
 from decorators.auth_decorators import role_required
@@ -197,6 +197,9 @@ def changePassword():
 
 @student_api.route('/reporting', methods=['POST'])
 def reporting():
+    
+   user = getCurrentUser()
+   print('user', user)
    if request.method == 'POST':
         # Handle form submission logic here
         date = request.form['date']
@@ -211,9 +214,13 @@ def reporting():
         print('incident_type_id', incident_type_id)
         description = request.form['description']
         print('description', description)
-        incident = IncidentReport(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, Description=description)
-        db.session.add(incident)
-        db.session.commit()
+        try:
+            incident = IncidentReport(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, ComplainantId=user.StudentId, Description=description)
+            db.session.add(incident)
+            db.session.commit()
+        except Exception as e:
+          print('An exception occurred', e)
+        
         flash('Incident reported successfully', 'success')
         return redirect(url_for('studentHome'))
     
@@ -249,6 +256,70 @@ def approvedReports():
             return jsonify({'result': list_reports})
         else :
             return jsonify({'message': 'No reports found'}), 404
-            
         
+    
+@student_api.route('/reporting_violation', methods=['POST'])
+def reporting_violation():
+    
+
+   user = getCurrentUser()
+   if request.method == 'POST':
+        # Handle form submission logic here
+        date = request.form['date']
+        print('date', date)
+        time = request.form['time']
+        print('time', time)
+        location_id = request.form['location']  # Use the selected location ID
+        print('location_id', location_id)
+        student_id = request.form['student']
+        print('student_id', student_id)
+        incident_type_id = request.form['incident']  # Use the selected incident type ID
+        print('incident_type_id', incident_type_id)
+        description = request.form['description']
+        print('description', description)
+        
+        try:
+            violation = ViolationForm(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, ComplainantId=user.StudentId, Description=description)
+            db.session.add(violation)
+            db.session.commit()
+        except Exception as e:
+          print('An exception occurred', e)
+        
+        flash('Incident reported successfully', 'success')
+        return redirect(url_for('studentHome'))
+            
+
+# fetch approved reports for student
+@student_api.route('/fetch/approved/violations', methods=['GET'])
+def approvedViolations():
+    if request.method == 'GET':
+        
+        # Handle form submission logic here
+        student_id = session.get('user_id')
+        allViolations = db.session.query(ViolationForm, Student, Location, IncidentType).join(Student, Student.StudentId == ViolationForm.StudentId).join(Location, Location.LocationId == ViolationForm.LocationId).join(IncidentType, IncidentType.IncidentTypeId == ViolationForm.IncidentId).filter(ViolationForm.StudentId==student_id,ViolationForm.IsAccessible== True).order_by(ViolationForm.Date).all()
+        
+        list_violations=[]
+        if allViolations:
+            for violations in allViolations:
+                # make a dictionary for reports
+                FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
+                dict_violation = {
+                'ViolationId': violations.ViolationForm.ViolationId,
+                'Date': violations.ViolationForm.Date,
+                'Time': violations.ViolationForm.Time,
+                'IncidentName': violations.IncidentType.Name,
+                'LocationName': violations.Location.Name,
+                'StudentName': FullName,
+                'Complainant': violations.ViolationForm.ComplainantId,
+                'Description': violations.ViolationForm.Description,
+                'Status': violations.ViolationForm.Status,
+                'Acessibility': violations.ViolationForm.IsAccessible
+
+                }
+                # append the dictionary to the list
+                list_violations.append(dict_violation)
+                print('list_violations', list_violations)
+            return jsonify({'result': list_violations})
+        else :
+            return jsonify({'message': 'No reports found'}), 404
             
