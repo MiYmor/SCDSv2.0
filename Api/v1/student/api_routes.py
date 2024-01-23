@@ -231,7 +231,7 @@ def approvedReports():
         # Handle form submission logic here
         student_id = session.get('user_id')
         print('student_id', student_id)
-        allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.StudentId==student_id,IncidentReport.IsAccessible== True, IncidentReport.Status=='approved').order_by(IncidentReport.Date).all()
+        allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.StudentId==student_id,IncidentReport.IsAccessible== True, IncidentReport.Status!='approved').order_by(IncidentReport.Date).all()
         list_reports=[]
         print('allReports', allReports)
         if allReports:
@@ -284,7 +284,7 @@ def reporting_violation():
             db.session.commit()
         except Exception as e:
           print('An exception occurred', e)
-        
+          
         flash('Incident reported successfully', 'success')
         return redirect(url_for('studentHome'))
             

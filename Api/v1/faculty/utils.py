@@ -19,22 +19,17 @@ def getFacultyData(str_faculty_id):
             db.session.query(Faculty).filter(
                 Faculty.FacultyId == str_faculty_id).first()
         )
-
-        if data_faculty:
-            FullName= report.Student.LastName + ", " + report.Student.FirstName 
-            dict_faculty_data = {
+        facultyFullName = data_faculty.LastName + ", " + data_faculty.FirstName + " " + data_faculty.MiddleName
+        dict_faculty_data = {
                 "FacultyId": data_faculty.FacultyId,
                 "TeacherNumber": data_faculty.TeacherNumber,
-                "Name": FullName,
+                "Name": facultyFullName,
                 "ResidentialAddress": data_faculty.ResidentialAddress,
                 "Email": data_faculty.Email,
                 "MobileNumber": data_faculty.MobileNumber,
                 "Gender": "Male" if data_faculty.Gender == 1 else "Female",
             }
-
-            return (dict_faculty_data)
-        else:
-            return None
+        return (dict_faculty_data)
     except Exception as e:
         # Handle the exception here, e.g., log it or return an error response
         return None

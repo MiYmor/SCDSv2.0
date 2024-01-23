@@ -9,6 +9,37 @@ endblock title %} {% block styles %}
   /* Add any additional styles here */
 </style>
 {% endblock styles %} {% block content %}
+
+<!-- Modal container -->
+<div
+  id="statusModal"
+  class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+>
+  <div class="modal-content bg-white p-8 rounded-lg">
+    <span
+      class="close text-2xl absolute top-2 right-2 cursor-pointer"
+      onclick="closeStatusModal()"
+      >&times;</span
+    >
+    <input type="hidden" id="violationId" />
+    <h2 class="text-2xl font-bold mb-4">Update Status</h2>
+    <label for="statusDropdown" class="block mb-2">Select Status:</label>
+    <select id="statusDropdown" class="w-full p-2 mb-4 border rounded-md">
+      <option value="Excused">Excused</option>
+      <option value="1st">1st Offense</option>
+      <option value="2nd">2nd Offense</option>
+      <option value="3rd">3rd Offense</option>
+      <option value="4th">4th Offense</option>
+    </select>
+    <button
+      onclick="updateStatus()"
+      class="bg-blue-500 text-white px-4 py-2 rounded-md"
+    >
+      Update
+    </button>
+  </div>
+</div>
+
 <div class="p-4 md:ml-72">
   <div class="border-2 border-gray-200 border-dashed rounded-lg">
     <div class="grid grid-cols-1">
@@ -84,6 +115,7 @@ endblock title %} {% block styles %}
   </div>
 </div>
 {% endblock content %} {% block script %}
+
 <script>
   // Fetch location and incident types
   async function fetchViolations() {
@@ -123,8 +155,9 @@ endblock title %} {% block styles %}
               <!-- Add other details as needed -->
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <button class="bg-red-600 p-2 text-white" onclick="accessViolations(${violation.ViolationId})">Open Case</button>
-              <button class="bg-blue-600 p-2 text-white" onclick="removeAccessViolations(${violation.ViolationId})">Close Case</button>
+              <button class="bg-red-600 p-2 text-white" onclick="accessViolations(${violation.ViolationId})">Approve Violation</button>
+              <button class="bg-blue-600 p-2 text-white" onclick="openStatusModal(${violation.ViolationId})">Manage Violation</button>
+
             </td>
           `;
 
@@ -165,35 +198,56 @@ endblock title %} {% block styles %}
     }
   }
 
-  // Make a approved report function
-  async function removeAccessViolations(ViolationId) {
-    console.log('removeAccessViolations', ViolationId);
-    try {
-      const response = await fetch(`${api_base_url}/remove-access-violation`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ ViolationId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to make accesible report');
-      }
-
-      const data = await response.json();
-      console.log(data);
-
-      if (data.result) {
-        notyf.success('Case is now Closed');
-        document.getElementById(`status-${ViolationId}`).innerHTML = 'false';
-      } else if (data.error) {
-        notyf.error('Failed to close case');
-      }
-    } catch (error) {
-      console.error(error.message);
-    }
+  // Function to open the status modal
+  function openStatusModal(ViolationId) {
+    // You can perform additional logic here if needed
+    document.getElementById('statusModal').classList.remove('hidden');
+    //get the violation id abnd set the value of the hidden input
+    document.getElementById('violationId').value = ViolationId;
   }
+
+  // Function to close the status modal
+  function closeStatusModal(ViolationId) {
+    document.getElementById('statusModal').classList.add('hidden');
+  }
+
+  // Function to update the status
+  function updateStatus() {
+    //get tge violtioan input
+    const ViolationId = document.getElementById('violationId').value;
+    console.log(ViolationId);
+    const newStatus = document.getElementById('statusDropdown').value;
+    console.log(newStatus);
+
+    // make a post request
+    fetch(`${api_base_url}/manage-violation-offense`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ViolationId, newStatus }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        if (data.result) {
+          notyf.success('Status updated successfully');
+          document.getElementById(`status-${ViolationId}`).innerHTML =
+            newStatus;
+        } else if (data.error) {
+          notyf.error('Failed to update status');
+        }
+      })
+      .catch((error) => {
+        console.error(error.message);
+      });
+    // Call your API to update the status here using the ViolationId and newStatus
+    // ...
+
+    // Close the modal after updating
+    closeStatusModal(ViolationId);
+  }
+
   fetchViolations();
 </script>
 {% endblock script %}

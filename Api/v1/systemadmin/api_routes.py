@@ -169,7 +169,7 @@ def allReports():
 @system_admin_api.route('/all-violations', methods={'GET'})
 def allViolations():
     #.filter = multiple queries .filter_by = single query
-    allViolations = db.session.query(ViolationForm, Student, Location, IncidentType).join(Student, Student.StudentId == ViolationForm.StudentId).join(Location, Location.LocationId == ViolationForm.LocationId).join(IncidentType, IncidentType.IncidentTypeId == ViolationForm.IncidentId).order_by(ViolationForm.Date).all()
+    allViolations = db.session.query(ViolationForm, Student, Location, IncidentType).join(Student, Student.StudentId == ViolationForm.StudentId).join(Location, Location.LocationId == ViolationForm.LocationId).join(IncidentType, IncidentType.IncidentTypeId == ViolationForm.IncidentId).filter(ViolationForm.IsAccessible == False).order_by(ViolationForm.Date).all()
     list_violations=[]
     if allViolations:
         for violations in allViolations:
@@ -218,10 +218,10 @@ def allClosedCase():
             return jsonify({'result': list_closedcase})
 
 
-@system_admin_api.route('/all-closed=violations', methods={'GET'})
+@system_admin_api.route('/all-closed-violations', methods={'GET'})
 def allClosedViolations():
     #.filter = multiple queries .filter_by = single query
-    allClosedViolations = db.session.query(ViolationForm, Student, Location, IncidentType).join(Student, Student.StudentId == ViolationForm.StudentId).join(Location, Location.LocationId == ViolationForm.LocationId).join(IncidentType, IncidentType.IncidentTypeId == ViolationForm.IncidentId).filter(ViolationForm.IsAccessible == False).order_by(ViolationForm.Date).all()
+    allClosedViolations = db.session.query(ViolationForm, Student, Location, IncidentType).join(Student, Student.StudentId == ViolationForm.StudentId).join(Location, Location.LocationId == ViolationForm.LocationId).join(IncidentType, IncidentType.IncidentTypeId == ViolationForm.IncidentId).filter(ViolationForm.IsAccessible == True, ViolationForm.Status != 'pending').order_by(ViolationForm.Date).all()
     list_closedviolations=[]
     if allClosedViolations:
         for violations in allClosedViolations:
@@ -242,7 +242,31 @@ def allClosedViolations():
             # append the dictionary to the list
             list_closedviolations.append(dict_closedviolation)
         return jsonify({'result': list_closedviolations})
-    
+
+@system_admin_api.route('/all-removed-violations', methods={'GET'})
+def allRemovedViolations():
+    #.filter = multiple queries .filter_by = single query
+    allRemovedViolations = db.session.query(ViolationForm, Student, Location, IncidentType).join(Student, Student.StudentId == ViolationForm.StudentId).join(Location, Location.LocationId == ViolationForm.LocationId).join(IncidentType, IncidentType.IncidentTypeId == ViolationForm.IncidentId).filter(ViolationForm.IsAccessible == True, ViolationForm.Status == 'pending').order_by(ViolationForm.Date).all()
+    list_removedviolations=[]
+    if allRemovedViolations:
+        for violations in allRemovedViolations:
+            # make a dictionary for reports
+            FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
+            dict_removedviolation = {
+                'ViolationId': violations.ViolationForm.ViolationId,
+                'Date': violations.ViolationForm.Date,
+                'Time': violations.ViolationForm.Time,
+                'IncidentName': violations.IncidentType.Name,
+                'LocationName': violations.Location.Name,
+                'StudentName': FullName,
+                'Complainant': violations.ViolationForm.ComplainantId,
+                'Description': violations.ViolationForm.Description,
+                'Status': violations.ViolationForm.Status,
+                'Acessibility': violations.ViolationForm.IsAccessible
+            }
+            # append the dictionary to the list
+            list_removedviolations.append(dict_removedviolation)
+        return jsonify({'result': list_removedviolations})
 
 # to approve the case or open the case 
 @system_admin_api.route('/access-report', methods={'POST'})
@@ -329,6 +353,32 @@ def removeAccessViolations():
     if violation:
         # change the status to approved
         violation.IsAccessible = False
+        # commit the changes
+        db.session.commit()
+        # return a message
+        return jsonify({'result': 'success', 'message': 'Report approved'})
+    else:
+        # return a message
+        return jsonify({'error': 'failed', 'message': 'Report not found'})
+    
+# to maanage the violation using the modal
+@system_admin_api.route('/manage-violation-offense', methods={'POST'})
+def manageViolationOffense():
+    # Assuming the incoming data is JSON
+    data = request.get_json()
+    # Extract incidentId from the JSON payload
+    violation_id = data.get('ViolationId')
+    # Your logic to handle the incidentId
+    print('Received ViolationId:', violation_id)
+    #get the offense from the modal
+    new_status = data.get('newStatus')
+    
+    # make a querry calling the incidentreport table
+    violation = ViolationForm.query.filter_by(ViolationId=violation_id).first()
+    # if the incident is found
+    if violation:
+        # change the status to approved
+        violation.Status = new_status
         # commit the changes
         db.session.commit()
         # return a message

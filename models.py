@@ -14,8 +14,11 @@ from flask_sqlalchemy import SQLAlchemy
 # from data.admins import faculty_data
 # from data.users import student_data
 # from data.superadmin import system_admin_data
+# from data.course import course_data
 # from data.incidenttype import incidenttype_data
 # from data.location import location_data
+
+
 
 
 db = SQLAlchemy()
@@ -243,10 +246,32 @@ class SystemAdmin(db.Model):
 
     def get_user_id(self):
         return self.SysAdminId
+    
+    
+# Course List
+class Course(db.Model):
+    __tablename__ = 'SPSCourse'
+
+    CourseId = db.Column(db.Integer, primary_key=True, autoincrement=True) # Unique Identifier
+    CourseCode = db.Column(db.String(10), unique=True) # Course Code - (BSIT, BSHM, BSCS)
+    Name = db.Column(db.String(200)) # (Name of Course (Bachelor of Science in Information Technology)
+    Description = db.Column(db.String(200)) # Description of course
+    IsValidPUPQCCourses = db.Column(db.Boolean, default=True) # APMS are handling different courses so there are specific courses available in QC Only
+    created_at = db.Column(db.DateTime, default=datetime.now)
+    updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+
+    def to_dict(self):
+        return {
+            'CourseId': self.CourseId,
+            'CourseCode': self.CourseCode,
+            'Name': self.Name,
+            'Description': self.Description,
+            'IsValidPUPQCCourses': self.IsValidPUPQCCourses
+        }
 
 def init_db(app):
     db.init_app(app)
-#     with app.app_context():
+    # with app.app_context():
 #         inspector = inspect(db.engine)
 #         if not inspector.has_table('Students'):
 #             db.create_all()
@@ -265,6 +290,10 @@ def init_db(app):
 #     for data in system_admin_data:
 #         admin = SystemAdmin(**data)
 #         db.session.add(admin)
+        
+#     for data in course_data:
+#         course = Course(**data)
+#         db.session.add(course)
         
 #     for data in incidenttype_data:
 #         incidenttype = IncidentType(**data)

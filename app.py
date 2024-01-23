@@ -244,6 +244,11 @@ def create_app():
     @role_required('systemAdmin')
     def closedViolation():
         return render_template('systemadmin/closed_violation.html', system_admin_api_base_url=system_admin_api_base_url, current_page="close-violation")
+    
+    @app.route('/systemadmin/removed-violation')
+    @role_required('systemAdmin')
+    def removedViolation():
+        return render_template('systemadmin/removed_violation.html', system_admin_api_base_url=system_admin_api_base_url, current_page="removed-violation")
     # ========================================================================
     # Register the API blueprint
     app.register_blueprint(system_admin_api, url_prefix=system_admin_api_base_url)

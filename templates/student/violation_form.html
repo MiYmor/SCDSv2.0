@@ -172,7 +172,7 @@
       },
     ],
   });
-
+  console.log('Notyf initialized');
   // Get the form
     // Add event listener to the form submission
     document
@@ -200,12 +200,11 @@
           })
           .then((data) => {
             // If the API returned a success message, display it and redirect to the dashboard
-            if (data.message) {
-              notyf.success(data.message);
-              setTimeout(() => {
-                window.location.href = "{{ url_for('studentHome') }}";
-              }, 5000);
-            }
+            if (data.success) {
+              notyf.success('Report submitted successfully');
+
+              }
+            });
           .catch((error) => {
             // Handle errors
             console.error('Error submitting report:', error.message);

@@ -14,10 +14,10 @@ def getStudentData(student_id):
             db.session.query(Student).filter(
                 Student.StudentId == student_id).first()
         )
-
+        studentFullName = data_student.LastName + ", " + data_student.FirstName + " " + data_student.MiddleName
         dict_student_data = {
                 "StudentNumber": data_student.StudentNumber,
-                "Name": data_student.Name,
+                "Name": studentFullName,
                 "PlaceOfBirth": data_student.PlaceOfBirth,
                 "ResidentialAddress": data_student.ResidentialAddress,
                 "Email": data_student.Email,

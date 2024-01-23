@@ -64,7 +64,7 @@ def facultyData():
 
 
 # UpDate the details of the faculty
-@faculty_api.route('/details/upDate', methods=['GET', 'POST'])
+@faculty_api.route('/details/update', methods=['GET', 'POST'])
 @role_required('faculty')
 def upDateDetails():
     faculty = getCurrentUser()
@@ -74,7 +74,7 @@ def upDateDetails():
             number = request.json.get('number')
             residential_address = request.json.get('residential_address')
 
-            json_result = upDateFacultyData(
+            json_result = updateFacultyData(
                 faculty.FacultyId, email, number, residential_address)
 
             return json_result
@@ -97,7 +97,7 @@ def changePassword():
             new_password = request.json.get('new_password')
             confirm_password = request.json.get('confirm_password')
 
-            json_result = upDatePassword(faculty.FacultyId, password, new_password, confirm_password)
+            json_result = updatePassword(faculty.FacultyId, password, new_password, confirm_password)
 
             return json_result
 
