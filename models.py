@@ -217,7 +217,9 @@ class SystemAdmin(db.Model):
 
     SysAdminId = db.Column(db.Integer, primary_key=True, autoincrement=True)
     SysAdminNumber = db.Column(db.String(30), unique=True)  # UserID
-    Name = db.Column(db.String(50), nullable=False)  # Name
+    FirstName = db.Column(db.String(50), nullable=False)  # First Name
+    LastName = db.Column(db.String(50), nullable=False)  # Last Name
+    MiddleName = db.Column(db.String(50))  # Middle Name
     Email = db.Column(db.String(50), unique=True, nullable=False)  # Email
     Password = db.Column(db.String(256), nullable=False)  # Password
     Gender = db.Column(db.Integer)  # Gender
@@ -233,9 +235,10 @@ class SystemAdmin(db.Model):
         return {
             'SysAdminId': self.SysAdminId,
             'SysAdminNumber': self.SysAdminNumber,
-            'Name': self.Name,
+            'FirstName': self.FirstName,
+            'LastName': self.LastName,
+            'MiddleName': self.MiddleName,
             'Email': self.Email,
-            'Password': self.Password,
             'Gender': self.Gender,
             'DateOfBirth': self.DateOfBirth,
             'PlaceOfBirth': self.PlaceOfBirth,
@@ -295,12 +298,12 @@ def init_db(app):
 #         course = Course(**data)
 #         db.session.add(course)
         
-#     for data in incidenttype_data:
-#         incidenttype = IncidentType(**data)
-#         db.session.add(incidenttype)
+    # for data in incidenttype_data:
+    #     incidenttype = IncidentType(**data)
+    #     db.session.add(incidenttype)
         
-#     for data in location_data:
-#         location = Location(**data)
-#         db.session.add(location)
+    # for data in location_data:
+    #     location = Location(**data)
+    #     db.session.add(location)
 
-#     db.session.commit()
+    # db.session.commit()

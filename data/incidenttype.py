@@ -23,5 +23,6 @@ incidenttype_data = [
     { "Name": "Cyber Trolling" },
     { "Name": "Cyber Catfishing" },
     { "Name": "Cyber Doxxing" },
-    { "Name": "Cyber Impersonation" }
+    { "Name": "Cyber Impersonation" },
+    { "Name": "Others..." }
 ]
