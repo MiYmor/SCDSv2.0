@@ -57,7 +57,7 @@
                   name="incident"
                   class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
               >
-                  {% for incident_type in incident_types|sort(attribute='Name') %}
+                  {% for incident_type in incident_types %}
                       <option value="{{ incident_type.IncidentTypeId }}">{{ incident_type.Name }}</option>
                   {% endfor %}
               </select>
@@ -72,7 +72,7 @@
                   name="location"
                   class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
               >
-                  {% for location in locations|sort(attribute='Name') %}
+                  {% for location in locations %}
                       <option value="{{ location.LocationId }}">{{ location.Name }}</option>
                   {% endfor %}
               </select>

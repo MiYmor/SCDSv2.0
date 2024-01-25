@@ -45,6 +45,12 @@ def create_app():
     app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     
+    # Configure Flask to use HTTPS
+    app.config['SESSION_COOKIE_SECURE'] = True
+    app.config['SESSION_COOKIE_HTTPONLY'] = True
+    app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'  # or 'Strict'
+    app.config['SESSION_PERMANENT'] = True
+    
     # Replace 'your-secret-key' with an actual secret key
     app.secret_key = os.getenv('SECRET_KEY')
     Cache(app, config={'CACHE_TYPE': 'simple'})
@@ -87,6 +93,8 @@ def create_app():
     
     @app.before_request
     def before_request():
+        if 'user_role' in session:
+            print(session['user_role'])
         session.permanent=True
         pass
     
@@ -107,8 +115,11 @@ def create_app():
 
     @app.route('/logout')
     def logout():
-
         session.clear()
+        if 'user_role' in session:
+            print(session['user_role'])
+        else :
+            print("no user role")
         return redirect(url_for('home'))  # Redirect to home or appropriate route
 
     # ========================================================================
@@ -149,16 +160,19 @@ def create_app():
 
 
     @app.route('/student/view-cases')
+    @role_required('student')
     def studentViewCases():
         reports = IncidentReport.query.all()
         return render_template('student/view_reports.html', reports=reports, student_api_base_url=student_api_base_url,  current_page="view-cases")
 
     @app.route('/student/view-violations')
+    @role_required('student')
     def studentViewViolations():
         reports = IncidentReport.query.all()
         return render_template('student/view_violations.html', reports=reports, student_api_base_url=student_api_base_url,  current_page="view-violations")
     
     @app.route('/student/incident-report', methods=['GET'])
+    @role_required('student')
     def studentIncidentReport():
         # Fetch incident types and locations from the database
         incident_types = IncidentType.query.all()
@@ -169,6 +183,7 @@ def create_app():
         return render_template('student/incident_report_form.html', authenticated=True, students=students, incident_types=incident_types, locations=locations, current_page="incident-report")
     
     @app.route('/student/violation-form', methods=['GET'])
+    @role_required('student')
     def violationFOrm():
         # Fetch incident types and locations from the database
         incident_types = IncidentType.query.all()

@@ -42,7 +42,6 @@ def preventAuthenticated(fn):
         return fn(*args, **kwargs)
     return wrapper
 
-
 # SERVER REQUIRED:
 def role_required(required_role):
     def decorator(func):

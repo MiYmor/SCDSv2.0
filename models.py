@@ -274,7 +274,7 @@ class Course(db.Model):
 
 def init_db(app):
     db.init_app(app)
-    # with app.app_context():
+#     with app.app_context():
 #         inspector = inspect(db.engine)
 #         if not inspector.has_table('Students'):
 #             db.create_all()
@@ -298,12 +298,12 @@ def init_db(app):
 #         course = Course(**data)
 #         db.session.add(course)
         
-    # for data in incidenttype_data:
-    #     incidenttype = IncidentType(**data)
-    #     db.session.add(incidenttype)
+#     for data in incidenttype_data:
+#         incidenttype = IncidentType(**data)
+#         db.session.add(incidenttype)
         
-    # for data in location_data:
-    #     location = Location(**data)
-    #     db.session.add(location)
+#     for data in location_data:
+#         location = Location(**data)
+#         db.session.add(location)
 
-    # db.session.commit()
+#     db.session.commit()
