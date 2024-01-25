@@ -125,7 +125,7 @@ endblock title %} {% block styles %}
                 <!-- Add other details as needed -->
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <button class="bg-red-600 p-2 text-white" onclick="removeAccessViolations(${violation.ViolationId})">Reopen Violation</button>
+                <button class="bg-blue-600 p-2 text-white" onclick="removeAccessViolations(${violation.ViolationId})">Reopen Violation</button>
               </td>
             `;
 
@@ -156,10 +156,10 @@ endblock title %} {% block styles %}
       console.log(data);
 
       if (data.result) {
-        notyf.success('Case is now Closed');
+        notyf.success('Violation is now reopened');
         document.getElementById(`status-${ViolationId}`).innerHTML = 'false';
       } else if (data.error) {
-        notyf.error('Failed to close case');
+        notyf.error('Failed to reopen violation');
       }
     } catch (error) {
       console.error(error.message);

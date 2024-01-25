@@ -228,7 +228,9 @@ def create_app():
     @app.route('/systemadmin/manage-reports')
     @role_required('systemAdmin')
     def reportManagementAdmin():
-        return render_template('systemadmin/manage_report.html', system_admin_api_base_url=system_admin_api_base_url, current_page="manage-reports")
+        #fetch the list of faculty
+        faculty = Faculty.query.all()
+        return render_template('systemadmin/manage_report.html', system_admin_api_base_url=system_admin_api_base_url,faculty=faculty, current_page="manage-reports")
     
     @app.route('/systemadmin/manage-violations')
     @role_required('systemAdmin')
@@ -249,6 +251,11 @@ def create_app():
     @role_required('systemAdmin')
     def removedViolation():
         return render_template('systemadmin/removed_violation.html', system_admin_api_base_url=system_admin_api_base_url, current_page="removed-violation")
+    
+    @app.route('/systemadmin/resolved-precase')
+    @role_required('systemAdmin')
+    def resolvedprecase():
+        return render_template('systemadmin/resolve_precase.html', system_admin_api_base_url=system_admin_api_base_url, current_page="resolved-precase")
     # ========================================================================
     # Register the API blueprint
     app.register_blueprint(system_admin_api, url_prefix=system_admin_api_base_url)

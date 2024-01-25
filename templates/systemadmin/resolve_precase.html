@@ -16,7 +16,7 @@ endblock title %} {% block styles %}
         class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
       >
         <h3 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">
-          Resolved Cases
+          Resolved Pre-Case
         </h3>
         <hr class="mx-2" />
 
@@ -83,7 +83,7 @@ endblock title %} {% block styles %}
   async function fetchReport() {
     try {
       // Fetch location data
-      const reportResponse = await fetch(`${api_base_url}/closed-case`);
+      const reportResponse = await fetch(`${api_base_url}/resolved-pre-case`);
 
       if (!reportResponse.ok) {
         throw new Error('Failed to fetch report data');
@@ -100,23 +100,23 @@ endblock title %} {% block styles %}
         // Create a tr element for each report
         const reportRow = document.createElement('tr');
         reportRow.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <p><strong>Report ID:</strong> ${report.IncidentId}</p>
-                  <p><strong>Time:</strong> ${report.Time}</p>
-                  <p><strong>Incident Type:</strong> ${report.IncidentName}</p>
-                  <p><strong>Location:</strong> ${report.LocationName}</p>
-                  <p><strong>Student:</strong> ${report.StudentName}</p>
-                  <p><strong>Submitted by:</strong> ${report.Complainant}</p>
-                  <p><strong>Description:</strong> ${report.Description}</p>
-                  <strong>Status:</strong>
-                  <p id='status-${report.IncidentId}'> ${report.Status}</p>
-                  <!-- Add other details as needed -->
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <button class="bg-red-600 p-2 text-white" onclick="removeAccessReports(${report.IncidentId})">Reopen Case</button>
-                </td>
-              `;
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <p><strong>Report ID:</strong> ${report.IncidentId}</p>
+                    <p><strong>Time:</strong> ${report.Time}</p>
+                    <p><strong>Incident Type:</strong> ${report.IncidentName}</p>
+                    <p><strong>Location:</strong> ${report.LocationName}</p>
+                    <p><strong>Student:</strong> ${report.StudentName}</p>
+                    <p><strong>Submitted by:</strong> ${report.Complainant}</p>
+                    <p><strong>Description:</strong> ${report.Description}</p>
+                    <strong>Status:</strong>
+                    <p id='status-${report.IncidentId}'> ${report.Status}</p>
+                    <!-- Add other details as needed -->
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button class="bg-blue-600 p-2 text-white" onclick="reopenPreCase(${report.IncidentId})">Reopen Pre-Case</button>
+                  </td>
+                `;
 
         // Append the reportRow to the outputContainer
         outputContainer.appendChild(reportRow);
@@ -126,10 +126,10 @@ endblock title %} {% block styles %}
     }
   }
   // Make a approved report function
-  async function removeAccessReports(IncidentId) {
-    console.log('removeAccessReports', IncidentId);
+  async function reopenPreCase(IncidentId) {
+    console.log('reopenPreCase', IncidentId);
     try {
-      const response = await fetch(`${api_base_url}/remove-access-report`, {
+      const response = await fetch(`${api_base_url}/reopen-report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,10 +145,10 @@ endblock title %} {% block styles %}
       console.log(data);
 
       if (data.result) {
-        notyf.success('Case is now reopened');
+        notyf.success('Case is now Reopened');
         document.getElementById(`status-${IncidentId}`).innerHTML = 'false';
       } else if (data.error) {
-        notyf.error('Failed to reopen case');
+        notyf.error('Failed to to reopen case');
       }
     } catch (error) {
       console.error(error.message);

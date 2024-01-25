@@ -26,10 +26,10 @@ endblock title %} {% block styles %}
     <label for="statusDropdown" class="block mb-2">Select Status:</label>
     <select id="statusDropdown" class="w-full p-2 mb-4 border rounded-md">
       <option value="Excused">Excused</option>
-      <option value="1st">1st Offense</option>
-      <option value="2nd">2nd Offense</option>
-      <option value="3rd">3rd Offense</option>
-      <option value="4th">4th Offense</option>
+      <option value="1st Offense">1st Offense</option>
+      <option value="2nd Offense">2nd Offense</option>
+      <option value="3rd Offense">3rd Offense</option>
+      <option value="4th Offense">4th Offense</option>
     </select>
     <button
       onclick="updateStatus()"
@@ -47,7 +47,7 @@ endblock title %} {% block styles %}
         class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
       >
         <h3 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">
-          Violations
+          Pending Violations
         </h3>
         <hr class="mx-2" />
 
@@ -141,25 +141,25 @@ endblock title %} {% block styles %}
         // Create a tr element for each violation
         const violationRow = document.createElement('tr');
         violationRow.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <p><strong>Violation ID:</strong> ${violation.ViolationId}</p>
-              <p><strong>Time:</strong> ${violation.Time}</p>
-              <p><strong>Incident Type:</strong> ${violation.IncidentName}</p>
-              <p><strong>Location:</strong> ${violation.LocationName}</p>
-              <p><strong>Student:</strong> ${violation.StudentName}</p>
-              <p><strong>Submitted by:</strong> ${violation.Complainant}</p>
-              <p><strong>Description:</strong> ${violation.Description}</p>
-              <strong>Status:</strong>
-              <p id='status-${violation.ViolationId}'> ${violation.Status}</p>
-              <!-- Add other details as needed -->
-            </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <button class="bg-red-600 p-2 text-white" onclick="accessViolations(${violation.ViolationId})">Approve Violation</button>
-              <button class="bg-blue-600 p-2 text-white" onclick="openStatusModal(${violation.ViolationId})">Manage Violation</button>
-
-            </td>
-          `;
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <p><strong>Violation ID:</strong> ${violation.ViolationId}</p>
+                <p><strong>Time:</strong> ${violation.Time}</p>
+                <p><strong>Incident Type:</strong> ${violation.IncidentName}</p>
+                <p><strong>Location:</strong> ${violation.LocationName}</p>
+                <p><strong>Student:</strong> ${violation.StudentName}</p>
+                <p><strong>Submitted by:</strong> ${violation.Complainant}</p>
+                <p><strong>Description:</strong> ${violation.Description}</p>
+                <strong>Status:</strong>
+                <p id='status-${violation.ViolationId}'> ${violation.Status}</p>
+                <!-- Add other details as needed -->
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <button class="bg-green-600 p-2 text-white" onclick="openStatusModal(${violation.ViolationId})">Manage Violation</button>
+                <button class="bg-red-600 p-2 text-white" onclick="accessViolations(${violation.ViolationId})">Approve Violation</button>
+                <button class="bg-blue-600 p-2 text-white" onclick="removeViolations(${violation.ViolationId})">Remove Violation</button>
+              </td>
+            `;
 
         // Append the violationRow to the outputContainer
         outputContainer.appendChild(violationRow);
@@ -192,6 +192,36 @@ endblock title %} {% block styles %}
         document.getElementById(`status-${ViolationId}`).innerHTML = 'true';
       } else if (data.error) {
         notyf.error('Failed to approve violation');
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+
+  // Make a approved report function
+  async function removeViolations(ViolationId) {
+    console.log('removeViolations', ViolationId);
+    try {
+      const response = await fetch(`${api_base_url}/remove-violation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ViolationId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to make accesible report');
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.result) {
+        notyf.success('Violation is now removed');
+        document.getElementById(`status-${ViolationId}`).innerHTML = 'false';
+      } else if (data.error) {
+        notyf.error('Failed to removed violation');
       }
     } catch (error) {
       console.error(error.message);
@@ -241,10 +271,6 @@ endblock title %} {% block styles %}
       .catch((error) => {
         console.error(error.message);
       });
-    // Call your API to update the status here using the ViolationId and newStatus
-    // ...
-
-    // Close the modal after updating
     closeStatusModal(ViolationId);
   }
 

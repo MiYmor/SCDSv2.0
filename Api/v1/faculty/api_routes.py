@@ -158,8 +158,10 @@ def manage_reports():
 @faculty_api.route('/all-reports', methods={'GET'})
 def allReports():
     print("Hello")
+    
      #.filter = multiple queries .filter_by = single query
-    allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.IsAccessible == True).order_by(IncidentReport.Date).all()
+    faculty_id= session.get('user_id')
+    allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.InvestigatorId == faculty_id, IncidentReport.IsAccessible == True).order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
         for report in allReports:
