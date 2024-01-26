@@ -197,7 +197,9 @@
                   alt=""
                 />
 
-                <h4 class="font-extrabold ml-4 text-3xl text-black">PUP SPS</h4>
+                <h4 class="font-extrabold ml-4 text-3xl text-black">
+                  PUPQC SCDS
+                </h4>
               </a>
             </div>
             <div class="h-full mt-4 overflow-y-auto flex flex-col">
@@ -209,17 +211,6 @@
                   >
                     <span class="flex-1 ml-3 whitespace-nowrap"
                       >Case Management</span
-                    >
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    href="{{ url_for('violationManagementAdmin') }}"
-                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'manage-violations' else 'hover:bg-gray-100 hover:text-c1' }}"
-                  >
-                    <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Violation Management</span
                     >
                   </a>
                 </li>
@@ -253,6 +244,17 @@
                   >
                     <span class="flex-1 ml-3 whitespace-nowrap"
                       >Resolved Pre-Case</span
+                    >
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="{{ url_for('violationManagementAdmin') }}"
+                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'manage-violations' else 'hover:bg-gray-100 hover:text-c1' }}"
+                  >
+                    <span class="flex-1 ml-3 whitespace-nowrap"
+                      >Violation Management</span
                     >
                   </a>
                 </li>
