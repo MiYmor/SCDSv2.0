@@ -166,6 +166,8 @@ def allReports():
     if allReports:
         for report in allReports:
             # make a dictionary for reports
+            complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
+            FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= report.Student.LastName + ", " + report.Student.FirstName 
             dict_reports = {
                 'IncidentId': report.IncidentReport.Id,
@@ -174,7 +176,7 @@ def allReports():
                 'IncidentName': report.IncidentType.Name,
                 'LocationName': report.Location.Name,
                 'StudentName': FullName,
-                'Complainant': report.IncidentReport.ComplainantId,
+                'Complainant': FullNameComplainant,
                 'Description': report.IncidentReport.Description,
                 'Status': report.IncidentReport.Status,
                 'Acessibility': report.IncidentReport.IsAccessible
