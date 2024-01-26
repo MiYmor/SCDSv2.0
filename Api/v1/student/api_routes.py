@@ -1,6 +1,6 @@
 # api/api_routes.py
 from flask import jsonify
-from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
+from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template, get_flashed_messages
 from sqlalchemy import desc
 from werkzeug.security import check_password_hash
 from models import Student, db, IncidentReport, Location, IncidentType , ViolationForm
@@ -197,32 +197,31 @@ def changePassword():
 
 @student_api.route('/reporting', methods=['POST'])
 def reporting():
-    
-   user = getCurrentUser()
-   print('user', user)
-   if request.method == 'POST':
-        # Handle form submission logic here
-        date = request.form['date']
-        print('date', date)
-        time = request.form['time']
-        print('time', time)
-        location_id = request.form['location']  # Use the selected location ID
-        print('location_id', location_id)
-        student_id = request.form['student']
-        print('student_id', student_id)
-        incident_type_id = request.form['incident']  # Use the selected incident type ID
-        print('incident_type_id', incident_type_id)
-        description = request.form['description']
-        print('description', description)
+    user = getCurrentUser()
+    if request.method == 'POST':
         try:
+            # Handle form submission logic here
+            date = request.form['date']
+            time = request.form['time']
+            location_id = request.form['location']
+            student_id = request.form['student']
+            incident_type_id = request.form['incident']
+            description = request.form['description']
+
+            # Create an IncidentReport object and commit it to the database
             incident = IncidentReport(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, ComplainantId=user.StudentId, Description=description)
             db.session.add(incident)
             db.session.commit()
+
+            return jsonify({'message': 'Case reported successfully', 'success': True }), 200
         except Exception as e:
-          print('An exception occurred', e)
-        
-        flash('Incident reported successfully', 'success')
-        return redirect(url_for('studentHome'))
+            # Log the exception and display an error message to the user
+            print('An exception occurred:', e)
+            return jsonify({'message': 'An error occurred while reporting the incident'}), 500
+
+    # Handle GET request or other methods gracefully
+    flash('Invalid request method', 'error')
+    return redirect(url_for('studentHome'))
     
 # fetch approved reports for student
 @student_api.route('/fetch/approved/reports', methods=['GET'])
@@ -231,7 +230,7 @@ def approvedReports():
         # Handle form submission logic here
         student_id = session.get('user_id')
         print('student_id', student_id)
-        allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.StudentId==student_id,IncidentReport.IsAccessible== True, IncidentReport.Status!='approved').order_by(IncidentReport.Date).all()
+        allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.StudentId==student_id, IncidentReport.Status!='pending').order_by(IncidentReport.Date).all()
         list_reports=[]
         print('allReports', allReports)
         if allReports:
@@ -260,33 +259,26 @@ def approvedReports():
     
 @student_api.route('/reporting_violation', methods=['POST'])
 def reporting_violation():
-    
-
    user = getCurrentUser()
    if request.method == 'POST':
-        # Handle form submission logic here
-        date = request.form['date']
-        print('date', date)
-        time = request.form['time']
-        print('time', time)
-        location_id = request.form['location']  # Use the selected location ID
-        print('location_id', location_id)
-        student_id = request.form['student']
-        print('student_id', student_id)
-        incident_type_id = request.form['incident']  # Use the selected incident type ID
-        print('incident_type_id', incident_type_id)
-        description = request.form['description']
-        print('description', description)
-        
         try:
+        # Handle form submission logic here
+            date = request.form['date']
+            time = request.form['time']
+            location_id = request.form['location']  # Use the selected location ID
+            student_id = request.form['student']
+            incident_type_id = request.form['incident']  # Use the selected incident type ID
+            description = request.form['description']
+            
             violation = ViolationForm(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, ComplainantId=user.StudentId, Description=description)
             db.session.add(violation)
             db.session.commit()
+            
+            return jsonify({'message': 'Violation reported successfully', 'success': True }), 200
         except Exception as e:
-          print('An exception occurred', e)
-          
-        flash('Incident reported successfully', 'success')
-        return redirect(url_for('studentHome'))
+            # Log the exception and display an error message to the user
+            print('An exception occurred:', e)
+            return jsonify({'message': 'An error occurred while reporting the incident'}), 500
             
 
 # fetch approved reports for student

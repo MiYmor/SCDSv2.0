@@ -42,12 +42,15 @@ def preventAuthenticated(fn):
         return fn(*args, **kwargs)
     return wrapper
 
+
 # SERVER REQUIRED:
 def role_required(required_role):
     def decorator(func):
         @wraps(func)
         def wrapper(*args, **kwargs):
             user_role = session.get('user_role')
+            print('user_role', user_role)
+            print("required_role", required_role)
             if user_role == required_role:
                 return func(*args, **kwargs)
             else:

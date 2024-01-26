@@ -21,7 +21,7 @@
         <h3 class="text-2xl font-bold text-c4 mb-3" id="name"></h3>
         <hr />
 
-        <form class="w-full mt-4" method="POST" id="submitReport" action="{{ url_for('student_api.reporting') }}">
+        <form class="w-full mt-4" id="submitReport">
           <div class="grid gap-6 mb-6 md:grid-cols-2">
             <!-- INPUTS HERE -->
             <div>
@@ -33,6 +33,7 @@
                 id="date-input"
                 name="date"
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+                required
               />
               <p id="error-date" class="text-c4 text-sm"></p>
             </div>
@@ -46,6 +47,7 @@
                 id="time-input"
                 name="time"
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+                required
               />
               <p id="error-time" class="text-c4 text-sm"></p>
             </div>
@@ -56,6 +58,7 @@
                   id="incident-input"
                   name="incident"
                   class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+                  required
               >
                   {% for incident_type in incident_types %}
                       <option value="{{ incident_type.IncidentTypeId }}">{{ incident_type.Name }}</option>
@@ -71,6 +74,7 @@
                   id="location-input"
                   name="location"
                   class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+                  required
               >
                   {% for location in locations %}
                       <option value="{{ location.LocationId }}">{{ location.Name }}</option>
@@ -86,6 +90,7 @@
               id="student-input"
               name="student"
               class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+              required
             >
               {% for Student in students|sort(attribute='LastName') %}
                 <option value="{{ Student.StudentId }}">{{ Student.LastName }}, {{ Student.FirstName }} {{ Student.MiddleName }}</option>
@@ -106,6 +111,7 @@
                 id="description-input"
                 name="description"
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+                required
               />
               <p id="error-description" class="text-c4 text-sm"></p>
             </div>
@@ -150,68 +156,54 @@
 <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
 <script>
-  // Initialize Notyf for notifications
-  const notyf = new Notyf({
-    duration: 5000,
-    position: {
-      x: 'right',
-      y: 'top',
-    },
-    types: [
-      {
-        type: 'success',
-        background: '#5EEE82',
-        duration: 5000,
-        dismissible: true,
-      },
-      {
-        type: 'error',
-        background: '#ef233c',
-        duration: 5000,
-        dismissible: true,
-      },
-    ],
-  });
-
   // Get the form
     // Add event listener to the form submission
     document
-      .getElementById('submitReport')
-      .addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent the default form submission
+    .getElementById('submitReport')
+    .addEventListener('submit', function (event) {
+      event.preventDefault(); // Prevent the default form submission
   
-        // Get the form data
-        const formData = new FormData(event.target);
+      // Get the form data
+      const formData = new FormData(event.target);
+      console.log('Here is the formData', formData);
+      // Define the API URL for the login endpoint
+      const apiUrl = "{{ url_for('student_api.reporting') }}";
   
-        // Define the API URL for the login endpoint
-        const apiUrl = "{{ url_for('student_api.reporting') }}";
-  
-        // Make a POST request to the login API
-        fetch(apiUrl, {
-          method: 'POST',
-          body: formData,
-          credentials: 'include', // Include credentials (cookies) in the request
+      // Make a POST request to the login API
+      fetch(apiUrl, {
+        method: 'POST',
+        body: formData,
+        credentials: 'include', // Include credentials (cookies) in the request
+      })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error('Failed to submit report');
+          }
+          return response.json(); // Parse the JSON response
         })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error('Failed to submit report');
-            }
-            return response.json(); // Parse the JSON response
-          })
-          .then((data) => {
-            // If the API returned a success message, display it and redirect to the dashboard
-            if (data.message) {
-              notyf.success(data.message);
-              setTimeout(() => {
-                window.location.href = "{{ url_for('studentHome') }}";
-              }, 5000);
-            }
-          .catch((error) => {
-            // Handle errors
-            console.error('Error submitting report:', error.message);
-            notyf.error('Failed to submit report');
-          });
-      });
+        .then((data) => {
+          // If the API returned a success message, display it and redirect to the dashboard
+          console.log('success:', data);
+          if (data.success) {
+            notyf.success(data.message);
+          // remove all the field values upon successful submission
+          document.getElementById('date-input').value = '';
+          document.getElementById('time-input').value = '';
+          document.getElementById('description-input').value = '';
+          document.getElementById('incident-input').value = '';
+          document.getElementById('location-input').value = '';
+          document.getElementById('student-input').value = '';
+          } else {
+            // If the API returned an error message, display it
+            notyf.error(data.message);
+          }
+        }) // Added missing closing parenthesis for then()
+        .catch((error) => {
+          // Handle errors
+          console.error('Error submitting report:', error.message);
+          notyf.error('Failed to submit report');
+        });
+    }); // Added missing closing parenthesis for addEventListener()
 </script>
 
 //<!-- FETCHING USER DETAILS -->
