@@ -236,6 +236,8 @@ def approvedReports():
         if allReports:
             for report in allReports:
                 # make a dictionary for reports
+                complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
+                FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
                 FullName= report.Student.LastName + ", " + report.Student.FirstName
                 dict_reports = {
                     'IncidentId': report.IncidentReport.Id,
@@ -244,6 +246,7 @@ def approvedReports():
                     'IncidentName': report.IncidentType.Name,
                     'LocationName': report.Location.Name,
                     'StudentName': FullName,
+                    'Complainant': FullNameComplainant,
                     'Description': report.IncidentReport.Description,
                     'Status': report.IncidentReport.Status,
                     'Acessibility': report.IncidentReport.IsAccessible
@@ -294,6 +297,8 @@ def approvedViolations():
         if allViolations:
             for violations in allViolations:
                 # make a dictionary for reports
+                complainant = db.session.query(Student).filter(Student.StudentId == violations.ViolationForm.ComplainantId).first()
+                FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
                 FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
                 dict_violation = {
                 'ViolationId': violations.ViolationForm.ViolationId,
@@ -302,7 +307,7 @@ def approvedViolations():
                 'IncidentName': violations.IncidentType.Name,
                 'LocationName': violations.Location.Name,
                 'StudentName': FullName,
-                'Complainant': violations.ViolationForm.ComplainantId,
+                'Complainant': FullNameComplainant,
                 'Description': violations.ViolationForm.Description,
                 'Status': violations.ViolationForm.Status,
                 'Acessibility': violations.ViolationForm.IsAccessible
