@@ -117,7 +117,7 @@ endblock title %} {% block styles %}
   async function fetchReport() {
     try {
       // Fetch location data
-      const reportResponse = await fetch(`${api_base_url}/closed-case`);
+      const reportResponse = await fetch(`${api_base_url}/resolved-case`);
 
       if (!reportResponse.ok) {
         throw new Error('Failed to fetch report data');
@@ -134,23 +134,23 @@ endblock title %} {% block styles %}
         // Create a tr element for each report
         const reportRow = document.createElement('tr');
         reportRow.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <p><strong>Report ID:</strong> ${report.IncidentId}</p>
-                  <p><strong>Time:</strong> ${report.Time}</p>
-                  <p><strong>Incident Type:</strong> ${report.IncidentName}</p>
-                  <p><strong>Location:</strong> ${report.LocationName}</p>
-                  <p><strong>Student:</strong> ${report.StudentName}</p>
-                  <p><strong>Submitted by:</strong> ${report.Complainant}</p>
-                  <p><strong>Description:</strong> ${report.Description}</p>
-                  <strong>Status:</strong>
-                  <p id='status-${report.IncidentId}'> ${report.Status}</p>
-                  <!-- Add other details as needed -->
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
-                  <button class="bg-red-600 p-2 text-white" onclick="removeAccessReports(${report.IncidentId})">Reopen Case</button>
-                </td>
-              `;
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <p><strong>Report ID:</strong> ${report.IncidentId}</p>
+                      <p><strong>Time:</strong> ${report.Time}</p>
+                      <p><strong>Incident Type:</strong> ${report.IncidentName}</p>
+                      <p><strong>Location:</strong> ${report.LocationName}</p>
+                      <p><strong>Student:</strong> ${report.StudentName}</p>
+                      <p><strong>Submitted by:</strong> ${report.Complainant}</p>
+                      <p><strong>Description:</strong> ${report.Description}</p>
+                      <strong>Status:</strong>
+                      <p id='status-${report.IncidentId}'> ${report.Status}</p>
+                      <!-- Add other details as needed -->
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
+                      <button class="bg-red-600 p-2 text-white" onclick="removeAccessReports(${report.IncidentId})">Reopen Case</button>
+                    </td>
+                  `;
 
         // Append the reportRow to the outputContainer
         outputContainer.appendChild(reportRow);

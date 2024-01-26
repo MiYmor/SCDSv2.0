@@ -230,6 +230,17 @@
                     class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'close-case' else 'hover:bg-gray-100 hover:text-c1' }}"
                   >
                     <span class="flex-1 ml-3 whitespace-nowrap"
+                      >Approved Case</span
+                    >
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="{{ url_for('resolvedCase') }}"
+                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'resolved-case' else 'hover:bg-gray-100 hover:text-c1' }}"
+                  >
+                    <span class="flex-1 ml-3 whitespace-nowrap"
                       >Resolved Case</span
                     >
                   </a>

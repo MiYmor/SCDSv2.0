@@ -199,7 +199,35 @@ def allViolations():
 # get all the case that are closed
 @system_admin_api.route('/closed-case', methods=['GET'])
 def allClosedCase():
-    allClosedCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.IsAccessible == True).order_by(IncidentReport.Date).all()
+    allClosedCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='pending').order_by(IncidentReport.Date).all()
+    list_closedcase=[]
+    if allClosedCase:
+            for report in allClosedCase:
+                # make a dictionary for reports
+                complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
+                FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
+                FullName= report.Student.LastName + ", " + report.Student.FirstName 
+                dict_closedcase = {
+                    'IncidentId': report.IncidentReport.Id,
+                    'Date': report.IncidentReport.Date,
+                    'Time': report.IncidentReport.Time,
+                    'IncidentName': report.IncidentType.Name,
+                    'LocationName': report.Location.Name,
+                    'StudentName': FullName,
+                    'Complainant': FullNameComplainant,
+                    'Description': report.IncidentReport.Description,
+                    'Status': report.IncidentReport.Status,
+                    'Acessibility': report.IncidentReport.IsAccessible
+
+                }
+                # append the dictionary to the list
+                list_closedcase.append(dict_closedcase)
+            return jsonify({'result': list_closedcase})
+        
+# get all the case that are closed
+@system_admin_api.route('/resolved-case', methods=['GET'])
+def allResolvedCase():
+    allClosedCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='approved').order_by(IncidentReport.Date).all()
     list_closedcase=[]
     if allClosedCase:
             for report in allClosedCase:

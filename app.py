@@ -257,6 +257,11 @@ def create_app():
     def closedCase():
         return render_template('systemadmin/closed_case.html', system_admin_api_base_url=system_admin_api_base_url, current_page="close-case")
     
+    @app.route('/systemadmin/resolved-case')
+    @role_required('systemAdmin')
+    def resolvedCase():
+        return render_template('systemadmin/resolved_case.html', system_admin_api_base_url=system_admin_api_base_url, current_page="resolved-case")
+    
     @app.route('/systemadmin/close-violation')
     @role_required('systemAdmin')
     def closedViolation():
