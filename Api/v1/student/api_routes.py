@@ -212,6 +212,10 @@ def reporting():
             incident = IncidentReport(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, ComplainantId=user.StudentId, Description=description)
             db.session.add(incident)
             db.session.commit()
+            
+            msg = Message('Incident Reported', sender=("MAIL_USERNAME", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg.body = 'An incident has been reported. Please check the system for details.'
+            mail.send(msg)
 
             return jsonify({'message': 'Case reported successfully', 'success': True }), 200
         except Exception as e:
@@ -277,6 +281,9 @@ def reporting_violation():
             db.session.add(violation)
             db.session.commit()
             
+            msg = Message('Incident Reported', sender=("MAIL_USERNAME", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg.body = 'An Violation has been reported. Please check the system for details.'
+            mail.send(msg)
             return jsonify({'message': 'Violation reported successfully', 'success': True }), 200
         except Exception as e:
             # Log the exception and display an error message to the user
