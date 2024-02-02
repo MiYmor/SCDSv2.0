@@ -5,13 +5,14 @@ from flask_cors import CORS
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired
+from flask_mail import Mail, Message
+
 
 
 from Api.v1.student.api_routes import student_api
 from Api.v1.faculty.api_routes import faculty_api
 from Api.v1.systemadmin.api_routes import system_admin_api
 
-from flask_mail import Mail, Message
 import os
 from dotenv import load_dotenv
 
@@ -65,12 +66,12 @@ def create_app():
     
    
     # Configure Flask-Mail for sending emails
-    app.config['MAIL_SERVER'] =  os.getenv("MAIL_SERVER")
-    app.config['MAIL_PORT'] =  os.getenv("MAIL_PORT")
-    app.config['MAIL_USERNAME'] =  os.getenv("MAIL_USERNAME")
-    app.config['MAIL_PASSWORD'] = os.getenv("MAIL_PASSWORD")
-    app.config['MAIL_USE_TLS'] = False
+    app.config['MAIL_SERVER'] = os.getenv('SCDS_MAIL_SERVER')
+    app.config['MAIL_PORT'] = os.getenv('SCDS_MAIL_PORT')
     app.config['MAIL_USE_SSL'] = True
+    app.config['MAIL_USERNAME'] = os.getenv('SCDS_MAIL_USERNAME')
+    app.config['MAIL_PASSWORD'] = os.getenv('SCDS_MAIL_PASSWORD')
+
     # app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
     mail.init_app(app)
     # The Api Key is static for development mode. The Api key in future must refresh in order to secure the api endpoint of the application
