@@ -185,9 +185,7 @@ def reporting_violation():
             return jsonify({'message': 'An error occurred while reporting the incident'}), 500
 
 @faculty_api.route('/all-reports', methods={'GET'})
-def allReports():
-    print("Hello")
-    
+def allReports():    
      #.filter = multiple queries .filter_by = single query
     faculty_id= session.get('user_id')
     allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.InvestigatorId == faculty_id, IncidentReport.IsAccessible == True).order_by(IncidentReport.Date).all()

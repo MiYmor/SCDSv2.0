@@ -1,0 +1,242 @@
+{% extends "systemadmin/layout.html" %} {% block title %} SCDS - Profile {%
+endblock title %} {% block styles %}
+<style>
+  //* Apply bold style to the header cells */
+  .e-headertext {
+    color: white;
+    font-weight: bolder !important;
+    font-size: 16px !important;
+  }
+
+  th.e-headercell {
+    background-color: #6376eb !important;
+    color: white;
+  }
+
+  /* Table styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  /* Alternate row colors */
+  tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  /* Hover effect */
+  tbody tr:hover {
+    background-color: #ddd;
+  }
+
+  /* Adjust text color */
+  tbody td {
+    color: #333;
+  }
+</style>
+{% endblock styles %} {% block content %}
+    <div class="p-4 md:ml-72">
+      <div class="border-2 border-gray-200 border-dashed rounded-lg">
+        <div class="grid grid-cols-1">
+          <div
+            class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
+          >
+            <h3 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">
+              Pending Faculty Cases
+            </h3>
+            <hr class="mx-2" />
+
+            <div class="flex items-end justify-between">
+              <div class="w-full bg-white p-4">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Date
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Report Details
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody id="output-container">
+                    {% for report in reports %}
+                    <tr class="bg-white">
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                      >
+                        {{ report.date }}
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                      >
+                        <p>
+                          <strong>Report ID:</strong> {{ report.CaseId }}
+                        </p>
+                        <p>
+                          <strong>Incident Type:</strong> {{
+                          report.incident_type }}
+                        </p>
+                        <p><strong>Location:</strong> {{ report.location }}</p>
+                        <p>
+                          <strong>Submitted by:</strong> {{ report.complainant
+                          }}
+                        </p>
+
+                        <!-- Add other details as needed -->
+                      </td>
+                      <td
+                        class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"
+                      >
+                        <button
+                          class="bg-blue-600 p-2 text-white"
+                          onclick="editReport({{ report.CaseId }})"
+                        >
+                          Edit Report
+                        </button>
+                      </td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endblock content %} {% block script %}
+    <script>
+      // Fetch location and incident types
+      async function fetchReport() {
+        try {
+          // Fetch location data
+          const reportResponse = await fetch(
+            `${api_base_url}/all-faculty-case`
+          );
+
+          if (!reportResponse.ok) {
+            throw new Error('Failed to fetch report data');
+          }
+
+          const reportDetails = await reportResponse.json();
+          console.log(reportDetails);
+
+          // Get the container element where you want to render the data
+          const outputContainer = document.getElementById('output-container');
+
+          // Loop through the consoleResponse array and create HTML elements for each object
+          reportDetails.result.forEach(async (report) => {
+            // Create a tr element for each report
+            const reportRow = document.createElement('tr');
+            reportRow.innerHTML = `
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <p><strong>Report ID:</strong> ${report.CaseId}</p>
+                    <p><strong>Time:</strong> ${report.Time}</p>
+                    <p><strong>Location:</strong> ${report.LocationName}</p>
+                    <p><strong>Faculty:</strong> ${report.FacultyName}</p>
+                    <p><strong>Submitted by:</strong> ${report.Complainant}</p>
+                    <p><strong>Description:</strong> ${report.Description}</p>
+                    <strong>Status:</strong>
+                    <p id='status-${report.CaseId}'> ${report.Status}</p>
+                    <!-- Add other details as needed -->
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
+                    <button class="bg-red-600 p-2 text-white" onclick="approveFacultyCase(${report.CaseId})">Approve Faculty Case</button>
+                    <button class="bg-blue-600 p-2 text-white" onclick="resolveFacultyCase(${report.CaseId})">Resolve Faculty Case</button>
+                  </td>
+                `;
+
+            // Append the reportRow to the outputContainer
+            outputContainer.appendChild(reportRow);
+          });
+        } catch (error) {
+          console.error(error.message);
+        }
+      }
+      // Make a approved report function
+      async function approveFacultyCase(CaseId) {
+        console.log('approveFacultyCase', CaseId);
+        try {
+          const response = await fetch(`${api_base_url}/approve-faculty-case`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ CaseId }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to make accesible faculty case');
+          }
+
+          const data = await response.json();
+          console.log(data);
+
+          if (data.result) {
+            notyf.success('Faculty Case is now approved');
+            document.getElementById(`status-${CaseId}`).innerHTML = 'true';
+          } else if (data.error) {
+            notyf.error('Failed to approve faculty case');
+          }
+        } catch (error) {
+          console.error(error.message);
+        }
+      }
+
+      // Make a approved report function
+      async function resolveFacultyCase(CaseId) {
+        console.log('resolveFacultyCase', CaseId);
+        try {
+          const response = await fetch(`${api_base_url}/resolved-faculty-case`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ CaseId }),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to make accesible faculty case');
+          }
+
+          const data = await response.json();
+          console.log(data);
+
+          if (data.result) {
+            notyf.success('Faculty Case is now Resolved');
+            document.getElementById(`status-${CaseId}`).innerHTML = 'false';
+          } else if (data.error) {
+            notyf.error('Failed to resolve faculty case');
+          }
+        } catch (error) {
+          console.error(error.message);
+        }
+      }
+
+      fetchReport();
+    </script>
+    {% endblock script %}
+  </div>
+</div>

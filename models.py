@@ -113,6 +113,32 @@ class IncidentReport(db.Model):
             'IsAccessible': self.IsAccessible
         }
 
+class FacultyIncidentReport(db.Model):
+    __tablename__ = 'SCDSFacultyIncidentReport'
+    
+    Id = db.Column(db.Integer, primary_key=True, nullable=False) #ReportID
+    Date = db.Column(db.String(20), nullable=False) #Date
+    Time = db.Column(db.String(20), nullable=False) #Time
+    LocationId = db.Column(db.Integer, db.ForeignKey('SCDSLocation.LocationId', ondelete="CASCADE")) #LocationID
+    FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE")) #StudentID
+    ComplainantId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #ComplainantID
+    Description = db.Column(db.Text, nullable=False) #Description
+    Sanction = db.Column(db.Text, nullable=True) #Sanction
+    Status = db.Column(db.String(20), nullable=False, default='pending') #Status
+    IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
+    
+    def to_dict(self):
+        return {
+            'Date': self.Date,
+            'Time': self.Time,
+            'LocationId': self.LocationId,
+            'StudentId': self.StudentId,
+            'ComplainantID': self.ComplainantID,
+            'Description': self.Description, 
+            'Sanction': self.Sanction,
+            'Status': self.Status,
+            'IsAccessible': self.IsAccessible
+        }
 
 # Student Users
 class Student(db.Model): # (class SPSStudent) In DJANGO you must set the name directly here 

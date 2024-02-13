@@ -176,21 +176,20 @@ def create_app():
     @role_required('student')
     def studentIncidentReport():
         # Fetch incident types and locations from the database
-        incident_types = IncidentType.query.all()
         locations = Location.query.all()
         # Fetch the list of students (modify the query based on your data model)
         students = Student.query.all()
         # Pass the 'authenticated' variable, students, incident types, and locations to the template context
-        return render_template('student/incident_report_form.html', authenticated=True, students=students, incident_types=incident_types, locations=locations, current_page="incident-report")
+        return render_template('student/incident_report_form.html', authenticated=True, students=students, locations=locations, current_page="incident-report")
     
     @app.route('/student/faculty-incident-report', methods=['GET'])
     @role_required('student')
     def facultyIncidentReport():
         # Fetch incident types and locations from the database
         locations = Location.query.all()
-        faculties  = Faculty.query.all()
+        faculty  = Faculty.query.all()
         # Pass the 'authenticated' variable, students, incident types, and locations to the template context
-        return render_template('student/incident_report_form.html', authenticated=True, locations=locations, faculty=faculties , current_page="faculty-incident-report")
+        return render_template('student/faculty_case.html', authenticated=True, locations=locations, faculty=faculty , current_page="faculty-incident-report")
     
     
 
@@ -251,17 +250,14 @@ def create_app():
     def systemAdminHome():
         return render_template('systemadmin/home.html', system_admin_api_base_url=system_admin_api_base_url, current_page="home")
     
+    # ========================================================================
+    # All Student Case Routes Here
     @app.route('/systemadmin/manage-reports')
     @role_required('systemAdmin')
     def reportManagementAdmin():
         #fetch the list of faculty
         faculty = Faculty.query.all()
         return render_template('systemadmin/manage_report.html', system_admin_api_base_url=system_admin_api_base_url,faculty=faculty, current_page="manage-reports")
-    
-    @app.route('/systemadmin/manage-violations')
-    @role_required('systemAdmin')
-    def violationManagementAdmin():
-        return render_template('systemadmin/manage_violation.html', system_admin_api_base_url=system_admin_api_base_url, current_page="manage-violations")
     
     @app.route('/systemadmin/close-case')
     @role_required('systemAdmin')
@@ -273,6 +269,40 @@ def create_app():
     def resolvedCase():
         return render_template('systemadmin/resolved_case.html', system_admin_api_base_url=system_admin_api_base_url, current_page="resolved-case")
     
+    @app.route('/systemadmin/resolved-precase')
+    @role_required('systemAdmin')
+    def resolvedprecase():
+        return render_template('systemadmin/resolve_precase.html', system_admin_api_base_url=system_admin_api_base_url, current_page="resolved-precase")
+    
+    # ========================================================================
+    # All Faculty Case Routes Here
+    @app.route('/systemadmin/manage-faculty-case')
+    @role_required('systemAdmin')
+    def facultyReportManagementAdmin():
+        #fetch the list of faculty
+        return render_template('systemadmin/manage_faculty_case.html', system_admin_api_base_url=system_admin_api_base_url, current_page="manage-faculty-case")
+    
+    @app.route('/systemadmin/resolved-faculty-case')
+    @role_required('systemAdmin')
+    def resolvedFacultyCase():
+        #fetch the list of faculty
+        return render_template('systemadmin/resolved_faculty_case.html', system_admin_api_base_url=system_admin_api_base_url, current_page="resolved-faculty-case")
+    
+    @app.route('/systemadmin/removed-faculty-case')
+    @role_required('systemAdmin')
+    def removedFacultyCase():
+        #fetch the list of faculty
+        return render_template('systemadmin/removed_faculty_case.html', system_admin_api_base_url=system_admin_api_base_url, current_page="removed-faculty-case")
+    
+    # ========================================================================
+    # All Violation Routes Here
+    @app.route('/systemadmin/manage-violations')
+    @role_required('systemAdmin')
+    def violationManagementAdmin():
+        #fetch the list of offense per violation type
+        violation_type = IncidentType.query.all()
+        return render_template('systemadmin/manage_violation.html', system_admin_api_base_url=system_admin_api_base_url,violation_type=violation_type, current_page="manage-violations")
+    
     @app.route('/systemadmin/close-violation')
     @role_required('systemAdmin')
     def closedViolation():
@@ -282,11 +312,6 @@ def create_app():
     @role_required('systemAdmin')
     def removedViolation():
         return render_template('systemadmin/removed_violation.html', system_admin_api_base_url=system_admin_api_base_url, current_page="removed-violation")
-    
-    @app.route('/systemadmin/resolved-precase')
-    @role_required('systemAdmin')
-    def resolvedprecase():
-        return render_template('systemadmin/resolve_precase.html', system_admin_api_base_url=system_admin_api_base_url, current_page="resolved-precase")
     # ========================================================================
     # Register the API blueprint
     app.register_blueprint(system_admin_api, url_prefix=system_admin_api_base_url)

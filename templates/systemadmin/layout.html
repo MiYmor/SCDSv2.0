@@ -210,7 +210,7 @@
                     class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'manage-reports' else 'hover:bg-gray-100 hover:text-c1' }}"
                   >
                     <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Case Management</span
+                      >Student Case Management</span
                     >
                   </a>
                 </li>
@@ -221,7 +221,7 @@
                     class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'close-case' else 'hover:bg-gray-100 hover:text-c1' }}"
                   >
                     <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Approved Case</span
+                      >Approved Student Case</span
                     >
                   </a>
                 </li>
@@ -232,7 +232,7 @@
                     class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'resolved-case' else 'hover:bg-gray-100 hover:text-c1' }}"
                   >
                     <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Resolved Case</span
+                      >Resolved Student Case</span
                     >
                   </a>
                 </li>
@@ -243,7 +243,40 @@
                     class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'resolved-precase' else 'hover:bg-gray-100 hover:text-c1' }}"
                   >
                     <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Resolved Pre-Case</span
+                      >Resolved Student Pre-Case</span
+                    >
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="{{ url_for('facultyReportManagementAdmin') }}"
+                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'manage-faculty-case' else 'hover:bg-gray-100 hover:text-c1' }}"
+                  >
+                    <span class="flex-1 ml-3 whitespace-nowrap"
+                      >Faculty Case Management</span
+                    >
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="{{ url_for('resolvedFacultyCase') }}"
+                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'resolved-faculty-case' else 'hover:bg-gray-100 hover:text-c1' }}"
+                  >
+                    <span class="flex-1 ml-3 whitespace-nowrap"
+                      >Resolved Faculty Case</span
+                    >
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="{{ url_for('removedFacultyCase') }}"
+                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'removed-faculty-case' else 'hover:bg-gray-100 hover:text-c1' }}"
+                  >
+                    <span class="flex-1 ml-3 whitespace-nowrap"
+                      >Removed Faculty Case</span
                     >
                   </a>
                 </li>

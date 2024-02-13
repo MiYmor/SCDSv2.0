@@ -3,7 +3,7 @@ from flask import jsonify
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template, get_flashed_messages
 from sqlalchemy import desc
 from werkzeug.security import check_password_hash
-from models import Student, db, IncidentReport, Location, IncidentType , SystemAdmin
+from models import Student, db, IncidentReport, Location, IncidentType , SystemAdmin, ViolationForm, Faculty, FacultyIncidentReport
 import os
 
 from decorators.auth_decorators import role_required
@@ -225,6 +225,37 @@ def reporting():
     # Handle GET request or other methods gracefully
     flash('Invalid request method', 'error')
     return redirect(url_for('studentHome'))
+
+@student_api.route('/faculty-reporting', methods=['POST'])
+def facultyReporting():
+    user = getCurrentUser()
+    if request.method == 'POST':
+        try:
+            # Handle form submission logic here
+            date = request.form['date']
+            time = request.form['time']
+            location_id = request.form['location']
+            faculty_id = request.form['faculty']
+            description = request.form['description']
+
+            # Create an IncidentReport object and commit it to the database
+            incident = FacultyIncidentReport(Date=date, Time=time, LocationId=location_id, FacultyId=faculty_id, ComplainantId=user.StudentId, Description=description)
+            db.session.add(incident)
+            db.session.commit()
+            
+            msg = Message('Case Reported', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg.body = 'An incident has been reported. Please check the system for details.'
+            mail.send(msg)
+
+            return jsonify({'message': 'Case reported successfully', 'success': True }), 200
+        except Exception as e:
+            # Log the exception and display an error message to the user
+            print('An exception occurred:', e)
+            return jsonify({'message': 'An error occurred while reporting the incident'}), 500
+
+    # Handle GET request or other methods gracefully
+    flash('Invalid request method', 'error')
+    return redirect(url_for('studentHome'))
     
 # fetch approved reports for student
 @student_api.route('/fetch/approved/reports', methods=['GET'])
@@ -279,7 +310,7 @@ def reporting_violation():
             db.session.add(violation)
             db.session.commit()
             
-            msg = Message('Incident Reported', sender=("MAIL_USERNAME", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg = Message('Violation Reported', sender=("MAIL_USERNAME", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
             msg.body = 'An Violation has been reported. Please check the system for details.'
             mail.send(msg)
             return jsonify({'message': 'Violation reported successfully', 'success': True }), 200

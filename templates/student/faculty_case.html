@@ -70,18 +70,18 @@
             
 
             <div>
-              <label for="student-input" class="block mb-2 text-c1 font-extrabold">Select Complainee</label>
+              <label for="faculty-input" class="block mb-2 text-c1 font-extrabold">Select Complainee</label>
               <select
-                id="student-input"
-                name="student"
+                id="faculty-input"
+                name="faculty"
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
                 required
               >
-                {% for Faculty in faculties|sort(attribute='LastName') %}
-                  <option value="{{ Faculty.FacultyId }}">{{ Faculty.LastName }}, {{ Faculty.FirstName }} {{ Faculty.MiddleName }}</option>
+                {% for Faculty in faculty|sort(attribute='LastName') %}
+                  <option value="{{ Faculty.FacultyId }}">{{ Faculty.LastName }}, {{ Faculty.FirstName }}</option>
                 {% endfor %}
               </select>
-              <p id="error-student" class="text-c4 text-sm"></p>
+              <p id="error-faculty" class="text-c4 text-sm"></p>
             </div>
           
             <div>
@@ -149,7 +149,7 @@
       const formData = new FormData(event.target);
       console.log('Here is the formData', formData);
       // Define the API URL for the login endpoint
-      const apiUrl = "{{ url_for('student_api.reporting') }}";
+      const apiUrl = "{{ url_for('student_api.facultyReporting') }}";
   
       // Make a POST request to the login API
       fetch(apiUrl, {

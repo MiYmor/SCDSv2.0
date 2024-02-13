@@ -2,7 +2,7 @@
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
 from flask_mail import Message
 from mail import mail
-from models import SystemAdmin, db, IncidentReport, Student, Location, IncidentType, Faculty, ViolationForm
+from models import SystemAdmin, db, IncidentReport, Student, Location, IncidentType, Faculty, ViolationForm, FacultyIncidentReport
 import pandas as pd
 
 from sqlalchemy.exc import IntegrityError
@@ -88,7 +88,53 @@ def manage_reports():
     except Exception as e:
         return {"message": "An error occurred", "status": 500}
 
+# to display all the reports
+@system_admin_api.route('/systemadmin/manage-faculty-case', methods={'GET', 'POST'})
+def manage_faculty_case():
+    if request.method == 'POST':
+        # Handle the form submission for updating status
+        report_id = request.form.get('report_id')
+        new_status = request.form.get('new_status')
 
+        try:
+            # Assuming you have a model named IncidentReport
+            report = db.session.query(FacultyIncidentReport).get(report_id)
+            if report:
+                report.status = new_status
+                db.session.commit()
+                return redirect(url_for('manage_faculty_case'))
+            else:
+                return {"message": "Report not found", "status": 404}
+        except IntegrityError:
+            db.session.rollback()
+            return {"message": "Error updating status", "status": 500}
+
+    try:
+        # Assuming you have a model named IncidentReport
+        reports = db.session.query(FacultyIncidentReport).all()
+
+        # Convert the reports data to a DataFrame
+        df = pd.DataFrame([{
+            'Report ID': report.id,
+            'Date': report.date,
+            'Time': report.time,
+            'Location': report.location,
+            'Faculty': report.faculty,
+            'Complainant': report.complainant,
+            'Description': report.description,
+            'Status': report.status,
+            # Add other fields as needed
+        } for report in reports])
+
+        # Optionally, you can perform additional data manipulations here
+
+        # Save the DataFrame to a CSV file
+        df.to_csv('static/csv/reports.csv', index=False)
+
+        return render_template('systemadmin/manage_faculty_case.html', reports=reports)
+    except Exception as e:
+        return {"message": "An error occurred", "status": 500}
+    
 #to fetch all violation available
 @system_admin_api.route('/systemadmin/manage-violation', methods={'GET', 'POST'})
 def manage_violations():
@@ -138,7 +184,7 @@ def manage_violations():
         return {"message": "An error occurred", "status": 500}
 
 
-# fetch all the case that are available
+# fetch all the student case that are available
 @system_admin_api.route('/all-reports', methods={'GET'})
 def allReports():
     #.filter = multiple queries .filter_by = single query
@@ -166,8 +212,35 @@ def allReports():
             list_reports.append(dict_reports)
         return jsonify({'result': list_reports})
 
+# fetch all the faculty case that are available
+@system_admin_api.route('/all-faculty-case', methods={'GET'})
+def allFacultyCase():
+    #.filter = multiple queries .filter_by = single query
+    allFacultyCase = db.session.query(FacultyIncidentReport, Faculty, Location).join(Faculty, Faculty.FacultyId == FacultyIncidentReport.FacultyId).join(Location, Location.LocationId == FacultyIncidentReport.LocationId).filter(FacultyIncidentReport.IsAccessible == False, FacultyIncidentReport.Status != 'resolved').order_by(FacultyIncidentReport.Date).all()
+    list_reports=[]
+    if allFacultyCase:
+        for report in allFacultyCase:
+            # make a dictionary for reports
+            complainant = db.session.query(Student).filter(Student.StudentId == report.FacultyIncidentReport.ComplainantId).first()
+            FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
+            FullName= report.Faculty.LastName + ", " + report.Faculty.FirstName
+            dict_reports = {
+                'IncidentId': report.FacultyIncidentReport.Id,
+                'Date': report.FacultyIncidentReport.Date,
+                'Time': report.FacultyIncidentReport.Time,
+                'LocationName': report.Location.Name,
+                'FacultyName': FullName,
+                'Complainant': FullNameComplainant,
+                'Description': report.FacultyIncidentReport.Description,
+                'Status': report.FacultyIncidentReport.Status,
+                'Acessibility': report.FacultyIncidentReport.IsAccessible
 
-# fetch all the case that are available
+            }
+            # append the dictionary to the list
+            list_reports.append(dict_reports)
+        return jsonify({'result': list_reports})
+    
+# fetch all the violations that are available
 @system_admin_api.route('/all-violations', methods={'GET'})
 def allViolations():
     #.filter = multiple queries .filter_by = single query
@@ -194,7 +267,6 @@ def allViolations():
             # append the dictionary to the list
             list_violations.append(dict_violation)
         return jsonify({'result': list_violations})
-
 
 # get all the case that are closed
 @system_admin_api.route('/closed-case', methods=['GET'])
@@ -332,6 +404,9 @@ def allRemovedViolations():
             list_removedviolations.append(dict_removedviolation)
         return jsonify({'result': list_removedviolations})
 
+
+
+#================================================================================================
 # to approve the case or open the case 
 @system_admin_api.route('/access-report', methods={'POST'})
 def accessReports():    
@@ -399,6 +474,50 @@ def resolvePreCase():
     print('Received incidentId:', incident_id)
     # make a querry calling the incidentreport table
     incident = IncidentReport.query.filter_by(Id=incident_id).first()
+    # if the incident is found
+    if incident:
+        # change the status to approved
+        incident.Status = 'resolved'
+        # commit the changes
+        db.session.commit()
+        # return a message
+        return jsonify({'result': 'success', 'message': 'Report approved'})
+    else:
+        # return a message
+        return jsonify({'error': 'failed', 'message': 'Report not found'})
+
+@system_admin_api.route('/approve-faculty-case', methods={'POST'})
+def approveFacultyCase():    
+     # Assuming the incoming data is JSON
+    data = request.get_json()
+    # Extract incidentId from the JSON payload
+    case_id = data.get('CaseId')
+    # Your logic to handle the incidentId
+    print('Received CaseId:', case_id)
+    # make a querry calling the incidentreport table
+    incident = FacultyIncidentReport.query.filter_by(Id=case_id).first()
+    # if the incident is found
+    if incident:
+        # change the status to approved
+        incident.Status = 'approved'
+        # commit the changes
+        db.session.commit()
+        # return a message
+        return jsonify({'result': 'success', 'message': 'Report approved'})
+    else:
+        # return a message
+        return jsonify({'error': 'failed', 'message': 'Report not found'})
+    
+@system_admin_api.route('/resolved-faculty-case', methods={'POST'})
+def resolveFacultyCase():    
+     # Assuming the incoming data is JSON
+    data = request.get_json()
+    # Extract incidentId from the JSON payload
+    case_id = data.get('CaseId')
+    # Your logic to handle the incidentId
+    print('Received CaseId:', case_id)
+    # make a querry calling the incidentreport table
+    incident = FacultyIncidentReport.query.filter_by(Id=case_id).first()
     # if the incident is found
     if incident:
         # change the status to approved

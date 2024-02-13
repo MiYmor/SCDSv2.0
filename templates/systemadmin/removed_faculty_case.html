@@ -1,0 +1,204 @@
+{% extends "systemadmin/layout.html" %} {% block title %} SCDS - Profile {%
+endblock title %} {% block styles %}
+<style>
+  /* Apply bold style to the header cells */
+  .e-headertext {
+    color: white;
+    font-weight: bolder !important;
+    font-size: 16px !important;
+  }
+
+  th.e-headercell {
+    background-color: #6376eb !important;
+    color: white;
+  }
+
+  /* Table styles */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+  }
+
+  th,
+  td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+
+  /* Alternate row colors */
+  tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  /* Hover effect */
+  tbody tr:hover {
+    background-color: #ddd;
+  }
+
+  /* Adjust text color */
+  tbody td {
+    color: #333;
+  }
+</style>
+{% endblock styles %} {% block content %}
+<div class="p-4 md:ml-72">
+  <div class="border-2 border-gray-200 border-dashed rounded-lg">
+    <div class="grid grid-cols-1">
+      <div
+        class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
+      >
+        <h3 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">
+          Removed Violations
+        </h3>
+        <hr class="mx-2" />
+
+        <div class="flex items-end justify-between">
+          <div class="w-full bg-white p-4">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Date
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Violation Details
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="output-container">
+                {% for report in reports %}
+                <tr class="bg-white">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {{ report.date }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <p>
+                      <strong>Violation ID:</strong> {{ report.ViolationId }}
+                    </p>
+                    <p>
+                      <strong>Violation Type:</strong> {{ report.incident_type
+                      }}
+                    </p>
+                    <p><strong>Location:</strong> {{ report.location }}</p>
+                    <p>
+                      <strong>Submitted by:</strong> {{ report.complainant }}
+                    </p>
+                    <!-- Add other details as needed -->
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button
+                      class="bg-blue-600 p-2 text-white"
+                      onclick="editReport({{ report.ViolationId }})"
+                    >
+                      Violation Offense
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock content %} {% block script %}
+<script>
+  // Fetch location and incident types
+  async function fetchViolations() {
+    try {
+      // Fetch violation data
+      const violationResponse = await fetch(
+        `${api_base_url}/all-removed-violations`
+      );
+
+      if (!violationResponse.ok) {
+        throw new Error('Failed to fetch violation data');
+      }
+
+      const violationDetails = await violationResponse.json();
+      console.log(violationDetails);
+
+      // Get the container element where you want to render the data
+      const outputContainer = document.getElementById('output-container');
+
+      // Clear existing content in the output container
+      outputContainer.innerHTML = '';
+
+      // Loop through the violationDetails array and create HTML elements for each object
+      violationDetails.result.forEach((violation) => {
+        // Create a tr element for each violation
+        const violationRow = document.createElement('tr');
+        violationRow.innerHTML = `
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <p><strong>Violation ID:</strong> ${violation.ViolationId}</p>
+                        <p><strong>Time:</strong> ${violation.Time}</p>
+                        <p><strong>Violation Type:</strong> ${violation.IncidentName}</p>
+                        <p><strong>Location:</strong> ${violation.LocationName}</p>
+                        <p><strong>Violator:</strong> ${violation.StudentName}</p>
+                        <p><strong>Submitted by:</strong> ${violation.Complainant}</p>
+                        <p><strong>Description:</strong> ${violation.Description}</p>
+                        <strong>Status:</strong>
+                        <p id='status-${violation.ViolationId}'> ${violation.Status}</p>
+                        <!-- Add other details as needed -->
+                      </td>
+                      <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
+                        <button class="bg-blue-600 p-2 text-white" onclick="reopenRemovedViolations(${violation.ViolationId})">Reopen Violation</button>
+                      </td>
+                    `;
+
+        // Append the violationRow to the outputContainer
+        outputContainer.appendChild(violationRow);
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+  // Make a approved report function
+  async function reopenRemovedViolations(ViolationId) {
+    console.log('reopenRemovedViolations', ViolationId);
+    try {
+      const response = await fetch(`${api_base_url}/reopen-removedviolation`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ViolationId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to make accesible report');
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.result) {
+        notyf.success('Violation is now Reopened');
+        document.getElementById(`status-${ViolationId}`).innerHTML = 'false';
+      } else if (data.error) {
+        notyf.error('Failed to reopen violation');
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+  fetchViolations();
+</script>
+{% endblock script %}
