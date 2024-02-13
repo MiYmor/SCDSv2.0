@@ -1,4 +1,4 @@
-Student Conduct and Discpline System
+Student Conduct and Discipline System
 
 The Student Conduct and Discipline System (SCDS) is a technology platform at Polytechnic University of the Philippines - Quezon City Branch designed to streamline incident reporting, tracking, and resolution within the university's Student Code and Conduct. Through this online system, students and faculty can formally report violations to the Office of Student Affairs and Services (OSAS). The system autonomously notifies implicated students, assigns offense levels based on the severity of violations, and allows OSAS administrators to resolve cases promptly or escalate them for further investigation.
 
