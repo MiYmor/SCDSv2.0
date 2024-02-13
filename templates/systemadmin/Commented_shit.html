@@ -1,0 +1,119 @@
+{% comment %}
+<!-- Sidebar -->
+<div class="flex bg-white lg:p-0 p-4 md:ml-72 shadow-md">
+  <div class="flex items-center justify-center md:gap-4 lg:gap-0 lg:ml-2">
+    <!-- Case option -->
+    <div class="relative">
+      <button
+        id="caseToggle"
+        class="text-gray-600 hover:text-gray-800 focus:outline-none ml-auto md:hidden"
+      >
+        <span class="sr-only">Open case options</span>
+        <!-- Your SVG path for toggle icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          class="w-6 h-6"
+        >
+          <!-- Your SVG path for toggle icon -->
+        </svg>
+      </button>
+      <div
+        id="caseOptions"
+        class="absolute left-0 mt-2 w-48 bg-white shadow-md hidden"
+      >
+        <!-- Sub-options for Case -->
+        <ul>
+          <li>
+            <a
+              href="{{ url_for('reportManagementAdmin') }}"
+              class="block px-4 py-2"
+              >Case Management</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('closedCase') }}" class="block px-4 py-2"
+              >Approved Case</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('resolvedCase') }}" class="block px-4 py-2"
+              >Resolved Case</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('resolvedprecase') }}" class="block px-4 py-2"
+              >Resolved Pre-Case</a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Violation option -->
+    <div class="relative">
+      <button
+        id="violationToggle"
+        class="text-gray-600 hover:text-gray-800 focus:outline-none ml-auto md:hidden"
+      >
+        <span class="sr-only">Open violation options</span>
+        <!-- Your SVG path for toggle icon -->
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          class="w-6 h-6"
+        >
+          <!-- Your SVG path for toggle icon -->
+        </svg>
+      </button>
+      <div
+        id="violationOptions"
+        class="absolute left-0 mt-2 w-48 bg-white shadow-md hidden"
+      >
+        <!-- Sub-options for Violation -->
+        <ul>
+          <li>
+            <a
+              href="{{ url_for('violationManagementAdmin') }}"
+              class="block px-4 py-2"
+              >Violation Management</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('closedViolation') }}" class="block px-4 py-2"
+              >Resolved Violation</a
+            >
+          </li>
+          <li>
+            <a href="{{ url_for('removedViolation') }}" class="block px-4 py-2"
+              >Removed Violation</a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endcomment %} {% comment %}
+<script>
+  // JavaScript to handle sidebar toggle for Case options
+  const caseToggle = document.getElementById('caseToggle');
+  const caseOptions = document.getElementById('caseOptions');
+
+  caseToggle.addEventListener('click', () => {
+    caseOptions.classList.toggle('hidden');
+  });
+
+  // JavaScript to handle sidebar toggle for Violation options
+  const violationToggle = document.getElementById('violationToggle');
+  const violationOptions = document.getElementById('violationOptions');
+
+  violationToggle.addEventListener('click', () => {
+    violationOptions.classList.toggle('hidden');
+  });
+</script>
+{% endcomment %}

@@ -3,7 +3,7 @@ from flask import jsonify
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template, get_flashed_messages
 from sqlalchemy import desc
 from werkzeug.security import check_password_hash
-from models import Student, db, IncidentReport, Location, IncidentType , ViolationForm
+from models import Student, db, IncidentReport, Location, IncidentType , SystemAdmin
 import os
 
 from decorators.auth_decorators import role_required
@@ -205,15 +205,14 @@ def reporting():
             time = request.form['time']
             location_id = request.form['location']
             student_id = request.form['student']
-            incident_type_id = request.form['incident']
             description = request.form['description']
 
             # Create an IncidentReport object and commit it to the database
-            incident = IncidentReport(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, ComplainantId=user.StudentId, Description=description)
+            incident = IncidentReport(Date=date, Time=time, LocationId=location_id, StudentId=student_id, ComplainantId=user.StudentId, Description=description)
             db.session.add(incident)
             db.session.commit()
             
-            msg = Message('Incident Reported', sender=("MAIL_USERNAME", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg = Message('Case Reported', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
             msg.body = 'An incident has been reported. Please check the system for details.'
             mail.send(msg)
 
@@ -234,7 +233,7 @@ def approvedReports():
         # Handle form submission logic here
         student_id = session.get('user_id')
         print('student_id', student_id)
-        allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.StudentId==student_id, IncidentReport.Status!='pending').order_by(IncidentReport.Date).all()
+        allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.StudentId==student_id, IncidentReport.Status!='pending').order_by(IncidentReport.Date).all()
         list_reports=[]
         print('allReports', allReports)
         if allReports:
@@ -247,7 +246,6 @@ def approvedReports():
                     'IncidentId': report.IncidentReport.Id,
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
-                    'IncidentName': report.IncidentType.Name,
                     'LocationName': report.Location.Name,
                     'StudentName': FullName,
                     'Complainant': FullNameComplainant,

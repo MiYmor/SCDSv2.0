@@ -1,4 +1,4 @@
-from models import Faculty, Student, db, SystemAdmin, IncidentReport, Location, IncidentType
+from models import db, SystemAdmin
 from sqlalchemy import desc
 import re
 from werkzeug.security import check_password_hash, generate_password_hash

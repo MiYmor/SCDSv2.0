@@ -89,25 +89,25 @@
                 <li>
                   <a
                     href="{{ url_for('studentIncidentReport') }}"
-                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'incident_report_form' else 'hover:text-c4' }}"
+                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'incident-report' else 'hover:text-c4' }}"
                   >
-                    Case Form
+                    Student Case Form
                   </a>
                 </li>
 
                 <li>
                   <a
-                    href="{{ url_for('violationFOrm') }}"
-                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'violationFOrm' else 'hover:text-c4' }}"
+                    href="{{ url_for('facultyIncidentReport') }}"
+                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'faculty-incident-report' else 'hover:text-c4' }}"
                   >
-                    Violation Form
+                    Faculty Case Form
                   </a>
                 </li>
 
                 <li>
                   <a
                     href="{{ url_for('studentViewCases') }}"
-                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'view_reports' else 'hover:text-c4' }}"
+                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'view-cases' else 'hover:text-c4' }}"
                   >
                     My Cases
                   </a>
@@ -116,7 +116,7 @@
                 <li>
                   <a
                     href="{{ url_for('studentViewViolations') }}"
-                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'view_violations' else 'hover:text-c4' }}"
+                    class="block px-4 py-2 duration-300 {{ 'text-c4' if current_page == 'view-violations' else 'hover:text-c4' }}"
                   >
                     My Violations
                   </a>

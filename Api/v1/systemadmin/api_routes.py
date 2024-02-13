@@ -1,5 +1,7 @@
 # api/api_routes.py
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
+from flask_mail import Message
+from mail import mail
 from models import SystemAdmin, db, IncidentReport, Student, Location, IncidentType, Faculty, ViolationForm
 import pandas as pd
 
@@ -69,7 +71,6 @@ def manage_reports():
             'Report ID': report.id,
             'Date': report.date,
             'Time': report.time,
-            'Incident Type': report.incident_type,
             'Location': report.location,
             'Student': report.student,
             'Complainant': report.complainant,
@@ -141,7 +142,7 @@ def manage_violations():
 @system_admin_api.route('/all-reports', methods={'GET'})
 def allReports():
     #.filter = multiple queries .filter_by = single query
-    allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.IsAccessible == False, IncidentReport.Status != 'resolved').order_by(IncidentReport.Date).all()
+    allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == False, IncidentReport.Status != 'resolved').order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
         for report in allReports:
@@ -153,7 +154,6 @@ def allReports():
                 'IncidentId': report.IncidentReport.Id,
                 'Date': report.IncidentReport.Date,
                 'Time': report.IncidentReport.Time,
-                'IncidentName': report.IncidentType.Name,
                 'LocationName': report.Location.Name,
                 'StudentName': FullName,
                 'Complainant': FullNameComplainant,
@@ -176,7 +176,7 @@ def allViolations():
     if allViolations:
         for violations in allViolations:
             # make a dictionary for reports
-            complainant = db.session.query(Student).filter(Student.StudentId == violations.ViolationForm.ComplainantId).first()
+            complainant = db.session.query(Faculty).filter(Faculty.FacultyId == violations.ViolationForm.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
             dict_violation = {
@@ -199,7 +199,7 @@ def allViolations():
 # get all the case that are closed
 @system_admin_api.route('/closed-case', methods=['GET'])
 def allClosedCase():
-    allClosedCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='pending').order_by(IncidentReport.Date).all()
+    allClosedCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='pending').order_by(IncidentReport.Date).all()
     list_closedcase=[]
     if allClosedCase:
             for report in allClosedCase:
@@ -211,7 +211,6 @@ def allClosedCase():
                     'IncidentId': report.IncidentReport.Id,
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
-                    'IncidentName': report.IncidentType.Name,
                     'LocationName': report.Location.Name,
                     'StudentName': FullName,
                     'Complainant': FullNameComplainant,
@@ -227,7 +226,7 @@ def allClosedCase():
 # get all the case that are closed
 @system_admin_api.route('/resolved-case', methods=['GET'])
 def allResolvedCase():
-    allClosedCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='approved').order_by(IncidentReport.Date).all()
+    allClosedCase = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='approved').order_by(IncidentReport.Date).all()
     list_closedcase=[]
     if allClosedCase:
             for report in allClosedCase:
@@ -239,7 +238,6 @@ def allResolvedCase():
                     'IncidentId': report.IncidentReport.Id,
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
-                    'IncidentName': report.IncidentType.Name,
                     'LocationName': report.Location.Name,
                     'StudentName': FullName,
                     'Complainant': FullNameComplainant,
@@ -254,7 +252,7 @@ def allResolvedCase():
         
 @system_admin_api.route('/resolved-pre-case', methods=['GET'])
 def allResolvedPreCase():
-    allResolvedPreCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).filter(IncidentReport.Status=='resolved').order_by(IncidentReport.Date).all()
+    allResolvedPreCase = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.Status=='resolved').order_by(IncidentReport.Date).all()
     list_precase=[]
     if allResolvedPreCase:
             for report in allResolvedPreCase:
@@ -266,7 +264,6 @@ def allResolvedPreCase():
                     'IncidentId': report.IncidentReport.Id,
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
-                    'IncidentName': report.IncidentType.Name,
                     'LocationName': report.Location.Name,
                     'StudentName': FullName,
                     'Complainant': FullNameComplainant,
@@ -288,7 +285,7 @@ def allClosedViolations():
     if allClosedViolations:
         for violations in allClosedViolations:
             # make a dictionary for reports
-            complainant = db.session.query(Student).filter(Student.StudentId == violations.ViolationForm.ComplainantId).first()
+            complainant = db.session.query(Faculty).filter(Faculty.FacultyId == violations.ViolationForm.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
             dict_closedviolation = {
@@ -316,7 +313,7 @@ def allRemovedViolations():
         for violations in allRemovedViolations:
             # make a dictionary for reports
             #get the student id usinng the violationform.complainantid
-            complainant = db.session.query(Student).filter(Student.StudentId == violations.ViolationForm.ComplainantId).first()
+            complainant = db.session.query(Faculty).filter(Faculty.FacultyId == violations.ViolationForm.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
             dict_removedviolation = {
@@ -352,10 +349,20 @@ def accessReports():
         incident.IsAccessible = True
         # commit the changes
         db.session.commit()
-        # return a message
-        return jsonify({'result': 'success', 'message': 'Report approved'})
+        try:
+            # Compose the email message
+            msg = Message('Case Approved', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
+            msg.body = f"The case with ID {incident_id} has been approved and is now accessible."
+            # Send the email
+            mail.send(msg)
+            # Return a success response
+            return jsonify({'result': 'success', 'message': 'Report approved and email notification sent'})
+        except Exception as e:
+            # Log the exception and return an error response
+            print('An error occurred while sending the email notification:', e)
+            return jsonify({'error': 'failed', 'message': 'Report approved, but email notification failed'}), 500
     else:
-        # return a message
+        # Return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
 
 # to close the case 

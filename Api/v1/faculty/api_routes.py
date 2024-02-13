@@ -1,6 +1,6 @@
 # api/api_routes.py
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
-from models import Faculty, db, IncidentReport, Student, Location, IncidentType
+from models import Faculty, db, IncidentReport, Student, Location, IncidentType, SystemAdmin, ViolationForm
 import pandas as pd
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash
@@ -10,7 +10,11 @@ from .utils import updateFacultyData, getFacultyData, updatePassword, getCurrent
 
 import os
 
-
+from flask_mail import Message
+from mail import mail  # Import mail from the mail.py module
+import secrets
+from datetime import datetime, timedelta
+faculty_api_base_url = os.getenv("FACULTY_API_BASE_URL")
 faculty_api = Blueprint('faculty_api', __name__)
 
 # Api/v1/faculty/api_routes.py
@@ -137,7 +141,6 @@ def manage_reports():
             'Report ID': report.id,
             'Date': report.Date,
             'Time': report.time,
-            'Incident Type': report.incident_type,
             'Location': report.location,
             'Student': report.student,
             'Complainant': report.complainant,
@@ -155,13 +158,39 @@ def manage_reports():
     except Exception as e:
         return {"message": "An error occurred", "status": 500}
 
+@faculty_api.route('/reporting_violation', methods=['POST'])
+def reporting_violation():
+   user = getCurrentUser()
+   if request.method == 'POST':
+        try:
+        # Handle form submission logic here
+            date = request.form['date']
+            time = request.form['time']
+            location_id = request.form['location']  # Use the selected location ID
+            student_id = request.form['student']
+            incident_type_id = request.form['incident']  # Use the selected incident type ID
+            description = request.form['description']
+            
+            violation = ViolationForm(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, ComplainantId=user.FacultyId, Description=description)
+            db.session.add(violation)
+            db.session.commit()
+            
+            msg = Message('Violation Reported', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg.body = 'A Violation has been reported. Please check the system for details.'
+            mail.send(msg)
+            return jsonify({'message': 'Violation reported successfully', 'success': True }), 200
+        except Exception as e:
+            # Log the exception and display an error message to the user
+            print('An exception occurred:', e)
+            return jsonify({'message': 'An error occurred while reporting the incident'}), 500
+
 @faculty_api.route('/all-reports', methods={'GET'})
 def allReports():
     print("Hello")
     
      #.filter = multiple queries .filter_by = single query
     faculty_id= session.get('user_id')
-    allReports = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(IncidentType, IncidentType.IncidentTypeId == IncidentReport.IncidentId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.InvestigatorId == faculty_id, IncidentReport.IsAccessible == True).order_by(IncidentReport.Date).all()
+    allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.InvestigatorId == faculty_id, IncidentReport.IsAccessible == True).order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
         for report in allReports:
@@ -173,7 +202,6 @@ def allReports():
                 'IncidentId': report.IncidentReport.Id,
                 'Date': report.IncidentReport.Date,
                 'Time': report.IncidentReport.Time,
-                'IncidentName': report.IncidentType.Name,
                 'LocationName': report.Location.Name,
                 'StudentName': FullName,
                 'Complainant': FullNameComplainant,

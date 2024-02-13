@@ -183,16 +183,14 @@ def create_app():
         # Pass the 'authenticated' variable, students, incident types, and locations to the template context
         return render_template('student/incident_report_form.html', authenticated=True, students=students, incident_types=incident_types, locations=locations, current_page="incident-report")
     
-    @app.route('/student/violation-form', methods=['GET'])
+    @app.route('/student/faculty-incident-report', methods=['GET'])
     @role_required('student')
-    def violationFOrm():
+    def facultyIncidentReport():
         # Fetch incident types and locations from the database
-        incident_types = IncidentType.query.all()
         locations = Location.query.all()
-        # Fetch the list of students (modify the query based on your data model)
-        students = Student.query.all()
+        faculties  = Faculty.query.all()
         # Pass the 'authenticated' variable, students, incident types, and locations to the template context
-        return render_template('student/violation_form.html', authenticated=True, students=students, incident_types=incident_types, locations=locations, current_page="violation-form")
+        return render_template('student/incident_report_form.html', authenticated=True, locations=locations, faculty=faculties , current_page="faculty-incident-report")
     
     
 
@@ -216,6 +214,18 @@ def create_app():
     @role_required('faculty')
     def facultyProfile():
         return render_template('faculty/profile.html', faculty_api_base_url=faculty_api_base_url, current_page="profile")
+    
+    @app.route('/faculty/violation-form', methods=['GET'])
+    @role_required('faculty')
+    def violationFOrm():
+        # Fetch incident types and locations from the database
+        incident_types = IncidentType.query.all()
+        locations = Location.query.all()
+        # Fetch the list of students (modify the query based on your data model)
+        students = Student.query.all()
+        faculty = Faculty.query.all()
+        # Pass the 'authenticated' variable, students, incident types, and locations to the template context
+        return render_template('faculty/violation_form.html', authenticated=True, students=students, incident_types=incident_types, locations=locations,faculty=faculty, current_page="violation-form")
     
     @app.route('/faculty/manage-reports')
     @role_required('faculty')
