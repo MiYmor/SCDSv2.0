@@ -163,8 +163,8 @@ endblock title %} {% block styles %}
                     <!-- Add other details as needed -->
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
-                    <button class="bg-red-600 p-2 text-white" onclick="approveFacultyCase(${report.CaseId})">Approve Faculty Case</button>
-                    <button class="bg-blue-600 p-2 text-white" onclick="resolveFacultyCase(${report.CaseId})">Resolve Faculty Case</button>
+                    <button class="bg-red-600 p-2 text-white" onclick="resolveFacultyCase(${report.CaseId})">Resolve Faculty Case</button>
+                    <button class="bg-blue-600 p-2 text-white" onclick="removeFacultyCase(${report.CaseId})">Remove Faculty Case</button>
                   </td>
                 `;
 
@@ -176,10 +176,10 @@ endblock title %} {% block styles %}
         }
       }
       // Make a approved report function
-      async function approveFacultyCase(CaseId) {
-        console.log('approveFacultyCase', CaseId);
+      async function resolveFacultyCase(CaseId) {
+        console.log('resolveFacultyCase', CaseId);
         try {
-          const response = await fetch(`${api_base_url}/approve-faculty-case`, {
+          const response = await fetch(`${api_base_url}/resolve-faculty-case`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -206,10 +206,10 @@ endblock title %} {% block styles %}
       }
 
       // Make a approved report function
-      async function resolveFacultyCase(CaseId) {
-        console.log('resolveFacultyCase', CaseId);
+      async function removeFacultyCase(CaseId) {
+        console.log('removeFacultyCase', CaseId);
         try {
-          const response = await fetch(`${api_base_url}/resolved-faculty-case`, {
+          const response = await fetch(`${api_base_url}/remove-faculty-case`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

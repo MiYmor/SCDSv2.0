@@ -1,5 +1,3 @@
-# NOTES: Any data here is a dummy only for development purposes
-
 from werkzeug.security import generate_password_hash
 
 faculty_data = [
@@ -23,7 +21,8 @@ faculty_data = [
         'ResidentialAddress': '123 Main Street, Cityville',
         'MobileNumber': '555-1234',
         'Gender': 1,  # 1 for Male
-        'IsActive': True,
+        'Status': 'Deactivated',
+        'Login_Attempt': '12',
         'Password': generate_password_hash('Faculty123')
     },
     {
@@ -40,7 +39,8 @@ faculty_data = [
         'Email': 'jane.smith@example.com',
         'MobileNumber': '555-5678',
         'Gender': 2,  # 2 for Female
-        'IsActive': True,
+        'Status': 'Deactivated',
+        'Login_Attempt': '12',
         'Password': generate_password_hash('Faculty123')
     },
     {
@@ -56,7 +56,8 @@ faculty_data = [
         'Email': 'robert.johnson@example.com',
         'MobileNumber': '555-8765',
         'Gender': 1,  # 1 for Male
-        'IsActive': True,
+        'Status': 'Deactivated',
+        'Login_Attempt': '12',
         'Password': generate_password_hash('Faculty123')
     },
     {
@@ -73,7 +74,8 @@ faculty_data = [
         'Email': 'emily.white@example.com',
         'MobileNumber': '555-4321',
         'Gender': 2,  # 2 for Female
-        'IsActive': True,
+        'Status': 'Deactivated',
+        'Login_Attempt': '12',
         'Password': generate_password_hash('Faculty123')
     },
     {
@@ -90,7 +92,8 @@ faculty_data = [
         'Email': 'michael.turner@example.com',
         'MobileNumber': '555-9876',
         'Gender': 1,  # 1 for Male
-        'IsActive': True,
+        'Status': 'Deactivated',
+        'Login_Attempt': '12',
         'Password': generate_password_hash('Faculty123')
     },
 ]

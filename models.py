@@ -67,7 +67,7 @@ class ViolationForm(db.Model):
     IncidentId = db.Column(db.Integer, db.ForeignKey('SCDSIncidentType.IncidentTypeId', ondelete="CASCADE")) #IncidentTypeID
     ComplainantId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE")) #ComplainantID
     Description = db.Column(db.Text, nullable=False) #Description
-    Status = db.Column(db.String(20), nullable=False, default='pending') #Status
+    Status = db.Column(db.String(512), nullable=False, default='pending') #Status
     IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
         
     def to_dict(self):
@@ -214,7 +214,8 @@ class Faculty(db.Model):
     
     Password = db.Column(db.String(256), nullable=False)  # Password
     ProfilePic= db.Column(db.String(50),default="14wkc8rPgd8NcrqFoRFO_CNyrJ7nhmU08")  # Profile Pic
-    IsActive = db.Column(db.Boolean, default=True)
+    Status = db.Column(db.String(50), default="Deactivated")
+    Login_Attempt = db.Column(db.Integer, default=12)
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
     # FOREIGN TABLES
@@ -241,7 +242,8 @@ class Faculty(db.Model):
             'email': self.Email,
             'password': self.password,
             'profile_pic': self.ProfilePic,
-            'is_active': self.IsActive,
+            'status': self.Status,
+            'login_attempt': self.Login_Attempt,
         }
         
     def get_id(self):

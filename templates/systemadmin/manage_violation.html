@@ -49,7 +49,8 @@ endblock title %} {% block styles %}
   id="statusModal"
   class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
 >
-  <div class="modal-content bg-white p-8 rounded-lg">
+  <div class="modal-content bg-white p-8 rounded-lg max-w-md">
+    <!-- Added max-w-md -->
     <span
       class="close text-2xl absolute top-2 right-2 cursor-pointer"
       onclick="closeStatusModal()"
@@ -58,13 +59,10 @@ endblock title %} {% block styles %}
     <input type="hidden" id="violationId" />
     <h2 class="text-2xl font-bold mb-4">Sanction</h2>
     <label for="statusDropdown" class="block mb-2">Select Sanction:</label>
-    <select id="statusDropdown" class="w-full p-2 mb-4 border rounded-md">
-      <option value="Excused">Excused</option>
-      <option value="1st Offense">1st Offense</option>
-      <option value="2nd Offense">2nd Offense</option>
-      <option value="3rd Offense">3rd Offense</option>
-      <option value="4th Offense">4th Offense</option>
-    </select>
+    <select
+      id="statusDropdown"
+      class="w-full p-2 mb-4 border rounded-md"
+    ></select>
     <button
       onclick="updateStatus()"
       class="bg-blue-500 text-white px-4 py-2 rounded-md"
@@ -151,7 +149,6 @@ endblock title %} {% block styles %}
 {% endblock content %} {% block script %}
 
 <script>
-  // Fetch location and incident types
   async function fetchViolations() {
     try {
       // Fetch violation data
@@ -184,7 +181,7 @@ endblock title %} {% block styles %}
                 <p><strong>Violator:</strong> ${violation.StudentName}</p>
                 <p><strong>Submitted by:</strong> ${violation.Complainant}</p>
                 <p><strong>Description:</strong> ${violation.Description}</p>
-                <strong>Status:</strong>
+                <strong>Sanction:</strong>
                 <p id='status-${violation.ViolationId}'> ${violation.Status}</p>
                 <!-- Add other details as needed -->
               </td>
@@ -263,16 +260,46 @@ endblock title %} {% block styles %}
   }
 
   // Function to open the status modal
-  function openStatusModal(ViolationId) {
+  async function openStatusModal(ViolationId) {
     // You can perform additional logic here if needed
     document.getElementById('statusModal').classList.remove('hidden');
     //get the violation id abnd set the value of the hidden input
     document.getElementById('violationId').value = ViolationId;
+
+    try {
+      // Fetch IncidentTypeId corresponding to the given ViolationId
+      console.log(api_base_url);
+      const response = await fetch(
+        `${api_base_url}/get-violation-type/${ViolationId}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch IncidentTypeId');
+      }
+
+      const data = await response.json();
+      console.log(data);
+      // Get the statusDropdown element
+      const statusDropdown = document.getElementById('statusDropdown');
+      // Append options for each offense
+      for (const [offense, description] of Object.entries(data.result)) {
+        const option = document.createElement('option');
+        option.value = description;
+        option.textContent = `${offense}: ${description}`;
+        statusDropdown.appendChild(option);
+      }
+      // Check if data contains IncidentTypeId
+    } catch (error) {
+      console.error(error.message);
+      // Handle error if necessary
+    }
   }
 
   // Function to close the status modal
   function closeStatusModal(ViolationId) {
     document.getElementById('statusModal').classList.add('hidden');
+    // Clear the statusDropdown options
+    document.getElementById('statusDropdown').innerHTML = '';
   }
 
   // Function to update the status

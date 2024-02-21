@@ -175,7 +175,7 @@ def reporting_violation():
             db.session.add(violation)
             db.session.commit()
             
-            msg = Message('Violation Reported', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg = Message('Violation Reported', sender=("SCDSPUPQC", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
             msg.body = 'A Violation has been reported. Please check the system for details.'
             mail.send(msg)
             return jsonify({'message': 'Violation reported successfully', 'success': True }), 200
