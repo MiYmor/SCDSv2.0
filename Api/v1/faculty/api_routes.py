@@ -175,7 +175,7 @@ def reporting_violation():
             db.session.add(violation)
             db.session.commit()
             
-            msg = Message('Violation Reported', sender=("SCDSPUPQC", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg = Message('Violation Reported', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
             msg.body = 'A Violation has been reported. Please check the system for details.'
             mail.send(msg)
             return jsonify({'message': 'Violation reported successfully', 'success': True }), 200
@@ -188,7 +188,7 @@ def reporting_violation():
 def allReports():    
      #.filter = multiple queries .filter_by = single query
     faculty_id= session.get('user_id')
-    allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.InvestigatorId == faculty_id, IncidentReport.IsAccessible == True).order_by(IncidentReport.Date).all()
+    allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.InvestigatorId == faculty_id, IncidentReport.IsAccessible == True, IncidentReport.Status == 'pending').order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
         for report in allReports:
@@ -211,28 +211,35 @@ def allReports():
             # append the dictionary to the list
             list_reports.append(dict_reports)
         return jsonify({'result': list_reports})
-    
-@faculty_api.route('/approve-report', methods={'POST'})
-def approveReport():
-     # Assuming the incoming data is JSON
-    data = request.get_json()
-    # Extract incidentId from the JSON payload
-    incident_id = data.get('IncidentId')
-    # Your logic to handle the incidentId
-    print('Received incidentId:', incident_id)
-    # make a querry calling the incidentreport table
-    incident = IncidentReport.query.filter_by(Id=incident_id).first()
-    # if the incident is found
-    if incident:
-        # change the status to approved
-        incident.Status = 'approved'
-        # commit the changes
-        db.session.commit()
-        # return a message
-        return jsonify({'result': 'success', 'message': 'Report approved'})
-    else:
-        # return a message
-        return jsonify({'error': 'failed', 'message': 'Report not found'})
+
+@faculty_api.route('/all-approve-reports', methods={'GET'})
+def allapprovedReports():    
+     #.filter = multiple queries .filter_by = single query
+    faculty_id= session.get('user_id')
+    allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.InvestigatorId == faculty_id, IncidentReport.IsAccessible == True, IncidentReport.Status == 'approved').order_by(IncidentReport.Date).all()
+    list_reports=[]
+    if allReports:
+        for report in allReports:
+            # make a dictionary for reports
+            complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
+            FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
+            FullName= report.Student.LastName + ", " + report.Student.FirstName 
+            dict_reports = {
+                'IncidentId': report.IncidentReport.Id,
+                'Date': report.IncidentReport.Date,
+                'Time': report.IncidentReport.Time,
+                'LocationName': report.Location.Name,
+                'StudentName': FullName,
+                'Complainant': FullNameComplainant,
+                'Description': report.IncidentReport.Description,
+                'Sanction': report.IncidentReport.Sanction,
+                'Status': report.IncidentReport.Status,
+                'Acessibility': report.IncidentReport.IsAccessible
+            }
+            # append the dictionary to the list
+            list_reports.append(dict_reports)
+        return jsonify({'result': list_reports})
+
 
 @faculty_api.route('/assign-sanction', methods={'POST'})
 def assignSanction():

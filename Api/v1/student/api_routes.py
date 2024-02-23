@@ -292,35 +292,8 @@ def approvedReports():
             return jsonify({'result': list_reports})
         else :
             return jsonify({'message': 'No reports found'}), 404
-        
     
-@student_api.route('/reporting_violation', methods=['POST'])
-def reporting_violation():
-   user = getCurrentUser()
-   if request.method == 'POST':
-        try:
-        # Handle form submission logic here
-            date = request.form['date']
-            time = request.form['time']
-            location_id = request.form['location']  # Use the selected location ID
-            student_id = request.form['student']
-            incident_type_id = request.form['incident']  # Use the selected incident type ID
-            description = request.form['description']
-            
-            violation = ViolationForm(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, ComplainantId=user.StudentId, Description=description)
-            db.session.add(violation)
-            db.session.commit()
-            
-            msg = Message('Violation Reported', sender=("MAIL_USERNAME", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
-            msg.body = 'An Violation has been reported. Please check the system for details.'
-            mail.send(msg)
-            return jsonify({'message': 'Violation reported successfully', 'success': True }), 200
-        except Exception as e:
-            # Log the exception and display an error message to the user
-            print('An exception occurred:', e)
-            return jsonify({'message': 'An error occurred while reporting the incident'}), 500
-            
-
+    
 # fetch approved reports for student
 @student_api.route('/fetch/approved/violations', methods=['GET'])
 def approvedViolations():

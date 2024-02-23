@@ -274,41 +274,47 @@ def allViolations():
 @system_admin_api.route('/closed-case', methods=['GET'])
 def allClosedCase():
     allClosedCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='pending').order_by(IncidentReport.Date).all()
+    
+    unique_reports = set()  # Set to store unique report IDs
     list_closedcase=[]
+
     if allClosedCase:
-            for report in allClosedCase:
-                # make a dictionary for reports
+        for report in allClosedCase:
+            report_id = report.IncidentReport.Id
+            if report_id not in unique_reports:  # Check if the report ID is unique
+                unique_reports.add(report_id)  # Add report ID to set
                 complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
                 FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
                 FullName= report.Student.LastName + ", " + report.Student.FirstName 
                 dict_closedcase = {
-                    'IncidentId': report.IncidentReport.Id,
+                    'IncidentId': report_id,
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
                     'LocationName': report.Location.Name,
                     'StudentName': FullName,
                     'Complainant': FullNameComplainant,
                     'Description': report.IncidentReport.Description,
+                    'Sanction': report.IncidentReport.Sanction,
                     'Status': report.IncidentReport.Status,
                     'Acessibility': report.IncidentReport.IsAccessible
-
                 }
-                # append the dictionary to the list
                 list_closedcase.append(dict_closedcase)
-            return jsonify({'result': list_closedcase})
+
+    return jsonify({'result': list_closedcase})
+
         
 # get all the case that are closed
 @system_admin_api.route('/resolved-case', methods=['GET'])
 def allResolvedCase():
-    allClosedCase = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='approved').order_by(IncidentReport.Date).all()
-    list_closedcase=[]
-    if allClosedCase:
-            for report in allClosedCase:
+    allResolvedCase = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='approved').order_by(IncidentReport.Date).all()
+    list_resolvedcase=[]
+    if allResolvedCase:
+            for report in allResolvedCase:
                 # make a dictionary for reports
                 complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
                 FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
                 FullName= report.Student.LastName + ", " + report.Student.FirstName 
-                dict_closedcase = {
+                dict_resolvedcase = {
                     'IncidentId': report.IncidentReport.Id,
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
@@ -316,13 +322,14 @@ def allResolvedCase():
                     'StudentName': FullName,
                     'Complainant': FullNameComplainant,
                     'Description': report.IncidentReport.Description,
+                    'Sanction': report.IncidentReport.Sanction,
                     'Status': report.IncidentReport.Status,
                     'Acessibility': report.IncidentReport.IsAccessible
 
                 }
                 # append the dictionary to the list
-                list_closedcase.append(dict_closedcase)
-            return jsonify({'result': list_closedcase})
+                list_resolvedcase.append(dict_resolvedcase)
+            return jsonify({'result': list_resolvedcase})
         
 @system_admin_api.route('/resolved-pre-case', methods=['GET'])
 def allResolvedPreCase():
@@ -483,7 +490,7 @@ def accessReports():
         try:
             # Compose the email message
             msg = Message('Case Approved', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
-            msg.body = f"The case with ID {incident_id} has been approved and is now accessible."
+            msg.body = f"The case with ID {incident_id} is now accessible please start investigating."
             # Send the email
             mail.send(msg)
             # Return a success response
@@ -519,7 +526,7 @@ def removeAccessReports():
         # return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
     
-    
+
 @system_admin_api.route('/resolved-precase', methods={'POST'})
 def resolvePreCase():    
      # Assuming the incoming data is JSON
@@ -631,6 +638,38 @@ def reopenReports():
     else:
         # return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
+
+@system_admin_api.route('/approve-report', methods={'POST'})
+def approveReport():    
+     # Assuming the incoming data is JSON
+    data = request.get_json()
+    # Extract incidentId from the JSON payload
+    incident_id = data.get('IncidentId')
+    # Your logic to handle the incidentId
+    print('Received incidentId:', incident_id)
+    # make a querry calling the incidentreport table
+    incident = IncidentReport.query.filter_by(Id=incident_id).first()
+    # if the incident is found
+    if incident:
+        # change the status to approved
+        incident.Status = 'approved'
+        # commit the changes
+        db.session.commit()
+        try:
+            # Compose the email message
+            msg = Message('You have been reported', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
+            msg.body = f"The case with ID {incident_id} has been approved and is now accessible."
+            # Send the email
+            mail.send(msg)
+            # Return a success response
+            return jsonify({'result': 'success', 'message': 'Report approved and email notification sent'})
+        except Exception as e:
+            # Log the exception and return an error response
+            print('An error occurred while sending the email notification:', e)
+            return jsonify({'error': 'failed', 'message': 'Report approved, but email notification failed'}), 500
+    else:
+        # Return a message
+        return jsonify({'error': 'failed', 'message': 'Report not found'})
         
 
 # to approve the case or open the case 
@@ -650,10 +689,20 @@ def accessViolations():
         violation.IsAccessible = True
         # commit the changes
         db.session.commit()
-        # return a message
-        return jsonify({'result': 'success', 'message': 'Report approved'})
+        try:
+            # Compose the email message
+            msg = Message('Violation Approved', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
+            msg.body = f"The Violation with ID {violation_id} has been approved."
+            # Send the email
+            mail.send(msg)
+            # Return a success response
+            return jsonify({'result': 'success', 'message': 'Report approved and email notification sent'})
+        except Exception as e:
+            # Log the exception and return an error response
+            print('An error occurred while sending the email notification:', e)
+            return jsonify({'error': 'failed', 'message': 'Report approved, but email notification failed'}), 500
     else:
-        # return a message
+        # Return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
 
 # to close the case 
@@ -724,7 +773,7 @@ def reopenRemoveViolations():
     else:
         # return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
-    
+
 # to maanage the violation using the modal
 @system_admin_api.route('/manage-violation-offense', methods={'POST'})
 def manageViolationOffense():
@@ -811,3 +860,33 @@ def assignFaculty():
         # Return an error message if an exception occurs
         return jsonify({'error': 'failed', 'message': str(e)})
 
+@system_admin_api.route('/manage-sanction', methods={'POST'})
+def manageSanction():
+    try:
+        # Assuming the incoming data is JSON
+        data = request.get_json()
+        # Extract incidentId and assignedFaculty from the JSON payload
+        incident_id = data.get('incidentId')
+        print('Received incidentId:', incident_id)
+        
+        manage_sanction = data.get('manageSanction')
+        print('Received Sanction:', manage_sanction)
+
+        # Query the incident report
+        report = IncidentReport.query.filter_by(Id=incident_id).first()
+
+        # Check if the incident report is found
+        if report:
+            # Update InvestigatorId with assigned_faculty
+            report.Sanction = manage_sanction
+            # Commit the changes to the database
+            db.session.commit()
+            # Return a success message
+            return jsonify({'result': 'success', 'message': 'Report approved'})
+        else:
+            # Return an error message if the incident report is not found
+            return jsonify({'error': 'failed', 'message': 'Report not found'})
+    except Exception as e:
+        print('error',e) 
+        # Return an error message if an exception occurs
+        return jsonify({'error': 'failed', 'message': str(e)})

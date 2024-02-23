@@ -230,6 +230,11 @@ def create_app():
     @role_required('faculty')
     def reportManagement():
         return render_template('faculty/manage_report.html', faculty_api_base_url=faculty_api_base_url, current_page="manage-reports")
+    
+    @app.route('/faculty/approved-reports')
+    @role_required('faculty')
+    def approvedReports():
+        return render_template('faculty/approved_report.html', faculty_api_base_url=faculty_api_base_url, current_page="approved-reports")
 
     @app.route('/faculty/change-password')
     @role_required('faculty')

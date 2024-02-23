@@ -43,6 +43,38 @@ endblock title %} {% block styles %}
   }
 </style>
 {% endblock styles %} {% block content %}
+
+<!-- Modal container -->
+<div
+  id="statusModal"
+  class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+>
+  <div class="modal-content bg-white p-8 rounded-lg">
+    <span
+      class="close text-2xl absolute top-2 right-2 cursor-pointer"
+      onclick="closeModal()"
+      >&times;</span
+    >
+    <input type="hidden" id="incidentId" />
+    <h2 class="text-2xl font-bold mb-4">Manage Sanction</h2>
+    <label for="statusDropdown" class="block mb-2">Edit Sanction:</label>
+    <input
+      type="text"
+      id="sanctionDescription"
+      name="sanction"
+      class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-10 py-5"
+      required
+    />
+    <p id="error-sanction" class="text-c4 text-sm"></p>
+    <button
+      onclick="manageSanction()"
+      class="bg-blue-500 text-white px-4 py-2 rounded-md"
+    >
+      Approve
+    </button>
+  </div>
+</div>
+
 <div class="p-4 md:ml-72">
   <div class="border-2 border-gray-200 border-dashed rounded-lg">
     <div class="grid grid-cols-1">
@@ -142,11 +174,14 @@ endblock title %} {% block styles %}
                   <p><strong>Student:</strong> ${report.StudentName}</p>
                   <p><strong>Submitted by:</strong> ${report.Complainant}</p>
                   <p><strong>Description:</strong> ${report.Description}</p>
+                  <p><strong>Sanction:</strong> ${report.Sanction}</p>
                   <strong>Status:</strong>
                   <p id='status-${report.IncidentId}'> ${report.Status}</p>
                   <!-- Add other details as needed -->
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
+                  <button class="bg-blue-600 p-2 text-white" onclick="openModal(${report.IncidentId})">Manage Case</button>
+                  <button class="bg-green-600 p-2 text-white" onclick="approveReport(${report.IncidentId})">Approve Case</button>
                   <button class="bg-red-600 p-2 text-white" onclick="removeAccessReports(${report.IncidentId})">Reopen Case</button>
                 </td>
               `;
@@ -187,6 +222,90 @@ endblock title %} {% block styles %}
       console.error(error.message);
     }
   }
+  // Make a approved report function
+  async function approveReport(IncidentId) {
+    console.log('approveReport', IncidentId);
+    try {
+      const response = await fetch(`${api_base_url}/approve-report`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ IncidentId }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to approve report');
+      }
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.result) {
+        notyf.success('Report approved successfully');
+        document.getElementById(`status-${IncidentId}`).innerHTML = 'Approved';
+      } else if (data.error) {
+        notyf.error('Failed to approve report');
+      }
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+  // Function to open the modal
+  function openModal(incidentId) {
+    // Set the caseId input field in the modal
+    document.getElementById('incidentId').value = incidentId;
+
+    // Show the modal
+    const modal = document.getElementById('statusModal');
+    modal.classList.remove('hidden');
+  }
+
+  // Function to close the modal
+  function closeModal() {
+    const modal = document.getElementById('statusModal');
+    modal.classList.add('hidden');
+  }
+
+  // Function to update the status
+  function manageSanction() {
+    // Open the modal and set the caseId input field
+    // get the caseId from the hidden input field
+    const incidentId = document.getElementById('incidentId').value;
+    console.log('incident value:', incidentId);
+
+    openModal(incidentId);
+    // Rest of your code...
+    const manageSanction = document.getElementById('sanctionDescription').value;
+    console.log('approved sanction:', manageSanction);
+
+    // make a post request
+    fetch(`${api_base_url}/manage-sanction`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ incidentId: incidentId, manageSanction }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        if (data.result) {
+          notyf.success('Sanction approved successfully');
+          document.getElementById(`status-${incidentId}`).innerHTML =
+            manageSanction;
+        } else if (data.error) {
+          notyf.error('Failed to approve the Sanction');
+        }
+      })
+      .catch((error) => {
+        console.error(error.message);
+      })
+      .finally(() => {
+        closeModal();
+      });
+  }
+
   fetchReport();
 </script>
 {% endblock script %}
