@@ -204,6 +204,7 @@ def allReports():
                 'StudentName': FullName,
                 'Complainant': FullNameComplainant,
                 'Description': report.IncidentReport.Description,
+                'Sanction': report.IncidentReport.Sanction,
                 'Status': report.IncidentReport.Status,
                 'Acessibility': report.IncidentReport.IsAccessible
             }
@@ -233,4 +234,34 @@ def approveReport():
         # return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
 
+@faculty_api.route('/assign-sanction', methods={'POST'})
+def assignSanction():
+    try:
+        # Assuming the incoming data is JSON
+        data = request.get_json()
+        # Extract incidentId and assignedFaculty from the JSON payload
+        incident_id = data.get('incidentId')
+        print('Received incidentId:', incident_id)
+        
+        appointed_sanction = data.get('assignSanction')
+        print('Received Sabction:', appointed_sanction)
+
+        # Query the incident report
+        report = IncidentReport.query.filter_by(Id=incident_id).first()
+
+        # Check if the incident report is found
+        if report:
+            # Update InvestigatorId with assigned_faculty
+            report.Sanction = appointed_sanction
+            # Commit the changes to the database
+            db.session.commit()
+            # Return a success message
+            return jsonify({'result': 'success', 'message': 'Report approved'})
+        else:
+            # Return an error message if the incident report is not found
+            return jsonify({'error': 'failed', 'message': 'Report not found'})
+    except Exception as e:
+        print('error',e) 
+        # Return an error message if an exception occurs
+        return jsonify({'error': 'failed', 'message': str(e)})
     

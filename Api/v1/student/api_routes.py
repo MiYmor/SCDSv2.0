@@ -281,6 +281,7 @@ def approvedReports():
                     'StudentName': FullName,
                     'Complainant': FullNameComplainant,
                     'Description': report.IncidentReport.Description,
+                    'Sanction': report.IncidentReport.Sanction,
                     'Status': report.IncidentReport.Status,
                     'Acessibility': report.IncidentReport.IsAccessible
 
