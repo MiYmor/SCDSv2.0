@@ -1,6 +1,7 @@
 {% extends "faculty/alt_layout.html" %} {% block title %}SCDS - Violation FOrms{%
 endblock title %} {% block styles %}
 <style>
+
     .e-headertext {
       color: white;
       font-weight: bolder !important;
@@ -11,7 +12,53 @@ endblock title %} {% block styles %}
       background-color: #6376eb !important;
       color: white;
     }
+    
+    .invalid-field {
+      border: 2px solid #ff0000 !important;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      background-color: #fefefe;
+      margin: 15% auto;
+      padding: 20px;
+      border: 1px solid #888;
+      width: 80%;
+      max-width: 600px;
+      border-radius: 8px;
+    }
+
+    .modal-content p {
+      margin-bottom: 20px;
+    }
+
+    .modal-buttons {
+      text-align: right;
+    }
+
+    .modal-buttons button {
+      margin-left: 10px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
   
+    .modal-buttons button:hover {
+      background-color: #f0f0f0;
+    }
+
     /* Table styles */
     table {
       width: 100%;
@@ -49,7 +96,7 @@ endblock title %} {% block styles %}
         <h3 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">Violation Form</h3>
         <hr class="mx-2" />
 
-        <form class="w-full mt-4" method="POST" id="submitReport" action="{{ url_for('faculty_api.reporting_violation') }}">
+        <form class="w-full mt-4" id="submitReport"> 
           <div class="grid gap-6 mb-6 md:grid-cols-2">
             <!-- INPUTS HERE -->
             <div>
@@ -61,7 +108,8 @@ endblock title %} {% block styles %}
                 id="date-input"
                 name="date"
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
-                required <!-- Add the required attribute -->
+                required
+              />
               <p id="error-date" class="text-c4 text-sm"></p>
             </div>
 
@@ -74,13 +122,22 @@ endblock title %} {% block styles %}
                 id="time-input"
                 name="time"
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
-                required <!-- Add the required attribute -->
+                required
+                />
               <p id="error-time" class="text-c4 text-sm"></p>
             </div>
 
             <div>
-              <label for="incident-input" class="block mb-2 text-c1 font-extrabold">Violation Type</label>
-              <select id="incident-input" name="incident" class="select2 bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1" required>
+              <label 
+                for="incident-input" 
+                class="block mb-2 text-c1 font-extrabold">Violation Type</label>
+
+              <select 
+                id="incident-input" 
+                name="incident" 
+                class="select2 bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1" 
+                required>
+
                   {% for incident_type in incident_types|sort(attribute='Name') %}
                       <option value="{{ incident_type.IncidentTypeId }}">{{ incident_type.Name }}</option>
                   {% endfor %}
@@ -115,23 +172,23 @@ endblock title %} {% block styles %}
           </div>
           
           
-          
-            
-            <div>
-              <label for="description-input" class="block mb-2 text-c1 font-extrabold"
-                >Description</label
-              >
-              <input
-                type="text"
-                id="description-input"
-                name="description"
-                class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
-                required <!-- Add the required attribute -->
-              <p id="error-description" class="text-c4 text-sm"></p>
-            </div>
+    
+          <div>
+            <label for="description-input" class="block mb-2 text-c1 font-extrabold">Description</label>
+
+            <input
+              type="text"
+              id="description-input"
+              name="description"
+              class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+              required
+            />
+            <p id="error-description" class="text-c4 text-sm"></p>
+          </div>
 
           <button
-            type="submit"
+            type="button"
+            id="submitModalBtn"
             class="text-white bg-c4 hover:bg-c5 transition duration-300 font-bold text-sm sm:w-auto px-5 px-5 py-2 text-center"
           >
             Submit
@@ -142,121 +199,108 @@ endblock title %} {% block styles %}
   </div>
 </div>
 
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <p>
+      I declare that the information provided to [PUP complaint system] for
+      collection is true and accurate to the best of my knowledge. I understand
+      that providing false information may have legal consequences and may
+      result in punishment as per student code and conduct and applicable laws.
+    </p>
+    <p>
+      Click "<strong>OK</strong>" button to proceed. Otherwise, click
+      "<strong>Cancel</strong>" button to go back.
+    </p>
+    <div class="modal-buttons">
+      <button id="confirmSubmitBtn" class="bg-blue-800 text-white">OK</button>
+      <button id="cancelSubmitBtn" class="bg-gray-400 text-gray-800">
+        Cancel
+      </button>
+    </div>
+  </div>
+</div>
+
 {% endblock %} {% block script %}
 <!-- Include Notyf script -->
 <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
 <script>
  
-document.getElementById('submitReport').addEventListener('submit', function(event) {
-  event.preventDefault(); // Prevent the default form submission
-  
-  // Check if the form is valid
-  if (!event.target.checkValidity()) {
-      // If the form is invalid, display error messages for each input field
-      event.target.querySelectorAll(':invalid').forEach((element) => {
-          const errorMessage = element.parentNode.querySelector(`#error-${element.id}`);
-          if (errorMessage) {
-              errorMessage.textContent = `${element.name} is required.`;
-          }
-      });
-      return; // Exit the function without submitting the form
-  }
-  
-  // If the form is valid, proceed with form submission
-  const formData = new FormData(event.target);
-  const apiUrl = "{{ url_for('faculty_api.reporting_violation') }}";
-  
-  fetch(apiUrl, {
+  const confirmationModal = document.getElementById('confirmationModal');
+  const submitModalBtn = document.getElementById('submitModalBtn');
+  const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
+  const cancelSubmitBtn = document.getElementById('cancelSubmitBtn');
+
+  // Add event listener to the form submission
+  function submitForm(formData) {
+    const apiUrl = "{{ url_for('faculty_api.reportingViolation') }}";
+
+    fetch(apiUrl, {
       method: 'POST',
       body: formData,
-      credentials: 'include',
-  })
-  .then((response) => {
-      if (!response.ok) {
+      credentials: 'include', // Include credentials (cookies) in the request
+    })
+      .then((response) => {
+        if (!response.ok) {
           throw new Error('Failed to submit report');
-      }
-      return response.json();
-  })
-  .then((data) => {
-    // If the API returned a success message, display it and redirect to the dashboard
-    console.log('success:', data);
-    if (data.success) {
-      notyf.success(data.message);
-    // remove all the field values upon successful submission
-    document.getElementById('date-input').value = '';
-    document.getElementById('time-input').value = '';
-    document.getElementById('description-input').value = '';
-    document.getElementById('incident-input').value = '';
-    document.getElementById('location-input').value = '';
-    document.getElementById('student-input').value = '';
+        }
+        return response.json(); // Parse the JSON response
+      })
+      .then((data) => {
+        // If the API returned a success message, display it and reset the form
+        console.log('success:', data);
+        if (data.success) {
+          notyf.success(data.message);
+          document.getElementById('submitReport').reset(); // Reset the form
+        } else {
+          // If the API returned an error message, display it
+          notyf.error(data.message);
+        }
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error('Error submitting report:', error.message);
+        notyf.error('Failed to submit report');
+      });
+  }
+
+  // Add event listener to the submit button to show the modal
+  submitModalBtn.addEventListener('click', function () {
+    const form = document.getElementById('submitReport');
+    const formIsValid = form.checkValidity();
+
+    if (formIsValid) {
+      confirmationModal.style.display = 'block';
     } else {
-      // If the API returned an error message, display it
-      notyf.error(data.message);
+      // Iterate over form elements to find empty required fields
+      const formElements = form.querySelectorAll('input, select');
+      formElements.forEach((element) => {
+        if (!element.checkValidity()) {
+          element.classList.add('invalid-field');
+        } else {
+          element.classList.remove('invalid-field');
+        }
+      });
+
+      notyf.error('Please fill out all required fields');
     }
-  })
-  .catch((error) => {
-    // Hanndle errors
-      console.error('Error submitting Violation:', error.message);
-      notyf.error('Failed to submit Violation');
   });
-});
-</script>
 
-//<!-- FETCHING USER DETAILS -->
-<script>
-  // Variables to store location and incident types
-  let locationDetails = {};
-  let incidentTypes = {};
+  // Add event listener to the OK button in the modal to submit the form
+  confirmSubmitBtn.addEventListener('click', function () {
+    // Get the form data
+    const formData = new FormData(document.getElementById('submitReport'));
+    // Submit the form
+    submitForm(formData);
+    // Hide the modal
+    confirmationModal.style.display = 'none';
+  });
 
-  // Fetch location and incident types
-  async function fetchLocation() {
-    try {
-      // Fetch location data
-      const locationResponse = await fetch(`${api_base_url}/location`);
-
-      if (!locationResponse.ok) {
-        throw new Error('Failed to fetch location data');
-      }
-
-      locationDetails = await locationResponse.json();
-      
-      updateDropdowns();
-      // Fetch incident types
-      const incidentResponse = await fetch(`${api_base_url}/incident_types`);
-      if (!incidentResponse.ok) {
-        throw new Error('Failed to fetch incident types data');
-      }
-      incidentTypes = await incidentResponse.json();
-      updateDropdowns();
-    } catch (error) {
-      console.error(error.message);
-    }
-  }
-
-  // Function to update dropdowns with location and incident types
-  function updateDropdowns() {
-    const incidentDropdown = document.getElementById('incident-input');
-    incidentDropdown.innerHTML = '';
-    for (const incidentType of incidentTypes) {
-      const option = document.createElement('option');
-      option.value = incidentType.IncidentTypeId;
-      option.text = incidentType.Name;
-      incidentDropdown.appendChild(option);
-    }
-
-    const locationDropdown = document.getElementById('location-input');
-    locationDropdown.innerHTML = '';
-    for (const location of locationDetails) {
-      const option = document.createElement('option');
-      option.value = location.LocationId;
-      option.text = location.Name;
-      locationDropdown.appendChild(option);
-    }
-  }
-
-  // Initial fetch when the page loads
-  fetchLocation();
+  // Add event listener to the Cancel button in the modal to hide the modal
+  cancelSubmitBtn.addEventListener('click', function () {
+    confirmationModal.style.display = 'none';
+  });
 </script>
 
 {% endblock script %}

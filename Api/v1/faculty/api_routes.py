@@ -158,8 +158,8 @@ def manage_reports():
     except Exception as e:
         return {"message": "An error occurred", "status": 500}
 
-@faculty_api.route('/reporting_violation', methods=['POST'])
-def reporting_violation():
+@faculty_api.route('/reporting-violation', methods=['POST'])
+def reportingViolation():
    user = getCurrentUser()
    if request.method == 'POST':
         try:

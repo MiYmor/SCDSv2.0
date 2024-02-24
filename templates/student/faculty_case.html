@@ -1,6 +1,5 @@
 {% extends "student/layout.html" %} {% block style %}
 <style>
-  /* Apply bold style to the header cells */
   .e-headertext {
     color: white;
     font-weight: bolder !important;
@@ -10,6 +9,54 @@
   th.e-headercell {
     background-color: #6376eb !important;
     color: white;
+  }
+
+  /* Define modal styles */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+
+  .modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+  }
+
+  .modal-content p {
+    margin-bottom: 20px;
+  }
+
+  .modal-buttons {
+    text-align: right;
+  }
+
+  .modal-buttons button {
+    margin-left: 10px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
+  .modal-buttons button:hover {
+    background-color: #f0f0f0;
+  }
+
+  /* Add style for highlighting invalid fields */
+  .invalid-field {
+    border: 2px solid #ff0000 !important;
   }
 </style>
 {% endblock %} {% block content %}
@@ -51,26 +98,34 @@
               />
               <p id="error-time" class="text-c4 text-sm"></p>
             </div>
-            
-          
-            <div>
-                <label for="location-input" class="block mb-2 text-c1 font-extrabold">Location</label>
-                <select
-                    id="location-input"
-                    name="location"
-                    class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
-                    required
-                >
-                    {% for location in locations %}
-                        <option value="{{ location.LocationId }}">{{ location.Name }}</option>
-                    {% endfor %}
-                </select>
-                <p id="error-location" class="text-c4 text-sm"></p>
-            </div>
-            
 
             <div>
-              <label for="faculty-input" class="block mb-2 text-c1 font-extrabold">Select Complainee</label>
+              <label
+                for="location-input"
+                class="block mb-2 text-c1 font-extrabold"
+                >Location</label
+              >
+              <select
+                id="location-input"
+                name="location"
+                class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+                required
+              >
+                {% for location in locations %}
+                <option value="{{ location.LocationId }}">
+                  {{ location.Name }}
+                </option>
+                {% endfor %}
+              </select>
+              <p id="error-location" class="text-c4 text-sm"></p>
+            </div>
+
+            <div>
+              <label
+                for="faculty-input"
+                class="block mb-2 text-c1 font-extrabold"
+                >Select Complainee</label
+              >
               <select
                 id="faculty-input"
                 name="faculty"
@@ -78,14 +133,18 @@
                 required
               >
                 {% for Faculty in faculty|sort(attribute='LastName') %}
-                  <option value="{{ Faculty.FacultyId }}">{{ Faculty.LastName }}, {{ Faculty.FirstName }}</option>
+                <option value="{{ Faculty.FacultyId }}">
+                  {{ Faculty.LastName }}, {{ Faculty.FirstName }}
+                </option>
                 {% endfor %}
               </select>
               <p id="error-faculty" class="text-c4 text-sm"></p>
             </div>
-          
+
             <div>
-              <label for="description-input" class="block mb-2 text-c1 font-extrabold"
+              <label
+                for="description-input"
+                class="block mb-2 text-c1 font-extrabold"
                 >Description</label
               >
               <input
@@ -97,15 +156,40 @@
               />
               <p id="error-description" class="text-c4 text-sm"></p>
             </div>
+          </div>
 
+          <!-- Submit button -->
           <button
-            type="submit"
+            type="button"
+            id="submitModalBtn"
             class="text-white bg-c4 hover:bg-c5 transition duration-300 font-bold text-sm sm:w-auto px-5 px-5 py-2 text-center"
           >
             Submit
           </button>
         </form>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div id="confirmationModal" class="modal">
+  <div class="modal-content">
+    <p>
+      I declare that the information provided to [PUP complaint system] for
+      collection is true and accurate to the best of my knowledge. I understand
+      that providing false information may have legal consequences and may
+      result in punishment as per student code and conduct and applicable laws.
+    </p>
+    <p>
+      Click "<strong>OK</strong>" button to proceed. Otherwise, click
+      "<strong>Cancel</strong>" button to go back.
+    </p>
+    <div class="modal-buttons">
+      <button id="confirmSubmitBtn" class="bg-blue-800 text-white">OK</button>
+      <button id="cancelSubmitBtn" class="bg-gray-400 text-gray-800">
+        Cancel
+      </button>
     </div>
   </div>
 </div>
@@ -132,58 +216,85 @@
     </div>
   </footer>
 </div>
-
 {% endblock %} {% block script %}
 <!-- Include Notyf script -->
 <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 
 <script>
   // Get the form
-    // Add event listener to the form submission
-    document
-    .getElementById('submitReport')
-    .addEventListener('submit', function (event) {
-      event.preventDefault(); // Prevent the default form submission
-  
-      // Get the form data
-      const formData = new FormData(event.target);
-      console.log('Here is the formData', formData);
-      // Define the API URL for the login endpoint
-      const apiUrl = "{{ url_for('student_api.facultyReporting') }}";
-  
-      // Make a POST request to the login API
-      fetch(apiUrl, {
-        method: 'POST',
-        body: formData,
-        credentials: 'include', // Include credentials (cookies) in the request
+  const confirmationModal = document.getElementById('confirmationModal');
+  const submitModalBtn = document.getElementById('submitModalBtn');
+  const confirmSubmitBtn = document.getElementById('confirmSubmitBtn');
+  const cancelSubmitBtn = document.getElementById('cancelSubmitBtn');
+
+  // Add event listener to the form submission
+  function submitForm(formData) {
+    const apiUrl = "{{ url_for('student_api.facultyReporting') }}";
+
+    fetch(apiUrl, {
+      method: 'POST',
+      body: formData,
+      credentials: 'include', // Include credentials (cookies) in the request
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Failed to submit report');
+        }
+        return response.json(); // Parse the JSON response
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error('Failed to submit report');
-          }
-          return response.json(); // Parse the JSON response
-        })
-        .then((data) => {
-          // If the API returned a success message, display it and redirect to the dashboard
-          console.log('success:', data);
-          if (data.success) {
-            notyf.success(data.message);
-          // remove all the field values upon successful submission
-          document.getElementById('date-input').value = '';
-          document.getElementById('time-input').value = '';
-          document.getElementById('description-input').value = '';
-          document.getElementById('location-input').value = '';
-          document.getElementById('faculty-input').value = '';
-          } else {
-            // If the API returned an error message, display it
-            notyf.error(data.message);
-          }
-        }) // Added missing closing parenthesis for then()
-        .catch((error) => {
-          // Handle errors
-          console.error('Error submitting report:', error.message);
-          notyf.error('Failed to submit report');
-        });
-    }); // Added missing closing parenthesis for addEventListener()
+      .then((data) => {
+        // If the API returned a success message, display it and reset the form
+        console.log('success:', data);
+        if (data.success) {
+          notyf.success(data.message);
+          document.getElementById('submitReport').reset(); // Reset the form
+        } else {
+          // If the API returned an error message, display it
+          notyf.error(data.message);
+        }
+      })
+      .catch((error) => {
+        // Handle errors
+        console.error('Error submitting report:', error.message);
+        notyf.error('Failed to submit report');
+      });
+  }
+
+  // Add event listener to the submit button to show the modal
+  submitModalBtn.addEventListener('click', function () {
+    const form = document.getElementById('submitReport');
+    const formIsValid = form.checkValidity();
+
+    if (formIsValid) {
+      confirmationModal.style.display = 'block';
+    } else {
+      // Iterate over form elements to find empty required fields
+      const formElements = form.querySelectorAll('input, select');
+      formElements.forEach((element) => {
+        if (!element.checkValidity()) {
+          element.classList.add('invalid-field');
+        } else {
+          element.classList.remove('invalid-field');
+        }
+      });
+
+      notyf.error('Please fill out all required fields');
+    }
+  });
+
+  // Add event listener to the OK button in the modal to submit the form
+  confirmSubmitBtn.addEventListener('click', function () {
+    // Get the form data
+    const formData = new FormData(document.getElementById('submitReport'));
+    // Submit the form
+    submitForm(formData);
+    // Hide the modal
+    confirmationModal.style.display = 'none';
+  });
+
+  // Add event listener to the Cancel button in the modal to hide the modal
+  cancelSubmitBtn.addEventListener('click', function () {
+    confirmationModal.style.display = 'none';
+  });
 </script>
-{% endblock script %}
+{% endblock %}
