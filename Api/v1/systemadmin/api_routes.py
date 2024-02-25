@@ -1,6 +1,6 @@
 # api/api_routes.py
-from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
-from flask_mail import Message
+from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template, render_template_string
+from flask_mail import Message, Mail
 from mail import mail
 from models import SystemAdmin, db, IncidentReport, Student, Location, IncidentType, Faculty, ViolationForm, FacultyIncidentReport
 import pandas as pd
@@ -273,7 +273,7 @@ def allViolations():
 # get all the case that are closed
 @system_admin_api.route('/closed-case', methods=['GET'])
 def allClosedCase():
-    allClosedCase = db.session.query(IncidentReport, Student, Location, IncidentType).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='pending').order_by(IncidentReport.Date).all()
+    allClosedCase = db.session.query(IncidentReport, Student, Location, Faculty).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='pending').order_by(IncidentReport.Date).all()
     
     unique_reports = set()  # Set to store unique report IDs
     list_closedcase=[]
@@ -283,6 +283,8 @@ def allClosedCase():
             report_id = report.IncidentReport.Id
             if report_id not in unique_reports:  # Check if the report ID is unique
                 unique_reports.add(report_id)  # Add report ID to set
+                investigator = db.session.query(Faculty).filter(Faculty.FacultyId == report.IncidentReport.InvestigatorId).first()
+                FullNameInvestigator = investigator.LastName + ", " + investigator.FirstName
                 complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
                 FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
                 FullName= report.Student.LastName + ", " + report.Student.FirstName 
@@ -292,6 +294,7 @@ def allClosedCase():
                     'Time': report.IncidentReport.Time,
                     'LocationName': report.Location.Name,
                     'StudentName': FullName,
+                    'Investigator': FullNameInvestigator,
                     'Complainant': FullNameComplainant,
                     'Description': report.IncidentReport.Description,
                     'Sanction': report.IncidentReport.Sanction,
@@ -311,6 +314,8 @@ def allResolvedCase():
     if allResolvedCase:
             for report in allResolvedCase:
                 # make a dictionary for reports
+                investigator = db.session.query(Faculty).filter(Faculty.FacultyId == report.IncidentReport.InvestigatorId).first()
+                FullNameInvestigator = investigator.LastName + ", " + investigator.FirstName
                 complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
                 FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
                 FullName= report.Student.LastName + ", " + report.Student.FirstName 
@@ -320,6 +325,7 @@ def allResolvedCase():
                     'Time': report.IncidentReport.Time,
                     'LocationName': report.Location.Name,
                     'StudentName': FullName,
+                    'Investigator': FullNameInvestigator,
                     'Complainant': FullNameComplainant,
                     'Description': report.IncidentReport.Description,
                     'Sanction': report.IncidentReport.Sanction,
@@ -639,15 +645,16 @@ def reopenReports():
         # return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
 
+
 @system_admin_api.route('/approve-report', methods={'POST'})
 def approveReport():    
-     # Assuming the incoming data is JSON
+    # Assuming the incoming data is JSON
     data = request.get_json()
     # Extract incidentId from the JSON payload
     incident_id = data.get('IncidentId')
     # Your logic to handle the incidentId
     print('Received incidentId:', incident_id)
-    # make a querry calling the incidentreport table
+    # make a query calling the incidentreport table
     incident = IncidentReport.query.filter_by(Id=incident_id).first()
     # if the incident is found
     if incident:
@@ -656,9 +663,10 @@ def approveReport():
         # commit the changes
         db.session.commit()
         try:
-            # Compose the email message
-            msg = Message('You have been reported', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
-            msg.body = f"The case with ID {incident_id} has been approved and is now accessible."
+            # Compose the email message with HTML content
+            html_content = render_template_string('email_templates/student_notyf.html')
+            msg = Message('Notification of Case Involvement', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
+            msg.html = html_content
             # Send the email
             mail.send(msg)
             # Return a success response
@@ -670,7 +678,7 @@ def approveReport():
     else:
         # Return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
-        
+
 
 # to approve the case or open the case 
 @system_admin_api.route('/access-violation', methods={'POST'})

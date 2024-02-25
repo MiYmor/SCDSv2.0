@@ -95,7 +95,7 @@ class IncidentReport(db.Model):
     ComplainantId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #ComplainantID
     InvestigatorId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE"), nullable=True) #InvestigatorID
     Description = db.Column(db.Text, nullable=False) #Description
-    Sanction = db.Column(db.Text, nullable=True) #Sanction
+    Sanction = db.Column(db.Text, nullable=False, default='pending') #Sanction
     Status = db.Column(db.String(20), nullable=False, default='pending') #Status
     IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
     
@@ -123,7 +123,7 @@ class FacultyIncidentReport(db.Model):
     FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE")) #StudentID
     ComplainantId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #ComplainantID
     Description = db.Column(db.Text, nullable=False) #Description
-    Sanction = db.Column(db.Text, nullable=True) #Sanction
+    Sanction = db.Column(db.Text, nullable=False, default='pending') #Sanction
     Status = db.Column(db.String(20), nullable=False, default='pending') #Status
     IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
     

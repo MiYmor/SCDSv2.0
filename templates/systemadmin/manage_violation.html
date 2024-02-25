@@ -41,6 +41,24 @@ endblock title %} {% block styles %}
   tbody td {
     color: #333;
   }
+
+  #searchInput {
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: #f8f8f8;
+  }
+
+  #searchInput:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+  }
 </style>
 {% endblock styles %} {% block content %}
 
@@ -81,6 +99,14 @@ endblock title %} {% block styles %}
         <h3 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">
           Pending Violations
         </h3>
+
+        <input
+          type="text"
+          id="searchInput"
+          onkeyup="searchTable()"
+          placeholder="Search..."
+        />
+
         <hr class="mx-2" />
 
         <div class="flex items-end justify-between">
@@ -171,18 +197,21 @@ endblock title %} {% block styles %}
       violationDetails.result.forEach((violation) => {
         // Create a tr element for each violation
         const violationRow = document.createElement('tr');
+
+        violationRow.setAttribute('id', `${violation.ViolationId}`);
+
         violationRow.innerHTML = `
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <p><strong>Violation ID:</strong> ${violation.ViolationId}</p>
-                <p><strong>Time:</strong> ${violation.Time}</p>
-                <p><strong>Violation Type:</strong> ${violation.IncidentName}</p>
-                <p><strong>Location:</strong> ${violation.LocationName}</p>
-                <p><strong>Violator:</strong> ${violation.StudentName}</p>
-                <p><strong>Submitted by:</strong> ${violation.Complainant}</p>
-                <p><strong>Description:</strong> ${violation.Description}</p>
+                <p name="violationId"><strong>Violation ID:</strong> ${violation.ViolationId}</p>
+                <p name="Time"><strong>Time:</strong> ${violation.Time}</p>
+                <p name="ViolationType"><strong>Violation Type:</strong> ${violation.IncidentName}</p>
+                <p name="Location"><strong>Location:</strong> ${violation.LocationName}</p>
+                <p name="Student"><strong>Violator:</strong> ${violation.StudentName}</p>
+                <p name="Complainant"><strong>Submitted by:</strong> ${violation.Complainant}</p>
+                <p name="Description"><strong>Description:</strong> ${violation.Description}</p>
                 <strong>Sanction:</strong>
-                <p id='status-${violation.ViolationId}'> ${violation.Status}</p>
+                <p name="Status" id='status-${violation.ViolationId}'> ${violation.Status}</p>
                 <!-- Add other details as needed -->
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
@@ -199,6 +228,39 @@ endblock title %} {% block styles %}
       console.error(error.message);
     }
   }
+
+  function searchTable() {
+    // Declare variables
+    var input, filter, table, tr, td, i, j, txtValue;
+    input = document.getElementById('searchInput');
+    filter = input.value.toUpperCase();
+    table = document.getElementById('output-container');
+    tr = table.getElementsByTagName('tr');
+
+    // Loop through all table rows, and hide those who don't match the search query
+    for (i = 0; i < tr.length; i++) {
+      td = tr[i].getElementsByTagName('td')[1]; // Only consider the second <td>
+      if (td) {
+        var pElements = td.querySelectorAll(
+          "p[name='violationId'], p[name='Location'], p[name='Student'], p[name='Complainant'], p[name='Description'], p[name='Status']"
+        );
+        var found = false;
+        for (j = 0; j < pElements.length; j++) {
+          txtValue = pElements[j].textContent || pElements[j].innerText;
+          if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            found = true;
+            break;
+          }
+        }
+        if (found) {
+          tr[i].style.display = '';
+        } else {
+          tr[i].style.display = 'none';
+        }
+      }
+    }
+  }
+
   // Make a approved report function
   async function accessViolations(ViolationId) {
     console.log('accessViolations', ViolationId);
