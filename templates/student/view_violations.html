@@ -2,9 +2,9 @@
 <style>
   /* Apply bold style to the header cells */
   .e-headertext {
-    color: white;
+    color: black;
     font-weight: bolder !important;
-    font-size: 16px !important;
+    font-size: 20px !important; /* Increased font size */
   }
 
   th.e-headercell {
@@ -38,120 +38,189 @@
 
   /* Adjust text color */
   tbody td {
-    color: #333;
+    color: black;
+    font-size: 18px;
+    font-weight: normal;
+  }
+
+  /* Center content horizontally and vertically */
+  .main-content {
+    padding: 1rem 0; /* Adjusted padding */
+    display: flex;
+    justify-content: center;
+    align-items: center; /* Center vertically */
+  }
+
+  /* Rounded edges */
+  .rounded-lg {
+    border-radius: 0.5rem;
+  }
+
+  /* Previous background color */
+  .bg-white {
+    background-color: #ffffff;
+  }
+
+  /* Maroon accent for header cells */
+  th.ID-header,
+  th.date-header,
+  th.report-details-header,
+  th.status-header,
+  th.sanction-header {
+    background-color: maroon !important;
+    color: white;
+  }
+
+  /* Container for the table */
+  .table-container {
+    width: 100%;
+    max-width: 1200px; /* Adjust as needed */
+    margin: 0 auto; /* Center the container */
+  }
+
+  /* Center the text within the table headers */
+  thead tr {
+    text-align: center;
+  }
+
+  /* Adjust the padding of the table headers */
+  thead th {
+    padding: 12px;
   }
 </style>
 {% endblock %} {% block content %}
-<div class="p-4 md:ml-72">
-  <div class="border-2 border-gray-200 border-dashed rounded-lg">
-    <div class="grid grid-cols-1">
-      <div
-        class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
-      >
-        <h3 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">
-          Violations
-        </h3>
-        <hr class="mx-2" />
+<div class="lg:px-40 md:px-16 py-4 w-screen px-8">
+  <div class="main-content">
+    <div class="border-2 border-gray-200 border-dashed rounded-lg">
+      <h3 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">
+        Violations
+      </h3>
+      <hr class="mx-2" />
+      <div class="grid grid-cols-1">
+        <div
+          class="rounded-lg border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm table-container"
+        >
+          <hr class="mx-2" />
 
-        <div class="flex items-end justify-between">
-          <div class="w-full bg-white p-4">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Date
-                  </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    violation Details
-                  </th>
-                </tr>
-              </thead>
-              <tbody id="output-container"></tbody>
-            </table>
+          <div class="flex items-end justify-between">
+            <div class="w-full bg-white p-4">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ID-header"
+                    >
+                      Violation ID
+                    </th>
+                    <th
+                      scope="col"
+                      class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider date-header"
+                    >
+                      Date
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header">
+                      Report Details
+                    </th>
+                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider sanction-header">
+                      Sanction
+                    </th>
+                  </tr>
+                </thead>
+                <tbody id="output-container"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="bg-white lg:px-40">
-  <footer class="items-center justify-between mx-auto px-8 py-8">
-    <h1 class="text-c1 text-2xl mb-2 font-bold">Contact Information</h1>
-    <div class="flex flex-wrap lg:flex-nowrap gap-4">
-      <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
-        <h5 class="text-lg font-semibold md:font-bold">Email:</h5>
-        <p class="text-lg">quezoncity@pup.edu.ph</p>
-      </div>
-      <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
-        <h5 class="text-lg font-semibold md:font-bold">Postal Mail:</h5>
-        <p class="text-lg">PUP Quezon City Branch</p>
-        <p class="text-lg">Don Fabian St., Commonwealth</p>
-        <p class="text-lg">Quezon City Philippines</p>
-      </div>
-      <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
-        <h5 class="text-lg font-semibold md:font-bold">Telephone:</h5>
-        <p class="text-lg">(632) 8952-7818</p>
-        <p class="text-lg">(632) 8287-8204</p>
-      </div>
+  <div class="bg-white mt-4 p-8 rounded-lg shadow-md additional-content">
+      <p>
+        Any member of the PUP community has the ability to report complaints they
+        believe violate our Community Guidelines. When a complaint is flagged, it
+        doesn't automatically result in immediate action or sanctions. Flagged
+        complaints are reviewed in accordance with the following guidelines:
+      </p>
+      <p>
+        Complaints that violate our School Guidelines and Student Code of Conduct
+        are subject to sanctions. Actions deemed inappropriate for the entire
+        campus community may result in disciplinary measures.
+      </p>
     </div>
-  </footer>
-</div>
-{% endblock %} {% block script %}
-<!-- Existing HTML code... -->
+  </div>
 
-<script>
-  // Fetch location and incident types
-  async function fetchViolation() {
-    try {
-      // Fetch location data
-      const violationResponse = await fetch(
-        `${api_base_url}/fetch/approved/violations`
-      );
+  <div class="bg-white lg:px-40">
+    <footer class="items-center justify-between mx-auto px-8 py-8">
+      <h1 class="text-c1 text-2xl mb-2 font-bold">Contact Information</h1>
+      <div class="flex flex-wrap lg:flex-nowrap gap-4">
+        <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
+          <h5 class="text-lg font-semibold md:font-bold">Email:</h5>
+          <p class="text-lg">quezoncity@pup.edu.ph</p>
+        </div>
+        <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
+          <h5 class="text-lg font-semibold md:font-bold">Postal Mail:</h5>
+          <p class="text-lg">PUP Quezon City Branch</p>
+          <p class="text-lg">Don Fabian St., Commonwealth</p>
+          <p class="text-lg">Quezon City Philippines</p>
+        </div>
+        <div class="w-screen md:w-5/12 md:grow lg:w-4/12">
+          <h5 class="text-lg font-semibold md:font-bold">Telephone:</h5>
+          <p class="text-lg">(632) 8952-7818</p>
+          <p class="text-lg">(632) 8287-8204</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+  {% endblock %} {% block script %}
+  <!-- Existing HTML code... -->
 
-      if (!violationResponse.ok) {
-        throw new Error('Failed to fetch violation data');
-      }
+  <script>
+    // Fetch location and incident types
+    async function fetchViolation() {
+      try {
+        // Fetch location data
+        const violationResponse = await fetch(
+          `${api_base_url}/fetch/approved/violations`
+        );
 
-      const violationDetails = await violationResponse.json();
-      console.log(violationDetails);
+        if (!violationResponse.ok) {
+          throw new Error('Failed to fetch violation data');
+        }
 
-      // Get the container element where you want to render the data
-      const outputContainer = document.getElementById('output-container');
+        const violationDetails = await violationResponse.json();
+        console.log(violationDetails);
 
-      // Loop through the consoleResponse array and create HTML elements for each object
-      violationDetails.result.forEach(async (violation) => {
-        // Create a tr element for each violation
-        const violationRow = document.createElement('tr');
-        violationRow.innerHTML = `
+        // Get the container element where you want to render the data
+        const outputContainer = document.getElementById('output-container');
+
+        // Loop through the consoleResponse array and create HTML elements for each object
+        violationDetails.result.forEach(async (violation) => {
+          // Create a tr element for each violation
+          const violationRow = document.createElement('tr');
+          violationRow.innerHTML = `
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.ViolationId}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-            <p><strong>Violation ID:</strong> ${violation.ViolationId}</p>
             <p><strong>Time:</strong> ${violation.Time}</p>
             <p><strong>Incident Type:</strong> ${violation.IncidentName}</p>
             <p><strong>Location:</strong> ${violation.LocationName}</p>
             <p><strong>Student:</strong> ${violation.StudentName}</p>
             <p><strong>Submitted by:</strong> ${violation.Complainant}</p>
             <p><strong>Description:</strong> ${violation.Description}</p>
-            <strong>Sanction:</strong>
-            <p id='status-${violation.ViolationId}'> ${violation.Status}</p>
-            <!-- Add other details as needed -->
           </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Status}
           `;
 
-        // Append the violationRow to the outputContainer
-        outputContainer.appendChild(violationRow);
-      });
-    } catch (error) {
-      console.error(error.message);
+          // Append the violationRow to the outputContainer
+          outputContainer.appendChild(violationRow);
+        });
+      } catch (error) {
+        console.error(error.message);
+      }
     }
-  }
-  fetchViolation();
-</script>
-{% endblock script %}
+    fetchViolation();
+  </script>
+  {% endblock script %}
+</div>

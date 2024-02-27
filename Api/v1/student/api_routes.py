@@ -104,7 +104,6 @@ def resetPassword(token):
 @student_api.route('/login', methods=['POST'])
 def login():
     if request.method == 'POST':
-        print("STUDENT")
         email = request.form['email']
         password = request.form['password']
         # create_app.sayHello()
@@ -263,10 +262,8 @@ def approvedReports():
     if request.method == 'GET':
         # Handle form submission logic here
         student_id = session.get('user_id')
-        print('student_id', student_id)
         allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.StudentId==student_id, IncidentReport.Status!='pending').order_by(IncidentReport.Date).all()
         list_reports=[]
-        print('allReports', allReports)
         if allReports:
             for report in allReports:
                 # make a dictionary for reports
@@ -288,7 +285,6 @@ def approvedReports():
                 }
                 # append the dictionary to the list
                 list_reports.append(dict_reports)
-                print('list_reports', list_reports)
             return jsonify({'result': list_reports})
         else :
             return jsonify({'message': 'No reports found'}), 404
@@ -325,7 +321,6 @@ def approvedViolations():
                 }
                 # append the dictionary to the list
                 list_violations.append(dict_violation)
-                print('list_violations', list_violations)
             return jsonify({'result': list_violations})
         else :
             return jsonify({'message': 'No reports found'}), 404

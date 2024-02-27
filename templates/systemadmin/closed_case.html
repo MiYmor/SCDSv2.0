@@ -305,7 +305,7 @@ endblock title %} {% block styles %}
       console.log(data);
 
       if (data.result) {
-        notyf.success('Report approved successfully');
+        notyf.success('Case approved successfully');
         document.getElementById(`status-${IncidentId}`).innerHTML = 'Approved';
       } else if (data.error) {
         notyf.error('Failed to approve report');

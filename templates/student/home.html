@@ -1,4 +1,4 @@
-{% extends "student/layout.html" %} {% block title %} Student - Home Page {%
+{% extends "student/layout.html" %} {% block title %} Case Filing Guidelines {%
 endblock title %} {% block style %}
 <style>
   /* Apply bold style to the header cells */
@@ -24,70 +24,84 @@ endblock title %} {% block style %}
     width: 100%; /* Inherit the width of the parent */
     height: 100%; /* Inherit the height of the parent */
   }
+
+  /* Adjust guideline titles */
+  .guideline p.title {
+    font-size: 20px;
+    color: black;
+    font-weight: bold;
+  }
+
+  /* Adjust guideline descriptions */
+  .guideline p.description {
+    font-size: 16px;
+    color: black;
+  }
+
+  /* Adjust additional content */
+  .additional-content {
+    font-size: 16px;
+    color: black;
+    line-height: 1.5;
+  }
 </style>
 {% endblock %} {% block content %}
 <div class="lg:px-40 md:px-16 py-4 w-screen px-8">
-  <h3 class="text-3xl font-bold text-c4 mb-4">Dashboard</h3>
+  <h3 class="text-3xl font-bold text-c4 mb-4">Case Filing Guidelines</h3>
 
-  <div class="flex flex-wrap lg:flex-wrap md:flex-no-wrap md:gap-4 lg:gap-4">
-    <div
-      class="bg-white lg:w-4/12 md:w-6/12 md:flex-1 w-screen md:mb-0 mb-4 rounded-lg p-6 shadow-md"
-    >
-      <p class="font-bold text-c1 opacity-80">Latest Case</p>
-      <div class="flex justify-between">
-        <p id="gpa" class="font-bold text-c1 text-4xl"></p>
-        <p class="bg-primary mt-2 text-white px-2 py-1 rounded-md font-bold">
-          Latest Case
-        </p>
-      </div>
+  <div class="bg-white rounded-lg p-6 shadow-md">
+    <div class="guideline">
+      <p class="title">Date:</p>
+      <p class="description">
+        Please date on which the incident occurred or submitting the complaint.
+      </p>
     </div>
 
-    <div
-      class="bg-white lg:w-4/12 md:w-6/12 md:flex-1 w-screen md:mb-0 mb-4 rounded-lg p-6 shadow-md"
-    >
-      <p class="font-bold text-c1 opacity-80">Total Cases Pending</p>
-      <div class="flex justify-between">
-        <p id="overall-gpa" class="font-bold text-c1 text-4xl"></p>
-        <p class="bg-success mt-2 text-white px-2 py-1 rounded-md font-bold">
-          Overall Resolved Cases
-        </p>
-      </div>
+    <div class="guideline mt-4">
+      <p class="title">Time of Incident:</p>
+      <p class="description">Specify the time the incident occurred.</p>
     </div>
 
-    <div
-      class="bg-white lg:w-4/12 md:w-6/12 md:flex-1 w-screen md:mb-0 mb-4 rounded-lg p-6 shadow-md"
-    >
-      <p class="font-bold text-c1 opacity-80">Violations</p>
-      <div class="flex justify-between">
-        <p class="font-bold text-c1 text-4xl">
-          2 <span class="text-c1 text-base">/total</span>
-        </p>
-        <p class="bg-info mt-2 text-white px-2 py-1 rounded-md font-bold">
-          Count
-        </p>
-      </div>
+    <div class="guideline mt-4">
+      <p class="title">Location:</p>
+      <p class="description">
+        Provide the location where the incident occurred or the context of the
+        report. Include any relevant details such as school building, specific
+        place which the incident occurred.
+      </p>
     </div>
 
-    <div
-      class="hidden md:flex md:flex-1 lg:hidden md:w-6/12 w-screen md:mb-4 rounded-lg p-6"
-    ></div>
-  </div>
-
-  <div class="flex lg:flex-nowrap flex-wrap gap-4 md:mt-4">
-    <div class="lg:w-9/12 w-screen rounded-lg bg-white p-6 shadow-md">
-      <div id="response" class="rounded-lg text-black">
-        <p class="text-2xl font-bold text-c1">Cases Overview Report</p>
-        <div id="columnChartContainer" class=""></div>
-      </div>
+    <div class="guideline mt-4">
+      <p class="title">Party Involved:</p>
+      <p class="description">
+        Input the specific individual in the incident or report. This may
+        include students and faculty.
+      </p>
     </div>
-    <div class="lg:w-3/12 lg:grow w-screen rounded-lg p-6 shadow-md bg-white">
-      <h3 class="text-2xl text-c1 font-bold mb-3">Previous Case</h3>
-      <div id="grid"></div>
+
+    <div class="guideline mt-4">
+      <p class="title">Description:</p>
+      <p class="description">
+        Please provide a detailed description of the incident or issue. Include
+        all relevant information, such as specific actions, conversations, or
+        circumstances, surrounding the complaint. Be as specific and clear as
+        possible.
+      </p>
     </div>
   </div>
 
-  <div class="bg-white mt-4 p-8 rounded-lg shadow-md">
-    <div id="CourseLineChartPerformance"></div>
+  <div class="bg-white mt-4 p-8 rounded-lg shadow-md additional-content">
+    <p>
+      Any member of the PUP community has the ability to report complaints they
+      believe violate our Community Guidelines. When a complaint is flagged, it
+      doesn't automatically result in immediate action or sanctions. Flagged
+      complaints are reviewed in accordance with the following guidelines:
+    </p>
+    <p>
+      Complaints that violate our School Guidelines and Student Code of Conduct
+      are subject to sanctions. Actions deemed inappropriate for the entire
+      campus community may result in disciplinary measures.
+    </p>
   </div>
 </div>
 

@@ -500,11 +500,11 @@ def accessReports():
             # Send the email
             mail.send(msg)
             # Return a success response
-            return jsonify({'result': 'success', 'message': 'Report approved and email notification sent'})
+            return jsonify({'result': 'success', 'message': 'Case approved and email notification sent'})
         except Exception as e:
             # Log the exception and return an error response
             print('An error occurred while sending the email notification:', e)
-            return jsonify({'error': 'failed', 'message': 'Report approved, but email notification failed'}), 500
+            return jsonify({'error': 'failed', 'message': 'Case approved, but email notification failed'}), 500
     else:
         # Return a message
         return jsonify({'error': 'failed', 'message': 'Report not found'})
@@ -527,10 +527,10 @@ def removeAccessReports():
         # commit the changes
         db.session.commit()
         # return a message
-        return jsonify({'result': 'success', 'message': 'Report approved'})
+        return jsonify({'result': 'success', 'message': 'Case approved'})
     else:
         # return a message
-        return jsonify({'error': 'failed', 'message': 'Report not found'})
+        return jsonify({'error': 'failed', 'message': 'Case not found'})
     
 
 @system_admin_api.route('/resolved-precase', methods={'POST'})
@@ -704,14 +704,14 @@ def accessViolations():
             # Send the email
             mail.send(msg)
             # Return a success response
-            return jsonify({'result': 'success', 'message': 'Report approved and email notification sent'})
+            return jsonify({'result': 'success', 'message': 'Violation approved and email notification sent'})
         except Exception as e:
             # Log the exception and return an error response
             print('An error occurred while sending the email notification:', e)
-            return jsonify({'error': 'failed', 'message': 'Report approved, but email notification failed'}), 500
+            return jsonify({'error': 'failed', 'message': 'Violation approved, but email notification failed'}), 500
     else:
         # Return a message
-        return jsonify({'error': 'failed', 'message': 'Report not found'})
+        return jsonify({'error': 'failed', 'message': 'Violation not found'})
 
 # to close the case 
 @system_admin_api.route('/remove-access-violation', methods={'POST'})
