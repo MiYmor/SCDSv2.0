@@ -193,6 +193,8 @@ def allReports():
     if allReports:
         for report in allReports:
             # make a dictionary for reports
+            investigator = db.session.query(Faculty).filter(Faculty.FacultyId == report.IncidentReport.InvestigatorId).first()
+            FullNameInvestigator = investigator.LastName + ", " + investigator.FirstName
             complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= report.Student.LastName + ", " + report.Student.FirstName 
@@ -202,6 +204,7 @@ def allReports():
                 'Time': report.IncidentReport.Time,
                 'LocationName': report.Location.Name,
                 'StudentName': FullName,
+                'Investigator': FullNameInvestigator,
                 'Complainant': FullNameComplainant,
                 'Description': report.IncidentReport.Description,
                 'Sanction': report.IncidentReport.Sanction,
@@ -221,6 +224,8 @@ def allapprovedReports():
     if allReports:
         for report in allReports:
             # make a dictionary for reports
+            investigator = db.session.query(Faculty).filter(Faculty.FacultyId == report.IncidentReport.InvestigatorId).first()
+            FullNameInvestigator = investigator.LastName + ", " + investigator.FirstName
             complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= report.Student.LastName + ", " + report.Student.FirstName 
@@ -230,6 +235,7 @@ def allapprovedReports():
                 'Time': report.IncidentReport.Time,
                 'LocationName': report.Location.Name,
                 'StudentName': FullName,
+                'Investigator': FullNameInvestigator,
                 'Complainant': FullNameComplainant,
                 'Description': report.IncidentReport.Description,
                 'Sanction': report.IncidentReport.Sanction,

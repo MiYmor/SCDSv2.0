@@ -59,6 +59,13 @@ endblock title %} {% block styles %}
     border-color: #007bff;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
   }
+
+  th.date-header.maroon-bg,
+  th.report-details-header.maroon-bg,
+  th.actions-header.maroon-bg {
+    background-color: maroon !important;
+    color: white;
+  }
 </style>
 {% endblock styles %} {% block content %}
 <div class="p-4 md:ml-72">
@@ -87,19 +94,19 @@ endblock title %} {% block styles %}
                 <tr>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
                   >
                     Date
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header maroon-bg"
                   >
                     Violation Details
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider actions-header maroon-bg"
                   >
                     Actions
                   </th>
