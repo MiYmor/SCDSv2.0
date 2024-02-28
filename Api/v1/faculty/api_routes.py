@@ -1,6 +1,6 @@
 # api/api_routes.py
 from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
-from models import Faculty, db, IncidentReport, Student, Location, IncidentType, SystemAdmin, ViolationForm
+from models import Faculty, db, IncidentReport, Student, Location, ViolationForm
 import pandas as pd
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash
@@ -256,8 +256,8 @@ def assignSanction():
         incident_id = data.get('incidentId')
         print('Received incidentId:', incident_id)
         
-        appointed_sanction = data.get('assignSanction')
-        print('Received Sabction:', appointed_sanction)
+        manage_sanction = data.get('assignSanction')
+        print('Received Sabction:', manage_sanction)
 
         # Query the incident report
         report = IncidentReport.query.filter_by(Id=incident_id).first()
@@ -265,7 +265,7 @@ def assignSanction():
         # Check if the incident report is found
         if report:
             # Update InvestigatorId with assigned_faculty
-            report.Sanction = appointed_sanction
+            report.Sanction = manage_sanction
             # Commit the changes to the database
             db.session.commit()
             # Return a success message

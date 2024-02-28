@@ -66,6 +66,12 @@ endblock title %} {% block styles %}
     background-color: maroon !important;
     color: white;
   }
+
+  td.actions-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 </style>
 {% endblock styles %} {% block content %}
 
@@ -126,19 +132,25 @@ endblock title %} {% block styles %}
                 <tr>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
+                    class="px-6 py-3 text-left text-center text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
+                  >
+                    Case ID
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-center text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
                   >
                     Date
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header maroon-bg"
+                    class="px-6 py-3 text-left text-center text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header maroon-bg"
                   >
                     Report Details
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider actions-header maroon-bg"
+                    class="px-6 py-3 text-left text-center text-xs font-medium text-gray-500 uppercase tracking-wider actions-header maroon-bg"
                   >
                     Actions
                   </th>
@@ -202,24 +214,23 @@ endblock title %} {% block styles %}
         reportRow.setAttribute('id', `${report.IncidentId}`);
 
         reportRow.innerHTML = `
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
+                <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${report.IncidentId}</td>
+                <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <p name ="reportId"><strong>Report ID:</strong> ${report.IncidentId}</p>
                   <p name ="Time"><strong>Time:</strong> ${report.Time}</p>
                   <p name ="Location"><strong>Location:</strong> ${report.LocationName}</p>
                   <p name ="Student"><strong>Student:</strong> ${report.StudentName}</p>
                   <p name ="Investigator"><strong>Investigator:</strong> ${report.Investigator}</p>
                   <p name ="Complainant"><strong>Submitted by:</strong> ${report.Complainant}</p>
-                  <p name ="Description"><strong>Description:</strong> ${report.Description}</p
+                  <p name ="Description"><strong>Description:</strong> ${report.Description}</p>
                   <p name ="Sanction"><strong>Sanction:</strong> ${report.Sanction}</p>
                   <strong>Status:</strong>
                   <p name ="status" id='status-${report.IncidentId}'> ${report.Status}</p>
-                  <!-- Add other details as needed -->
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
-                  <button class="bg-blue-600 p-2 text-white" onclick="openModal(${report.IncidentId})">Manage Case</button>
-                  <button class="bg-green-600 p-2 text-white" onclick="approveReport(${report.IncidentId})">Approve Case</button>
-                  <button class="bg-red-600 p-2 text-white" onclick="removeAccessReports(${report.IncidentId})">Reopen Case</button>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column">
+                  <button class="bg-blue-600 p-2 text-white block mb-2" onclick="openModal(${report.IncidentId})">Manage Case</button>
+                  <button class="bg-green-600 p-2 text-white block mb-2" onclick="approveReport(${report.IncidentId})">Approve Case</button>
+                  <button class="bg-red-600 p-2 text-white block mb-2" onclick="removeAccessReports(${report.IncidentId})">Reopen Case</button>
                 </td>
               `;
 
@@ -232,33 +243,27 @@ endblock title %} {% block styles %}
   }
 
   function searchTable() {
-    // Declare variables
     var input, filter, table, tr, td, i, j, txtValue;
     input = document.getElementById('searchInput');
     filter = input.value.toUpperCase();
     table = document.getElementById('output-container');
     tr = table.getElementsByTagName('tr');
 
-    // Loop through all table rows, and hide those who don't match the search query
     for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName('td')[1]; // Only consider the second <td>
-      if (td) {
-        var pElements = td.querySelectorAll(
-          "p[name='reportId'], p[name='Location'], p[name='Student'], p[name='Complainant'], p[name='Sanction'], p[name='Description'], p[name='Investigator']"
-        );
-        var found = false;
-        for (j = 0; j < pElements.length; j++) {
-          txtValue = pElements[j].textContent || pElements[j].innerText;
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            found = true;
-            break;
-          }
+      td = tr[i].getElementsByTagName('td'); // Get all td elements in the row
+      var found = false;
+      for (j = 0; j < td.length; j++) {
+        txtValue = td[j].textContent || td[j].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          found = true;
+          break;
         }
-        if (found) {
-          tr[i].style.display = '';
-        } else {
-          tr[i].style.display = 'none';
-        }
+      }
+      // Toggle row display based on search result
+      if (found) {
+        tr[i].style.display = '';
+      } else {
+        tr[i].style.display = 'none';
       }
     }
   }
@@ -284,7 +289,7 @@ endblock title %} {% block styles %}
 
       if (data.result) {
         notyf.success('Case is now reopened');
-        document.getElementById(`status-${IncidentId}`).innerHTML = 'false';
+        document.getElementById(`status-${IncidentId}`).innerHTML = 'pending';
       } else if (data.error) {
         notyf.error('Failed to reopen case');
       }
@@ -313,7 +318,7 @@ endblock title %} {% block styles %}
 
       if (data.result) {
         notyf.success('Case approved successfully');
-        document.getElementById(`status-${IncidentId}`).innerHTML = 'Approved';
+        document.getElementById(`status-${IncidentId}`).innerHTML = 'approved';
       } else if (data.error) {
         notyf.error('Failed to approve report');
       }
@@ -362,8 +367,15 @@ endblock title %} {% block styles %}
         console.log(data);
         if (data.result) {
           notyf.success('Sanction updated successfully');
-          document.getElementById(`status-${incidentId}`).innerHTML =
-            manageSanction;
+          const tdElement = document.getElementById(
+            `status-${incidentId}`
+          ).parentElement;
+          const pElement = tdElement.querySelector('p[name="Sanction"]');
+          if (pElement) {
+            pElement.innerHTML = `<strong>Sanction:</strong> ${manageSanction}`;
+          } else {
+            notyf.error('Failed to find the Sanction element');
+          }
         } else if (data.error) {
           notyf.error('Failed to approve the Sanction');
         }

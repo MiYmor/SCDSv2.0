@@ -66,6 +66,12 @@ endblock title %} {% block styles %}
     background-color: maroon !important;
     color: white;
   }
+
+  td.actions-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 </style>
 {% endblock styles %} {% block content %}
 
@@ -123,19 +129,25 @@ endblock title %} {% block styles %}
                 <tr>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
+                  >
+                    Violation ID
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
                   >
                     Date
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header maroon-bg"
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header maroon-bg"
                   >
                     Violation Details
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider actions-header maroon-bg"
+                    class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider actions-header maroon-bg"
                   >
                     Actions
                   </th>
@@ -208,25 +220,25 @@ endblock title %} {% block styles %}
         violationRow.setAttribute('id', `${violation.ViolationId}`);
 
         violationRow.innerHTML = `
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <p name="violationId"><strong>Violation ID:</strong> ${violation.ViolationId}</p>
-                <p name="Time"><strong>Time:</strong> ${violation.Time}</p>
-                <p name="ViolationType"><strong>Violation Type:</strong> ${violation.IncidentName}</p>
-                <p name="Location"><strong>Location:</strong> ${violation.LocationName}</p>
-                <p name="Student"><strong>Violator:</strong> ${violation.StudentName}</p>
-                <p name="Complainant"><strong>Submitted by:</strong> ${violation.Complainant}</p>
-                <p name="Description"><strong>Description:</strong> ${violation.Description}</p>
-                <strong>Sanction:</strong>
-                <p name="Status" id='status-${violation.ViolationId}'> ${violation.Status}</p>
-                <!-- Add other details as needed -->
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
-                <button class="bg-blue-600 p-2 text-white" onclick="openStatusModal(${violation.ViolationId})">Manage Violation</button>
-                <button class="bg-green-600 p-2 text-white" onclick="accessViolations(${violation.ViolationId})">Approve Violation</button>
-                <button class="bg-red-600 p-2 text-white" onclick="removeViolations(${violation.ViolationId})">Remove Violation</button>
-              </td>
-            `;
+                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${violation.ViolationId}</td>
+                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <p name="Time"><strong>Time:</strong> ${violation.Time}</p>
+                    <p name="ViolationType"><strong>Violation Type:</strong> ${violation.IncidentName}</p>S
+                    <p name="Location"><strong>Location:</strong> ${violation.LocationName}</p>
+                    <p name="Student"><strong>Violator:</strong> ${violation.StudentName}</p>
+                    <p name="Complainant"><strong>Submitted by:</strong> ${violation.Complainant}</p>
+                    <p name="Description"><strong>Description:</strong> ${violation.Description}</p>
+                    <strong>Sanction:</strong>
+                    <p name="Status" id='status-${violation.ViolationId}'> ${violation.Status}</p>
+                    <!-- Add other details as needed -->
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column">
+                    <button class="bg-blue-600 p-2 text-white block mb-2" onclick="openStatusModal(${violation.ViolationId})">Manage Violation</button>
+                    <button class="bg-green-600 p-2 text-white block mb-2" onclick="accessViolations(${violation.ViolationId})">Approve Violation</button>
+                    <button class="bg-red-600 p-2 text-white block mb-2" onclick="removeViolations(${violation.ViolationId})">Remove Violation</button>
+                  </td>
+                `;
 
         // Append the violationRow to the outputContainer
         outputContainer.appendChild(violationRow);
@@ -237,33 +249,27 @@ endblock title %} {% block styles %}
   }
 
   function searchTable() {
-    // Declare variables
     var input, filter, table, tr, td, i, j, txtValue;
     input = document.getElementById('searchInput');
     filter = input.value.toUpperCase();
     table = document.getElementById('output-container');
     tr = table.getElementsByTagName('tr');
 
-    // Loop through all table rows, and hide those who don't match the search query
     for (i = 0; i < tr.length; i++) {
-      td = tr[i].getElementsByTagName('td')[1]; // Only consider the second <td>
-      if (td) {
-        var pElements = td.querySelectorAll(
-          "p[name='violationId'], p[name='Location'], p[name='Student'], p[name='Complainant'], p[name='Description'], p[name='Status']"
-        );
-        var found = false;
-        for (j = 0; j < pElements.length; j++) {
-          txtValue = pElements[j].textContent || pElements[j].innerText;
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            found = true;
-            break;
-          }
+      td = tr[i].getElementsByTagName('td'); // Get all td elements in the row
+      var found = false;
+      for (j = 0; j < td.length; j++) {
+        txtValue = td[j].textContent || td[j].innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          found = true;
+          break;
         }
-        if (found) {
-          tr[i].style.display = '';
-        } else {
-          tr[i].style.display = 'none';
-        }
+      }
+      // Toggle row display based on search result
+      if (found) {
+        tr[i].style.display = '';
+      } else {
+        tr[i].style.display = 'none';
       }
     }
   }
@@ -289,7 +295,6 @@ endblock title %} {% block styles %}
 
       if (data.result) {
         notyf.success('Violation is now approved');
-        document.getElementById(`status-${ViolationId}`).innerHTML = 'true';
       } else if (data.error) {
         notyf.error('Failed to approve violation');
       }
@@ -319,7 +324,7 @@ endblock title %} {% block styles %}
 
       if (data.result) {
         notyf.success('Violation is now removed');
-        document.getElementById(`status-${ViolationId}`).innerHTML = 'false';
+        document.getElementById(`status-${ViolationId}`).innerHTML = 'removed';
       } else if (data.error) {
         notyf.error('Failed to removed violation');
       }

@@ -898,3 +898,39 @@ def manageSanction():
         print('error',e) 
         # Return an error message if an exception occurs
         return jsonify({'error': 'failed', 'message': str(e)})
+
+
+@system_admin_api.route('/cases-overview', methods=['GET'])
+def cases_overview():
+    try:
+        # Get the count of total pending cases
+        total_pending_cases = IncidentReport.query.filter_by(status='pending').count()
+
+        # Get the count of resolved cases
+        resolved_cases = IncidentReport.query.filter_by(status='approved').count()
+
+        # Calculate the violation rate (assuming total number of cases is available)
+        total_cases = total_pending_cases + resolved_cases
+        if total_cases > 0:
+            violation_rate = (total_pending_cases / total_cases) * 100
+        else:
+            violation_rate = 0
+
+        # Get the details of the latest case (assuming the IncidentReport table has a 'created_at' field)
+        latest_case = IncidentReport.query.order_by(IncidentReport.created_at.desc()).first()
+
+        # Construct the response dictionary
+        response = {
+            'latestCase': {
+                'date': latest_case.created_at.strftime('%Y-%m-%d'),
+                'description': latest_case.description,
+                # Add more fields if needed
+            },
+            'totalPending': total_pending_cases,
+            'resolvedCases': resolved_cases,
+            'violationRate': violation_rate
+        }
+
+        return jsonify(response), 200
+    except Exception as e:
+        return jsonify({'error': 'Failed to fetch cases overview', 'message': str(e)}), 500

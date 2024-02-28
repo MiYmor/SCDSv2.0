@@ -111,19 +111,19 @@ thead th {
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ID-header">
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider ID-header">
                       Report ID
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider date-header">
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider date-header">
                       Date
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header">
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header">
                       Report Details
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider status-header">
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider status-header">
                       Sanction
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider sanction-header">
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider sanction-header">
                       Status
                     </th>
                   </tr>
@@ -202,8 +202,8 @@ thead th {
         // Create a tr element for each report
         const reportRow = document.createElement('tr');
         reportRow.innerHTML = `
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.IncidentId}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
+        <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${report.IncidentId}</td>
+        <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
           <p><strong>Time:</strong> ${report.Time}</p>
           <p><strong>Location:</strong> ${report.LocationName}</p>
@@ -211,8 +211,8 @@ thead th {
           <p><strong>Submitted by:</strong> ${report.Complainant}</p>
           <p><strong>Description:</strong> ${report.Description}</p>
         </td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Sanction}</td>
-        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.Sanction}</td>
+        <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">
           <p id='status-${report.IncidentId}'> ${report.Status}</p>
           <!-- Add other details as needed -->
         </td>

@@ -109,20 +109,20 @@
                   <tr>
                     <th
                       scope="col"
-                      class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ID-header"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider ID-header"
                     >
                       Violation ID
                     </th>
                     <th
                       scope="col"
-                      class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider date-header"
+                      class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider date-header"
                     >
                       Date
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header">
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header">
                       Report Details
                     </th>
-                    <th scope="col" class="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider sanction-header">
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider sanction-header">
                       Sanction
                     </th>
                   </tr>
@@ -200,8 +200,8 @@
           // Create a tr element for each violation
           const violationRow = document.createElement('tr');
           violationRow.innerHTML = `
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.ViolationId}</td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
+          <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${violation.ViolationId}</td>
+          <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
             <p><strong>Time:</strong> ${violation.Time}</p>
             <p><strong>Incident Type:</strong> ${violation.IncidentName}</p>
@@ -210,7 +210,7 @@
             <p><strong>Submitted by:</strong> ${violation.Complainant}</p>
             <p><strong>Description:</strong> ${violation.Description}</p>
           </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${violation.Status}
+          <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${violation.Status}
           `;
 
           // Append the violationRow to the outputContainer

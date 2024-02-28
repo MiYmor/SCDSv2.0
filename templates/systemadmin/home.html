@@ -23,15 +23,7 @@
           <div>
             <h3 class="mb-4 text-4xl font-bold text-c1" id="high-average">1</h3>
             <div>
-              <p class="text-base font-semibold">Case</p>
-              <div class="flex gap-2">
-                <img
-                  src="{{ url_for('static', filename='images/faculty/trend.png') }}"
-                  alt=""
-                  class="w-10 h-5 opacity-80"
-                />
-                <p class="text-sm font-semibold" id="high-class">COURSE 1-1</p>
-              </div>
+              <p class="text-base font-semibold">Total Pending Case</p>
             </div>
           </div>
 
@@ -52,15 +44,7 @@
           <div>
             <h3 class="mb-4 text-4xl font-bold text-c1" id="low-average">1</h3>
             <div>
-              <p class="text-base font-semibold">Lowest Class Average</p>
-              <div class="flex gap-2">
-                <img
-                  src="{{ url_for('static', filename='images/faculty/bear.png') }}"
-                  alt=""
-                  class="w-10 h-5 opacity-80"
-                />
-                <p class="text-sm font-semibold" id="low-class">COURSE 1-1</p>
-              </div>
+              <p class="text-base font-semibold">Pending Faculty Case</p>
             </div>
           </div>
 
@@ -83,15 +67,7 @@
               1
             </h3>
             <div>
-              <p class="text-base font-semibold">Subjects Handle</p>
-              <div class="flex gap-2">
-                <img
-                  src="{{ url_for('static', filename='images/faculty/trend.png') }}"
-                  alt=""
-                  class="w-10 h-5 opacity-80"
-                />
-                <p class="text-sm font-semibold" id="current-year">Year</p>
-              </div>
+              <p class="text-base font-semibold">Pending Violations</p>
             </div>
           </div>
 
@@ -108,15 +84,17 @@
     <!-- CONTAINER -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div class="col-span-1 mt-4 shadow-sm h-max p-4 bg-white">
+        <h1 class="text-2xl font-bold p-4 text-c1">Resolved Case</h1>
         <div id="containerChart" class="w-full"></div>
       </div>
       <div class="col-span-1 mt-4 shadow-sm h-max p-4 bg-white">
+        <h1 class="text-2xl font-bold p-4 text-c1">Resolved Violations</h1>
         <div id="columnChartContainer"></div>
       </div>
     </div>
 
     <div class="w-full bg-white p-4 mt-4">
-      <h1 class="text-2xl font-bold p-4 text-c1">Top Performer Students</h1>
+      <h1 class="text-2xl font-bold p-4 text-c1">Violation Rate</h1>
       <div id="Grid" class="p-4"></div>
     </div>
   </div>

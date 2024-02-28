@@ -68,6 +68,11 @@ endblock title %} {% block styles %}
     color: white;
   }
 
+  td.actions-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
 </style>
 {% endblock styles %} {% block content %}
     <div class="p-4 md:ml-72">
@@ -96,19 +101,25 @@ endblock title %} {% block styles %}
                     <tr>
                       <th
                         scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
+                      >
+                        Case ID
+                      </th>
+                      <th
+                        scope="col"
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider date-header maroon-bg"
                       >
                         Date
                       </th>
                       <th
                         scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header maroon-bg"
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header maroon-bg"
                       >
                         Report Details
                       </th>
                       <th
                         scope="col"
-                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider actions-header maroon-bg"
+                        class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider actions-header maroon-bg"
                       >
                         Actions
                       </th>
@@ -188,9 +199,9 @@ endblock title %} {% block styles %}
             reportRow.setAttribute('id', `${report.CaseId}`);
 
             reportRow.innerHTML = `
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
+                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${report.CaseId}</td>
+                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <p name ="caseId"><strong>Report ID:</strong> ${report.CaseId}</p>
                     <p name ="Time"><strong>Time:</strong> ${report.Time}</p>
                     <p name ="Location"><strong>Location:</strong> ${report.LocationName}</p>
                     <p name ="Faculty"><strong>Faculty:</strong> ${report.FacultyName}</p>
@@ -200,9 +211,9 @@ endblock title %} {% block styles %}
                     <p name ="status" id='status-${report.CaseId}'> ${report.Status}</p>
                     <!-- Add other details as needed -->
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 flex justify-center items-center">
-                    <button class="bg-green-600 p-2 text-white" onclick="resolveFacultyCase(${report.CaseId})">Resolve Faculty Case</button>
-                    <button class="bg-red-600 p-2 text-white" onclick="removeFacultyCase(${report.CaseId})">Remove Faculty Case</button>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column">
+                    <button class="bg-green-600 p-2 text-white block mb-2" onclick="resolveFacultyCase(${report.CaseId})">Resolve Faculty Case</button>
+                    <button class="bg-red-600 p-2 text-white block mb-2" onclick="removeFacultyCase(${report.CaseId})">Remove Faculty Case</button>
                   </td>
                 `;
 
@@ -215,33 +226,27 @@ endblock title %} {% block styles %}
       }
 
       function searchTable() {
-        // Declare variables
         var input, filter, table, tr, td, i, j, txtValue;
         input = document.getElementById('searchInput');
         filter = input.value.toUpperCase();
         table = document.getElementById('output-container');
         tr = table.getElementsByTagName('tr');
     
-        // Loop through all table rows, and hide those who don't match the search query
         for (i = 0; i < tr.length; i++) {
-          td = tr[i].getElementsByTagName('td')[1]; // Only consider the second <td>
-          if (td) {
-            var pElements = td.querySelectorAll(
-              "p[name='caseId'], p[name='Location'], p[name='Faculty'], p[name='Complainant'], p[name='Description']"
-            );
-            var found = false;
-            for (j = 0; j < pElements.length; j++) {
-              txtValue = pElements[j].textContent || pElements[j].innerText;
-              if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                found = true;
-                break;
-              }
+          td = tr[i].getElementsByTagName('td'); // Get all td elements in the row
+          var found = false;
+          for (j = 0; j < td.length; j++) {
+            txtValue = td[j].textContent || td[j].innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              found = true;
+              break;
             }
-            if (found) {
-              tr[i].style.display = '';
-            } else {
-              tr[i].style.display = 'none';
-            }
+          }
+          // Toggle row display based on search result
+          if (found) {
+            tr[i].style.display = '';
+          } else {
+            tr[i].style.display = 'none';
           }
         }
       }
@@ -267,7 +272,7 @@ endblock title %} {% block styles %}
 
           if (data.result) {
             notyf.success('Faculty Case is now approved');
-            document.getElementById(`status-${CaseId}`).innerHTML = 'true';
+            document.getElementById(`status-${CaseId}`).innerHTML = 'approved';
           } else if (data.error) {
             notyf.error('Failed to approve faculty case');
           }
@@ -297,7 +302,7 @@ endblock title %} {% block styles %}
 
           if (data.result) {
             notyf.success('Faculty Case is now Resolved');
-            document.getElementById(`status-${CaseId}`).innerHTML = 'false';
+            document.getElementById(`status-${CaseId}`).innerHTML = 'removed';
           } else if (data.error) {
             notyf.error('Failed to resolve faculty case');
           }
