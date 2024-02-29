@@ -1,410 +1,243 @@
-{% extends "systemadmin/layout.html" %}
-
-<!----------------- TITLE ----------------->
-{% block title %} SPS - Dashboard {% endblock title %} {% block styles %}
+{% extends "systemadmin/layout.html" %} {% block title %} SPS - Dashboard {%
+endblock title %} {% block styles %}
 <style>
   /* Set the chart container to 100% width */
   #containerChart {
     width: 100%;
   }
-</style>
-{% endblock styles %}
 
-<!----------------- CONTENT ----------------->
-{% block content %}
+  /* Style for metric cards */
+  .metric-card {
+    border-radius: 0.5rem;
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: #ffffff; /* Changed background color to white */
+  }
+
+  .metric-card h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: black; /* Change number color to black */
+  }
+
+  .metric-card p {
+    font-size: 1rem;
+    color: #e53e3e; /* Bright red color */
+    margin-top: 0.5rem; /* Added margin to separate number and text */
+  }
+
+  /* Custom style for resolved case and resolved violations */
+  .resolved-title {
+    color: #48bb78 !important; /* Green color */
+  }
+
+  /* Custom style for blue text */
+  .blue-text {
+    color: blue !important;
+  }
+</style>
+{% endblock styles %} {% block content %}
 <div class="p-4 md:ml-72">
-  <div class="border-2 border-gray-200 border-dashed rounded-lg">
+  <div class="border-2 border-white-200 rounded-lg">
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-4 lg:grid-cols-3">
       <!-- 1st GRID -->
-      <div
-        class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
-      >
-        <div class="flex items-end justify-between">
-          <div>
-            <h3 class="mb-4 text-4xl font-bold text-c1" id="high-average">1</h3>
-            <div>
-              <p class="text-base font-semibold">Total Pending Case</p>
-            </div>
-          </div>
-
-          <div>
-            <img
-              src="{{ url_for('static', filename='images/faculty/circle.png') }}"
-              alt=""
-              class="w-[50px] h-[50px] opacity-80 lg:mt-auto"
-            />
-          </div>
+      <div class="metric-card">
+        <div>
+          <h3
+            id="total-pending-student-case"
+            class="mb-2 text-lg font-bold text-c1"
+          >
+            1
+          </h3>
+          <p class="text-sm font-semibold text-red-600">
+            Total Pending Student Case
+          </p>
+          <!-- Changed text color to red -->
         </div>
       </div>
 
-      <div
-        class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
-      >
-        <div class="flex items-end justify-between">
-          <div>
-            <h3 class="mb-4 text-4xl font-bold text-c1" id="low-average">1</h3>
-            <div>
-              <p class="text-base font-semibold">Pending Faculty Case</p>
-            </div>
-          </div>
-
-          <div>
-            <img
-              src="{{ url_for('static', filename='images/faculty/circle.png') }}"
-              alt=""
-              class="w-[50px] h-[50px] opacity-80 lg:mt-auto"
-            />
-          </div>
+      <div class="metric-card">
+        <div>
+          <h3
+            id="total-pending-faculty-case"
+            class="mb-2 text-lg font-bold text-c1"
+          >
+            1
+          </h3>
+          <p class="text-sm font-semibold text-red-600">Pending Faculty Case</p>
+          <!-- Changed text color to red -->
         </div>
       </div>
 
-      <div
-        class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
-      >
-        <div class="flex items-end justify-between">
-          <div>
-            <h3 class="mb-4 text-4xl font-bold text-c1" id="subject-count">
-              1
-            </h3>
-            <div>
-              <p class="text-base font-semibold">Pending Violations</p>
-            </div>
-          </div>
-
-          <div>
-            <img
-              src="{{ url_for('static', filename='images/faculty/circle.png') }}"
-              alt=""
-              class="w-[50px] h-[50px] opacity-80 lg:mt-auto"
-            />
-          </div>
+      <div class="metric-card">
+        <div>
+          <h3
+            id="total-pending-violations"
+            class="mb-2 text-lg font-bold text-c1"
+          >
+            1
+          </h3>
+          <p class="text-sm font-semibold text-red-600">Pending Violations</p>
+          <!-- Changed text color to red -->
         </div>
       </div>
     </div>
     <!-- CONTAINER -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-      <div class="col-span-1 mt-4 shadow-sm h-max p-4 bg-white">
-        <h1 class="text-2xl font-bold p-4 text-c1">Resolved Case</h1>
-        <div id="containerChart" class="w-full"></div>
+      <div class="col-span-1 mt-4 shadow-sm h-max p-4 bg-white rounded-lg">
+        <!-- Added rounded-lg class -->
+        <h1 class="text-2xl font-bold p-4 text-c1 resolved-title">
+          Resolved Case
+        </h1>
+        <div id="total-resolved-case" class="w-full metric-card"></div>
+        <!-- Added element for total resolved cases -->
       </div>
-      <div class="col-span-1 mt-4 shadow-sm h-max p-4 bg-white">
-        <h1 class="text-2xl font-bold p-4 text-c1">Resolved Violations</h1>
-        <div id="columnChartContainer"></div>
+      <div class="col-span-1 mt-4 shadow-sm h-max p-4 bg-white rounded-lg">
+        <!-- Added rounded-lg class -->
+        <h1 class="text-2xl font-bold p-4 text-c1 resolved-title">
+          Resolved Violations
+        </h1>
+        <div id="total-resolved-violations" class="w-full metric-card"></div>
+        <!-- Added element for total resolved violations -->
       </div>
     </div>
 
-    <div class="w-full bg-white p-4 mt-4">
-      <h1 class="text-2xl font-bold p-4 text-c1">Violation Rate</h1>
-      <div id="Grid" class="p-4"></div>
+    <div class="w-full bg-white p-4 mt-4 rounded-lg">
+      <!-- Added rounded-lg class -->
+      <h1 class="text-2xl font-bold p-4 text-c1 blue-text">Violation Rate</h1>
+      <div id="violationRate" class="p-4 metric-card"></div>
     </div>
   </div>
 </div>
-{% endblock content %}
+{% endblock content %}{% block script %}
 
-<!----------------- SCRIPTS ----------------->
-{% block script %}
-
-<!-- STATISTICS DATA FETCHING (COUNT) -->
 <script>
-  async function fetchStatistics() {
+  async function fetchTotalPendingStudentCase() {
     try {
-      const response = await fetch(`${api_base_url}/class-statistics`);
+      const response = await fetch(`${api_base_url}/total-pending-case`);
+      const json_data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch data. Try to contact the admin to resolve the issue.`
-        );
-      }
-
-      const json_statistics = await response.json();
-      displayStatistics(json_statistics);
+      document.getElementById('total-pending-student-case').innerText =
+        json_data;
     } catch (error) {
       console.error(error);
     }
-  }
-
-  function displayStatistics(json_statistics) {
-    const text_high_average = document.getElementById('high-average');
-    const text_low_average = document.getElementById('low-average');
-    const text_subject_count = document.getElementById('subject-count');
-
-    const text_high_class = document.getElementById('high-class');
-    const text_low_class = document.getElementById('low-class');
-
-    const currentYear = new Date().getFullYear();
-    document.getElementById('current-year').textContent = `${currentYear}`;
-
-    text_high_average.innerText = json_statistics.highest;
-    text_low_average.innerText = json_statistics.lowest;
-    text_subject_count.innerText = json_statistics.subjectCount;
-    text_high_class.innerText = json_statistics.highestClass;
-    text_low_class.innerText = json_statistics.lowestClass;
   }
 
   fetchStatistics();
 </script>
 
-<!-- SPLINE CHART PERFORMANCE (CLASS AVERAGE) -->
+<!-- Fetch and Display Total Pending Student Case -->
 <script>
-  function convertXToDate(item) {
-    item.ListGrade = item.ListGrade.map((grade) => {
-      grade.x = new Date(grade.x, 0, 1); // Assuming 'x' represents a year
-      return grade;
-    });
-    return item;
-  }
-
-  async function fetchClassAverage() {
+  async function fetchTotalPendingStudentCase() {
     try {
-      const response = await fetch(`${api_base_url}/class-average`);
+      const response = await fetch(`${api_base_url}/total-pending-case`);
+      const json_data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch data. Try to contact the admin to resolve the issue.`
-        );
-      }
-
-      const json_class_grade = await response.json();
-
-      displayClassGradeSpline(json_class_grade);
+      document.getElementById('total-pending-student-case').innerText =
+        json_data;
     } catch (error) {
       console.error(error);
     }
   }
 
-  function displayClassGradeSpline(json_class_grade) {
-    // Syncfusion.License.registeredModules = ['charts'];
-
-    var formattedData = json_class_grade.map(convertXToDate);
-    const customColors = [
-      '#6376EB',
-      '#29BAF2',
-      '#5EEE82',
-      '#FFA434',
-      '#FFA6A1',
-    ];
-
-    const series_data = formattedData.map((class_grade, index) => {
-      return {
-        dataSource: [...class_grade.ListGrade],
-        name: class_grade.Class,
-        xName: 'x',
-        yName: 'y',
-        type: 'SplineArea',
-        width: 2,
-        border: { width: 2 },
-        opacity: 0.5,
-        marker: {
-          visible: true,
-          isFilled: true,
-          height: 6,
-          width: 6,
-          shape: 'Circle',
-        },
-        fill: customColors[index % customColors.length],
-      };
-    });
-
-    const date_max = new Date(json_class_grade[0].Batch + 1, 0, 1);
-    const date_min = new Date(json_class_grade[0].Batch - 3, 0, 1);
-
-    // Initializing the chart
-    let chart = new ej.charts.Chart({
-      // Initializing Primary X Axis
-      primaryXAxis: {
-        valueType: 'DateTime',
-        labelFormat: 'yyyy',
-        majorGridLines: { width: 0 },
-        intervalType: 'Years',
-        edgeLabelPlacement: 'Shift',
-        minimum: date_min,
-        maximum: date_max,
-      },
-      // Initializing Primary Y Axis
-      primaryYAxis: {
-        labelFormat: '{value}%',
-        lineStyle: { width: 0 },
-        maximum: 100,
-        minimum: 0,
-        interval: 20,
-        majorTickLines: { width: 0 },
-        minorTickLines: { width: 0 },
-      },
-      chartArea: {
-        border: {
-          width: 0,
-        },
-      },
-      // Initializing Chart Series
-      series: [...series_data],
-      tooltip: { enable: true },
-      // Initializing Chart title
-      title: 'Class Performance',
-      width: '100%',
-    });
-
-    chart.appendTo('#containerChart');
-  }
-
-  fetchClassAverage();
+  fetchTotalPendingStudentCase();
 </script>
 
-<!-- PASS FAIL RATES -->
+<!-- Fetch and Display Total Pending Faculty Case -->
 <script>
-  async function fetchPassFailRates() {
+  async function fetchTotalPendingFacultyCase() {
     try {
-      const response = await fetch(`${api_base_url}/pass-fail`);
+      const response = await fetch(
+        `${api_base_url}/total-pending-faculty-case`
+      );
+      const json_data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch data. Try to contact the admin to resolve the issue.`
-        );
-      }
-
-      const json_pass_fail_rates = await response.json();
-
-      displayPassFailRates(json_pass_fail_rates);
+      document.getElementById('total-pending-faculty-case').innerText =
+        json_data;
     } catch (error) {
       console.error(error);
     }
   }
 
-  function displayPassFailRates(json_pass_fail_rates) {
-    const transformedData = json_pass_fail_rates.flatMap((entry) => {
-      const year = entry.Year;
-      return [
-        { Year: year, Type: 1, Count: entry.Passed },
-        { Year: year, Type: 2, Count: entry.Failed },
-        { Year: year, Type: 3, Count: entry.Dropout },
-      ];
-    });
-
-    // Sample dummy data
-    var chartData = [...transformedData];
-
-    // Create the chart
-    var chart = new ej.charts.Chart({
-      primaryXAxis: {
-        title: 'Year',
-        minimum: json_pass_fail_rates[0].Year - 4,
-        maximum: json_pass_fail_rates[0].Year + 1,
-        interval: 1,
-      },
-      primaryYAxis: {
-        title: 'Count',
-      },
-      series: [
-        {
-          dataSource: chartData.filter((data) => data.Type === 1),
-          xName: 'Year',
-          yName: 'Count',
-          name: 'Passed',
-          type: 'Column',
-          fill: '#6376EB',
-        },
-        {
-          dataSource: chartData.filter((data) => data.Type === 2),
-          xName: 'Year',
-          yName: 'Count',
-          name: 'Failed',
-          type: 'Column',
-          fill: '#5EEE82',
-        },
-        {
-          dataSource: chartData.filter((data) => data.Type === 3),
-          xName: 'Year',
-          yName: 'Count',
-          name: 'Dropout',
-          type: 'Column',
-          fill: '#29BAF2',
-        },
-      ],
-      title: 'Pass & Fail Counts',
-      tooltip: {
-        enable: true,
-        format: 'Year: ${point.x}<br>Count: ${point.y}',
-      },
-    });
-
-    // Render the chart
-    chart.appendTo('#columnChartContainer');
-  }
-
-  fetchPassFailRates();
+  fetchTotalPendingFacultyCase();
 </script>
 
-<!-- TOP PERFORMER STUDENTS (GRID) -->
+<!-- Fetch and Display Total Pending Violations -->
 <script>
-  async function fetchTopPerformerStudent() {
+  async function fetchTotalPendingViolations() {
     try {
-      const response = await fetch(`${api_base_url}/top-student`);
+      const response = await fetch(`${api_base_url}/total-pending-violation`);
+      const json_data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch data. Try to contact the admin to resolve the issue.`
-        );
-      }
-
-      const json_top_performer_student = await response.json();
-      displayTopPerformerStudent(json_top_performer_student);
+      document.getElementById('total-pending-violations').innerText = json_data;
     } catch (error) {
       console.error(error);
     }
   }
 
-  function displayTopPerformerStudent(json_top_performer_student) {
-    // Create the grid with filtering
-    var grid = new ej.grids.Grid({
-      dataSource: json_top_performer_student,
-      allowPaging: true,
-      allowFiltering: true,
+  fetchTotalPendingViolations();
+</script>
 
-      columns: [
-        {
-          field: 'StudentNumber',
-          headerText: 'Student Number',
-          width: 150,
-          editType: 'dropdownedit', // Use dropdown filter for this column
-        },
-        { field: 'StudentName', headerText: 'Student Name', width: 150 },
-        {
-          field: 'Grade',
-          headerText: 'Grade',
-          width: 150,
-          textAlign: 'Right',
-        },
-        {
-          field: 'Class',
-          headerText: 'Section Code',
-          width: 150,
-          textAlign: 'Right',
-        },
+<!-- Remaining scripts for other functionalities... -->
 
-        // {
-        //   field: 'Class',
-        //   headerText: 'Section Code',
-        //   width: 150,
-        //   textAlign: 'Right',
-        // },
-      ],
-      // pageSettings: { pageCount: 5 },
-      toolbar: ['ExcelExport'], // Add the ExcelExport button to the toolbar
-      allowExcelExport: true, // Enable Excel export feature
-    });
+<!-- Fetch and Display Total Resolved Cases -->
+<script>
+  async function fetchTotalResolvedCases() {
+    try {
+      const response = await fetch(`${api_base_url}/total-resolved-case`);
+      const json_data = await response.json();
 
-    // Render the grid
-    grid.appendTo('#Grid');
-
-    var filterbarOperator = new ej.buttons.CheckBox();
-    filterbarOperator.appendTo('#filterBarOperator');
-
-    filterbarOperator.addEventListener('change', function (args) {
-      grid.filterSettings.showFilterBarOperator = args.checked;
-      grid.clearFiltering();
-    });
+      // Update the corresponding HTML element with the fetched data
+      document.getElementById('total-resolved-case').innerText = json_data;
+    } catch (error) {
+      console.error(error);
+    }
   }
 
-  fetchTopPerformerStudent();
+  fetchTotalResolvedCases();
 </script>
+
+<!-- Fetch and Display Total Resolved Violations -->
+<script>
+  async function fetchTotalResolvedViolations() {
+    try {
+      const response = await fetch(`${api_base_url}/total-resolved-violation`);
+      const json_data = await response.json();
+
+      // Update the corresponding HTML element with the fetched data
+      document.getElementById('total-resolved-violations').innerText =
+        json_data;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  fetchTotalResolvedViolations();
+</script>
+
+<!-- Fetch and Display Violation Rate -->
+<script>
+  async function fetchViolationRate() {
+    try {
+      const response = await fetch(`${api_base_url}/violation-rate`);
+      const violationRate = await response.json();
+
+      // Format the violation rate with a "%" sign
+      const formattedViolationRate = `${violationRate.toFixed(2)}%`;
+
+      // Update the corresponding HTML element with the formatted violation rate
+      document.getElementById('violationRate').innerText =
+        formattedViolationRate;
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  fetchViolationRate();
+</script>
+
+<!-- Remaining scripts for other functionalities... -->
 
 {% endblock script %}

@@ -5,6 +5,7 @@ from mail import mail
 from models import SystemAdmin, db, IncidentReport, Student, Location, IncidentType, Faculty, ViolationForm, FacultyIncidentReport
 import pandas as pd
 
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash
 from decorators.auth_decorators import role_required
@@ -934,3 +935,51 @@ def cases_overview():
         return jsonify(response), 200
     except Exception as e:
         return jsonify({'error': 'Failed to fetch cases overview', 'message': str(e)}), 500
+    
+
+@system_admin_api.route('/total-pending-case', methods=['GET'])
+def totalPendingCase():
+    totalPendingCase = db.session.query(func.count(IncidentReport.Id)).filter(IncidentReport.Status == 'pending').scalar()
+
+    return jsonify(totalPendingCase)  # Return the result as JSON
+
+
+@system_admin_api.route('/total-pending-faculty-case', methods=['GET'])
+def totalPendingFacultyCase():
+    totalPendingFacultyCase = db.session.query(func.count(FacultyIncidentReport.Id)).filter(FacultyIncidentReport.Status == 'pending').scalar()
+
+    return jsonify(totalPendingFacultyCase)  # Return the result as JSON
+
+@system_admin_api.route('/total-pending-violation', methods=['GET'])
+def totalPendingViolation():
+    totalPendingViolation = db.session.query(func.count(ViolationForm.ViolationId)).filter(ViolationForm.IsAccessible == False).scalar()
+    
+    return jsonify(totalPendingViolation)  # Return the result as JSON
+
+    
+@system_admin_api.route('/total-resolved-case', methods=['GET'])
+def totalResolvedCase():
+    totalResolvedCase = db.session.query(func.count(IncidentReport.Id)).filter(IncidentReport.Status == 'approved').scalar()
+
+    return jsonify(totalResolvedCase)  # Return the result as JSON
+
+@system_admin_api.route('/total-resolved-violation', methods=['GET'])
+def totalResolvedViolation():
+    totalResolvedViolation = db.session.query(func.count(ViolationForm.ViolationId)).filter(ViolationForm.IsAccessible == True).scalar()
+    
+
+    return jsonify(totalResolvedViolation)
+
+@system_admin_api.route('/violation-rate', methods=['GET'])
+def violationRate():
+    totalPendingCase = db.session.query(IncidentReport).filter(IncidentReport.Status == 'pending').count()
+    totalResolvedCase = db.session.query(IncidentReport).filter(IncidentReport.Status != 'pending').count()
+    totalPendingViolation = db.session.query(ViolationForm).filter(ViolationForm.IsAccessible == False, ViolationForm.Status == 'pending').count()
+    totalResolvedViolation = db.session.query(ViolationForm).filter(ViolationForm.IsAccessible == True, ViolationForm.Status != 'pending').count()
+    totalCases = totalPendingCase + totalResolvedCase
+    totalViolations = totalPendingViolation + totalResolvedViolation
+    if totalCases > 0:
+        violationRate = (totalViolations / totalCases) * 100
+    else:
+        violationRate = 0
+    return jsonify(violationRate)
