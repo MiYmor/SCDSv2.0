@@ -664,10 +664,8 @@ def approveReport():
         # commit the changes
         db.session.commit()
         try:
-            # Compose the email message with HTML content
-            html_content = render_template_string('email_templates/student_notyf.html')
             msg = Message('Notification of Case Involvement', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
-            msg.html = html_content
+            msg.html = render_template('email_templates/student_notyf.html', caseId=incident_id)
             # Send the email
             mail.send(msg)
             # Return a success response

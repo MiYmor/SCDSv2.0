@@ -28,7 +28,7 @@ def login():
         password = request.form['password']
 
         teacher = Faculty.query.filter_by(Email=email).first()
-        if teacher and check_password_hash(teacher.Password, password):
+        if teacher and check_password_hash(teacher.Password, password, method='pbkdf2:sha256'):
             # Successfully authenticated
             session['user_id'] = teacher.FacultyId
             session['user_role'] = 'faculty'

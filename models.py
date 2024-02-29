@@ -13,8 +13,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 # from data.admins import faculty_data
 # from data.users import student_data
-# # from data.superadmin import system_admin_data
-# # from data.course import course_data
+# from data.superadmin import system_admin_data
+# from data.course import course_data
 # from data.incidenttype import incidenttype_data
 # from data.location import location_data
 
@@ -326,28 +326,28 @@ def init_db(app):
 
 
 # def create_sample_data():
-    # for data in student_data:
-    #     student = Student(**data)
-    #     db.session.add(student)
+#     for data in student_data:
+#         student = Student(**data)
+#         db.session.add(student)
 
-    # for data in faculty_data:
-    #     faculty = Faculty(**data)
-    #     db.session.add(faculty)
+#     for data in faculty_data:
+#         faculty = Faculty(**data)
+#         db.session.add(faculty)
         
-    # for data in system_admin_data:
-    #     admin = SystemAdmin(**data)
-    #     db.session.add(admin)
+#     for data in system_admin_data:
+#         admin = SystemAdmin(**data)
+#         db.session.add(admin)
         
-    # for data in course_data:
-    #     course = Course(**data)
-    #     db.session.add(course)
+#     for data in course_data:
+#         course = Course(**data)
+#         db.session.add(course)
         
-    # for data in incidenttype_data:
-    #     incidenttype = IncidentType(**data)
-    #     db.session.add(incidenttype)
+#     for data in incidenttype_data:
+#         incidenttype = IncidentType(**data)
+#         db.session.add(incidenttype)
         
-    # for data in location_data:
-    #     location = Location(**data)
-    #     db.session.add(location)
+#     for data in location_data:
+#         location = Location(**data)
+#         db.session.add(location)
 
-    # db.session.commit()
+#     db.session.commit()
