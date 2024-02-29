@@ -13,8 +13,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 # from data.admins import faculty_data
 # from data.users import student_data
-# from data.superadmin import system_admin_data
-# from data.course import course_data
+# # from data.superadmin import system_admin_data
+# # from data.course import course_data
 # from data.incidenttype import incidenttype_data
 # from data.location import location_data
 
@@ -214,10 +214,13 @@ class Faculty(db.Model):
     
     Password = db.Column(db.String(256), nullable=False)  # Password
     ProfilePic= db.Column(db.String(50),default="14wkc8rPgd8NcrqFoRFO_CNyrJ7nhmU08")  # Profile Pic
-    Status = db.Column(db.String(50), default="Deactivated")
-    Login_Attempt = db.Column(db.Integer, default=12)
+    Specialization = db.Column(db.String)  # Specialization
+    PreferredSchedule = db.Column(db.String)  # PreferredSchedule
     created_at = db.Column(db.DateTime, default=datetime.now)
     updated_at = db.Column(db.DateTime, default=datetime.now, onupdate=datetime.now)
+    Login_Attempt = db.Column(db.Integer, default=12)
+    Status = db.Column(db.String(50), default="Deactivated")
+
     # FOREIGN TABLES
     
 
@@ -242,8 +245,11 @@ class Faculty(db.Model):
             'email': self.Email,
             'password': self.password,
             'profile_pic': self.ProfilePic,
-            'status': self.Status,
             'login_attempt': self.Login_Attempt,
+            'status': self.Status,
+            'specialization': self.Specialization,
+            'preferred_schedule': self.PreferredSchedule,
+            
         }
         
     def get_id(self):
@@ -320,28 +326,28 @@ def init_db(app):
 
 
 # def create_sample_data():
-#     for data in student_data:
-#         student = Student(**data)
-#         db.session.add(student)
+    # for data in student_data:
+    #     student = Student(**data)
+    #     db.session.add(student)
 
-#     for data in faculty_data:
-#         faculty = Faculty(**data)
-#         db.session.add(faculty)
+    # for data in faculty_data:
+    #     faculty = Faculty(**data)
+    #     db.session.add(faculty)
         
-#     for data in system_admin_data:
-#         admin = SystemAdmin(**data)
-#         db.session.add(admin)
+    # for data in system_admin_data:
+    #     admin = SystemAdmin(**data)
+    #     db.session.add(admin)
         
-#     for data in course_data:
-#         course = Course(**data)
-#         db.session.add(course)
+    # for data in course_data:
+    #     course = Course(**data)
+    #     db.session.add(course)
         
-#     for data in incidenttype_data:
-#         incidenttype = IncidentType(**data)
-#         db.session.add(incidenttype)
+    # for data in incidenttype_data:
+    #     incidenttype = IncidentType(**data)
+    #     db.session.add(incidenttype)
         
-#     for data in location_data:
-#         location = Location(**data)
-#         db.session.add(location)
+    # for data in location_data:
+    #     location = Location(**data)
+    #     db.session.add(location)
 
-#     db.session.commit()
+    # db.session.commit()
