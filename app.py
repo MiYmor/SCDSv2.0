@@ -71,7 +71,7 @@ def create_app():
     app.config['MAIL_USE_SSL'] = True
     app.config['MAIL_USERNAME'] = os.getenv('SCDS_MAIL_USERNAME')
     app.config['MAIL_PASSWORD'] = os.getenv('SCDS_MAIL_PASSWORD')
-
+    mail = Mail(app)
     # app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
     mail.init_app(app)
     # The Api Key is static for development mode. The Api key in future must refresh in order to secure the api endpoint of the application

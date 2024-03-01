@@ -1,5 +1,5 @@
 # api/api_routes.py
-from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template, render_template_string
+from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
 from flask_mail import Message, Mail
 from mail import mail
 from models import SystemAdmin, db, IncidentReport, Student, Location, IncidentType, Faculty, ViolationForm, FacultyIncidentReport
@@ -189,11 +189,13 @@ def manage_violations():
 @system_admin_api.route('/all-reports', methods={'GET'})
 def allReports():
     #.filter = multiple queries .filter_by = single query
-    allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == False, IncidentReport.Status != 'resolved').order_by(IncidentReport.Date).all()
+    allReports = db.session.query(IncidentReport, Student, Location, Faculty).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.IsAccessible == False, IncidentReport.Status != 'resolved').order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
         for report in allReports:
             # make a dictionary for reports
+            investigator = db.session.query(Faculty).filter(Faculty.FacultyId == report.IncidentReport.InvestigatorId).first()
+            FullNameInvestigator = investigator.LastName + ", " + investigator.FirstName
             complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= report.Student.LastName + ", " + report.Student.FirstName
@@ -203,6 +205,7 @@ def allReports():
                 'Time': report.IncidentReport.Time,
                 'LocationName': report.Location.Name,
                 'StudentName': FullName,
+                'Investigator': FullNameInvestigator,
                 'Complainant': FullNameComplainant,
                 'Description': report.IncidentReport.Description,
                 'Status': report.IncidentReport.Status,
@@ -484,6 +487,7 @@ def accessReports():
     data = request.get_json()
     # Extract incidentId from the JSON payload
     incident_id = data.get('IncidentId')
+    name = data.get('Name')
     # Your logic to handle the incidentId
     print('Received incidentId:', incident_id)
     # make a querry calling the incidentreport table
@@ -496,9 +500,9 @@ def accessReports():
         db.session.commit()
         try:
             # Compose the email message
-            msg = Message('Case Approved', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
-            msg.body = f"The case with ID {incident_id} is now accessible please start investigating."
-            # Send the email
+            msg = Message('Notification of Case Assignment: Investigation of Student Matter', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg.html = render_template('email_templates/faculty_notyf_case.html', caseId=incident_id, name=name)
+                # Send the email
             mail.send(msg)
             # Return a success response
             return jsonify({'result': 'success', 'message': 'Case approved and email notification sent'})
@@ -547,6 +551,7 @@ def resolvePreCase():
     # if the incident is found
     if incident:
         # change the status to approved
+        incident.Sanction = 'none'
         incident.Status = 'resolved'
         # commit the changes
         db.session.commit()
@@ -637,6 +642,7 @@ def reopenReports():
     # if the incident is found
     if incident:
         # change the status to approved
+        incident.Sanction = 'pending'
         incident.Status = 'pending'
         # commit the changes
         db.session.commit()
@@ -653,6 +659,8 @@ def approveReport():
     data = request.get_json()
     # Extract incidentId from the JSON payload
     incident_id = data.get('IncidentId')
+    name = data.get('Name')
+    sanction = data.get('Sanction')
     # Your logic to handle the incidentId
     print('Received incidentId:', incident_id)
     # make a query calling the incidentreport table
@@ -664,11 +672,13 @@ def approveReport():
         # commit the changes
         db.session.commit()
         try:
-            msg = Message('Notification of Case Involvement', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
-            msg.html = render_template('email_templates/student_notyf.html', caseId=incident_id)
-            # Send the email
+                # Compose the email message with HTML content
+            msg = Message('Notification of Case Involvement', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+                
+            msg.html = render_template('email_templates/student_notyf_case.html', caseId=incident_id,name=name, sanction=sanction)
+                # Send the email
             mail.send(msg)
-            # Return a success response
+                # Return a success response
             return jsonify({'result': 'success', 'message': 'Report approved and email notification sent'})
         except Exception as e:
             # Log the exception and return an error response
@@ -686,6 +696,8 @@ def accessViolations():
     data = request.get_json()
     # Extract incidentId from the JSON payload
     violation_id = data.get('ViolationId')
+    name = data.get('Name')
+    sanction = data.get('Sanction')
     # Your logic to handle the incidentId
     print('Received ViolationId:', violation_id)
     # make a querry calling the incidentreport table
@@ -698,8 +710,8 @@ def accessViolations():
         db.session.commit()
         try:
             # Compose the email message
-            msg = Message('Violation Approved', sender='"SCDS", "scdspupqc.edu@gmail.com"', recipients=['david.ilustre@gmail.com'])
-            msg.body = f"The Violation with ID {violation_id} has been approved."
+            msg = Message('Notification of Violation Involvement', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
+            msg.html = render_template('email_templates/violation_notyf.html', violationId=violation_id, name=name, sanction=sanction)
             # Send the email
             mail.send(msg)
             # Return a success response
