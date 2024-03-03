@@ -216,7 +216,7 @@ def allReports():
             list_reports.append(dict_reports)
         return jsonify({'result': list_reports})
     else:
-        return jsonify({'result': 'No reports available'}), 200
+        return jsonify({'result': 'No reports available'}),200
 
 # fetch all the faculty case that are available
 @system_admin_api.route('/all-faculty-case', methods={'GET'})

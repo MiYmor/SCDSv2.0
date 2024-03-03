@@ -112,22 +112,6 @@ endblock title %} {% block styles %}
 </div>
 {% endblock content %}{% block script %}
 
-<script>
-  async function fetchTotalPendingStudentCase() {
-    try {
-      const response = await fetch(`${api_base_url}/total-pending-case`);
-      const json_data = await response.json();
-
-      document.getElementById('total-pending-student-case').innerText =
-        json_data;
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  fetchStatistics();
-</script>
-
 <!-- Fetch and Display Total Pending Student Case -->
 <script>
   async function fetchTotalPendingStudentCase() {
