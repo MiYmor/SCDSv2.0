@@ -13,21 +13,28 @@
   }
 
   /* Table styles */
-  table {
-    width: calc(100% - 24px); /* Adjusted table width to account for padding */
-    border-collapse: collapse;
-    font-size: 14px;
-  }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  overflow-x: auto; /* Enable horizontal scrolling */
+}
 
-  th,
-  td {
-    padding: 8px; /* Adjusted padding */
-    border: 1px solid #ddd;
-    text-align: left;
-    overflow-wrap: break-word; /* Allow long words to break */
-    word-wrap: break-word;
-    hyphens: auto; /* Enable hyphenation for long words */
-  }
+th,
+td {
+  padding: 8px;
+  border: 1px solid #ddd;
+  text-align: left;
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+  hyphens: auto;
+  min-width: 150px; /* Adjust the minimum width of the columns */
+}
+
+/* Adjust the padding of the table headers */
+thead th {
+  padding: 12px;
+}
 
   /* Container for the table */
   .table-container {

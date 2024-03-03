@@ -209,6 +209,7 @@ endblock title %} {% block styles %}
 
       // Get the container element where you want to render the data
       const outputContainer = document.getElementById('output-container');
+      outputContainer.innerHTML = '';
 
       // Loop through the consoleResponse array and create HTML elements for each object
       reportDetails.result.forEach(async (report) => {
