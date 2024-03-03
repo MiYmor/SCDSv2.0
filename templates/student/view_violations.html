@@ -1,6 +1,5 @@
 {% extends "student/layout.html" %} {% block style %}
 <style>
-  /* Apply bold style to the header cells */
   .e-headertext {
     color: black;
     font-weight: bolder !important;
@@ -12,7 +11,6 @@
     color: white;
   }
 
-  /* Table styles */
   table {
     width: 100%;
     border-collapse: collapse;
@@ -26,24 +24,20 @@
     text-align: left;
   }
 
-  /* Alternate row colors */
   tbody tr:nth-child(even) {
     background-color: #f2f2f2;
   }
 
-  /* Hover effect */
   tbody tr:hover {
     background-color: #ddd;
   }
 
-  /* Adjust text color */
   tbody td {
     color: black;
     font-size: 18px;
     font-weight: normal;
   }
 
-  /* Center content horizontally and vertically */
   .main-content {
     padding: 1rem 0; /* Adjusted padding */
     display: flex;
@@ -51,17 +45,14 @@
     align-items: center; /* Center vertically */
   }
 
-  /* Rounded edges */
   .rounded-lg {
     border-radius: 0.5rem;
   }
 
-  /* Previous background color */
   .bg-white {
     background-color: #ffffff;
   }
 
-  /* Maroon accent for header cells */
   th.ID-header,
   th.date-header,
   th.report-details-header,
@@ -71,19 +62,16 @@
     color: white;
   }
 
-  /* Container for the table */
   .table-container {
     width: 100%;
-    max-width: 1200px; /* Adjust as needed */
-    margin: 0 auto; /* Center the container */
+    max-width: 1200px;
+    margin: 0 auto;
   }
 
-  /* Center the text within the table headers */
   thead tr {
     text-align: center;
   }
 
-  /* Adjust the padding of the table headers */
   thead th {
     padding: 12px;
   }
