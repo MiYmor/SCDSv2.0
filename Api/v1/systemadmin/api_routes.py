@@ -189,13 +189,11 @@ def manage_violations():
 @system_admin_api.route('/all-reports', methods={'GET'})
 def allReports():
     #.filter = multiple queries .filter_by = single query
-    allReports = db.session.query(IncidentReport, Student, Location, Faculty).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.IsAccessible == False, IncidentReport.Status == 'pending').order_by(IncidentReport.Date).all()
+    allReports = db.session.query(IncidentReport, Student, Location, Faculty).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == False, IncidentReport.Status == 'pending').order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
         for report in allReports:
             # make a dictionary for reports
-            investigator = db.session.query(Faculty).filter(Faculty.FacultyId == report.IncidentReport.InvestigatorId).first()
-            FullNameInvestigator = investigator.LastName + ", " + investigator.FirstName
             complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= report.Student.LastName + ", " + report.Student.FirstName
@@ -205,7 +203,6 @@ def allReports():
                 'Time': report.IncidentReport.Time,
                 'LocationName': report.Location.Name,
                 'StudentName': FullName,
-                'Investigator': FullNameInvestigator,
                 'Complainant': FullNameComplainant,
                 'Description': report.IncidentReport.Description,
                 'Status': report.IncidentReport.Status,
