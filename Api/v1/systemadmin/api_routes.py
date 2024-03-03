@@ -189,7 +189,7 @@ def manage_violations():
 @system_admin_api.route('/all-reports', methods={'GET'})
 def allReports():
     #.filter = multiple queries .filter_by = single query
-    allReports = db.session.query(IncidentReport, Student, Location, Faculty).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.IsAccessible == False, IncidentReport.Status != 'resolved').order_by(IncidentReport.Date).all()
+    allReports = db.session.query(IncidentReport, Student, Location, Faculty).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).join(Faculty, Faculty.FacultyId == IncidentReport.InvestigatorId).filter(IncidentReport.IsAccessible == False, IncidentReport.Status == 'pending').order_by(IncidentReport.Date).all()
     list_reports=[]
     if allReports:
         for report in allReports:

@@ -14,21 +14,27 @@
 
   /* Table styles */
   table {
-    width: 100%;
+    width: calc(100% - 24px); /* Adjusted table width to account for padding */
     border-collapse: collapse;
     font-size: 14px;
   }
 
   th,
   td {
-    padding: 12px;
+    padding: 8px; /* Adjusted padding */
     border: 1px solid #ddd;
     text-align: left;
+    overflow-wrap: break-word; /* Allow long words to break */
+    word-wrap: break-word;
+    hyphens: auto; /* Enable hyphenation for long words */
   }
 
-  /* Alternate row colors */
-  tbody tr:nth-child(even) {
-    background-color: #f2f2f2;
+  /* Container for the table */
+  .table-container {
+    width: 100%;
+    max-width: 1200px; /* Adjust as needed */
+    margin: 0 auto; /* Center the container */
+    pa
   }
 
   /* Hover effect */
