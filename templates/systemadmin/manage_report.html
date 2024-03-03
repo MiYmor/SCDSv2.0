@@ -209,9 +209,9 @@ endblock title %} {% block styles %}
 
       // Get the container element where you want to render the data
       const outputContainer = document.getElementById('output-container');
-      console.log(reportDetails.result);
+
       // Loop through the consoleResponse array and create HTML elements for each object
-      reportDetails.result[0].forEach(async (report) => {
+      reportDetails.result.forEach(async (report) => {
         // Create a tr element for each report
         const reportRow = document.createElement('tr');
 
