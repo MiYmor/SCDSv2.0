@@ -303,7 +303,7 @@ def approvedViolations():
         if allViolations:
             for violations in allViolations:
                 # make a dictionary for reports
-                complainant = db.session.query(Student).filter(Student.StudentId == violations.ViolationForm.ComplainantId).first()
+                complainant = db.session.query(Faculty).filter(Faculty.FacultyId == violations.ViolationForm.ComplainantId).first()
                 FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
                 FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
                 dict_violation = {
@@ -321,7 +321,4 @@ def approvedViolations():
                 }
                 # append the dictionary to the list
                 list_violations.append(dict_violation)
-            return jsonify({'result': list_violations})
-        else :
-            return jsonify({'message': 'No reports found'}), 404
-            
+            return jsonify({'result': list_violations})            

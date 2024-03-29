@@ -498,7 +498,7 @@ def accessReports():
         try:
             # Compose the email message
             msg = Message('Notification of Case Assignment: Investigation of Student Matter', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
-            msg.html = render_template('email_templates/faculty_notyf_case.html', caseId=incident_id, name=name)
+            msg.html = render_template('email_templates/faculty_notyf_case.html', caseId=incident_id)
                 # Send the email
             mail.send(msg)
             # Return a success response
