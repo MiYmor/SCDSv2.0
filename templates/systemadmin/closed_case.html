@@ -101,7 +101,7 @@ endblock title %} {% block styles %}
       onclick="manageSanction()"
       class="bg-blue-500 text-white px-4 py-2 rounded-md"
     >
-      Approve
+      Submit
     </button>
   </div>
 </div>
@@ -229,7 +229,7 @@ endblock title %} {% block styles %}
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column">
                   <button class="bg-blue-600 p-2 text-white block mb-2" onclick="openModal(${report.IncidentId})">Manage Case</button>
-                  <button class="bg-green-600 p-2 text-white block mb-2" onclick="approveReport('${report.IncidentId}', '${report.StudentName}', '${report.Sanction}')">Approve Case</button>
+                  <button class="bg-green-600 p-2 text-white block mb-2" onclick="approveReport('${report.IncidentId}', '${report.StudentName}', '${report.Sanction}')">Resolve Case</button>
                   <button class="bg-red-600 p-2 text-white block mb-2" onclick="removeAccessReports(${report.IncidentId})">Reopen Case</button>
                 </td>
               `;
