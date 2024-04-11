@@ -262,7 +262,7 @@ def approvedReports():
     if request.method == 'GET':
         # Handle form submission logic here
         student_id = session.get('user_id')
-        allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.StudentId==student_id, IncidentReport.Status!='pending').order_by(IncidentReport.Date).all()
+        allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.StudentId==student_id, IncidentReport.Status=='pending').order_by(IncidentReport.Date).all()
         list_reports=[]
         if allReports:
             for report in allReports:
@@ -286,8 +286,6 @@ def approvedReports():
                 # append the dictionary to the list
                 list_reports.append(dict_reports)
             return jsonify({'result': list_reports})
-        else :
-            return jsonify({'message': 'No reports found'}), 404
     
     
 # fetch approved reports for student

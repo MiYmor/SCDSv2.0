@@ -304,7 +304,10 @@ def allClosedCase():
                     'Acessibility': report.IncidentReport.IsAccessible
                 }
                 list_closedcase.append(dict_closedcase)
-            return jsonify({'result': list_closedcase})
+        return jsonify({'result': list_closedcase})  # Move this line outside the loop
+    else:
+        return jsonify({'result': []})  # Return an empty list if no closed cases are found
+
 
         
 # get all the case that are closed
