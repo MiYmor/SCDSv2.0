@@ -262,7 +262,7 @@ def approvedReports():
     if request.method == 'GET':
         # Handle form submission logic here
         student_id = session.get('user_id')
-        allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.StudentId==student_id, IncidentReport.Status=='pending').order_by(IncidentReport.Date).all()
+        allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.StudentId==student_id, IncidentReport.Status!='pending').order_by(IncidentReport.Date).all()
         list_reports=[]
         if allReports:
             for report in allReports:
