@@ -203,11 +203,12 @@ thead th {
         const reportRow = document.createElement('tr');
         reportRow.innerHTML = `
         <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${report.IncidentId}</td>
-        <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
+        <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.SelfDate}</td>
         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
           <p><strong>Time:</strong> ${report.Time}</p>
+          <p><strong>Date:</strong> ${report.Date}</p>
           <p><strong>Location:</strong> ${report.LocationName}</p>
-          <p><strong>Student:</strong> ${report.StudentName}</p>
+          <p><strong>Complainee:</strong> ${report.StudentName}</p>
           <p><strong>Submitted by:</strong> ${report.Complainant}</p>
           <p><strong>Description:</strong> ${report.Description}</p>
         </td>

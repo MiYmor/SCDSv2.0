@@ -179,11 +179,12 @@ title %} {% block styles %}
 
         reportRow.innerHTML = `
                 <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${report.IncidentId}</td>
-                <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.Date}</td>
+                <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.SelfDate}</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <p name ="Time"><strong>Time:</strong> ${report.Time}</p>
+                  <p name ="Date"><strong>Date:</strong> ${report.Date}</p>
                   <p name ="Location"><strong>Location:</strong> ${report.LocationName}</p>
-                  <p name ="Student"><strong>Student:</strong> ${report.StudentName}</p>
+                  <p name ="Student"><strong>Complainee:</strong> ${report.StudentName}</p>
                   <p name ="Investigator"><strong>Investigator:</strong> ${report.Investigator}</p>
                   <p name ="Complainant"><strong>Submitted by:</strong> ${report.Complainant}</p>
                   <p name ="Description"><strong>Description:</strong> ${report.Description}</p>

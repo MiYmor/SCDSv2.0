@@ -101,7 +101,9 @@
                     >
                       Violation ID
                     </th>
-                  
+                    <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header">
+                      Date
+                    </th>
                     <th scope="col" class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider report-details-header">
                       Report Details
                     </th>
@@ -184,12 +186,13 @@
           const violationRow = document.createElement('tr');
           violationRow.innerHTML = `
           <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${violation.ViolationId}</td>
+          <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${violation.SelfDate}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
             <p><strong>Date:</strong> ${violation.Date}</p>
             <p><strong>Time:</strong> ${violation.Time}</p>
             <p><strong>Incident Type:</strong> ${violation.IncidentName}</p>
             <p><strong>Location:</strong> ${violation.LocationName}</p>
-            <p><strong>Student:</strong> ${violation.StudentName}</p>
+            <p><strong>Violator:</strong> ${violation.StudentName}</p>
             <p><strong>Submitted by:</strong> ${violation.Complainant}</p>
             <p><strong>Description:</strong> ${violation.Description}</p>
           </td>

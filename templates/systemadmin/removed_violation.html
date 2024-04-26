@@ -194,9 +194,10 @@ endblock title %} {% block styles %}
 
         violationRow.innerHTML = `
                   <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${violation.ViolationId}</td>
-                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${violation.Date}</td>
+                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${violation.SelfDate}</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <p name="Time"><strong>Time:</strong> ${violation.Time}</p>
+                    <p name="Date"><strong>Date:</strong> ${violation.Date}</p>
                     <p name="ViolationType"><strong>Violation Type:</strong> ${violation.IncidentName}</p>
                     <p name="Location"><strong>Location:</strong> ${violation.LocationName}</p>
                     <p name="Student"><strong>Violator:</strong> ${violation.StudentName}</p>

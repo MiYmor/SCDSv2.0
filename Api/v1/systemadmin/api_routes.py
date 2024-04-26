@@ -200,6 +200,7 @@ def allReports():
             FullName= report.Student.LastName + ", " + report.Student.FirstName
             dict_reports = {
                 'IncidentId': report.IncidentReport.Id,
+                'SelfDate': report.IncidentReport.SelfDate,
                 'Date': report.IncidentReport.Date,
                 'Time': report.IncidentReport.Time,
                 'LocationName': report.Location.Name,
@@ -228,6 +229,7 @@ def allFacultyCase():
             FullName= report.Faculty.LastName + ", " + report.Faculty.FirstName
             dict_reports = {
                 'CaseId': report.FacultyIncidentReport.Id,
+                'SelfDate': report.FacultyIncidentReport.SelfDate,
                 'Date': report.FacultyIncidentReport.Date,
                 'Time': report.FacultyIncidentReport.Time,
                 'LocationName': report.Location.Name,
@@ -256,6 +258,7 @@ def allViolations():
             FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
             dict_violation = {
                 'ViolationId': violations.ViolationForm.ViolationId,
+                'SelfDate': violations.ViolationForm.SelfDate,
                 'Date': violations.ViolationForm.Date,
                 'Time': violations.ViolationForm.Time,
                 'IncidentName': violations.IncidentType.Name,
@@ -292,6 +295,7 @@ def allClosedCase():
                 FullName= report.Student.LastName + ", " + report.Student.FirstName 
                 dict_closedcase = {
                     'IncidentId': report_id,
+                    'SelfDate': report.IncidentReport.SelfDate,
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
                     'LocationName': report.Location.Name,
@@ -325,6 +329,7 @@ def allResolvedCase():
                 FullName= report.Student.LastName + ", " + report.Student.FirstName 
                 dict_resolvedcase = {
                     'IncidentId': report.IncidentReport.Id,
+                    'SelfDate': report.IncidentReport.SelfDate,
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
                     'LocationName': report.Location.Name,
@@ -353,6 +358,7 @@ def allResolvedPreCase():
                 FullName= report.Student.LastName + ", " + report.Student.FirstName 
                 dict_precase = {
                     'IncidentId': report.IncidentReport.Id,
+                    'SelfDate': report.IncidentReport.SelfDate,
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
                     'LocationName': report.Location.Name,
@@ -381,6 +387,7 @@ def allResolvedFacultyCase():
             FullName= report.Faculty.LastName + ", " + report.Faculty.FirstName
             dict_reports = {
                 'CaseId': report.FacultyIncidentReport.Id,
+                'SelfDate': report.FacultyIncidentReport.SelfDate,
                 'Date': report.FacultyIncidentReport.Date,
                 'Time': report.FacultyIncidentReport.Time,
                 'LocationName': report.Location.Name,
@@ -408,6 +415,7 @@ def allRemovedFacultyCase():
             FullName= report.Faculty.LastName + ", " + report.Faculty.FirstName
             dict_reports = {
                 'CaseId': report.FacultyIncidentReport.Id,
+                'SelfDate': report.FacultyIncidentReport.SelfDate,
                 'Date': report.FacultyIncidentReport.Date,
                 'Time': report.FacultyIncidentReport.Time,
                 'LocationName': report.Location.Name,
@@ -435,6 +443,7 @@ def allClosedViolations():
             FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
             dict_closedviolation = {
                 'ViolationId': violations.ViolationForm.ViolationId,
+                'SelfDate': violations.ViolationForm.SelfDate,
                 'Date': violations.ViolationForm.Date,
                 'Time': violations.ViolationForm.Time,
                 'IncidentName': violations.IncidentType.Name,
@@ -463,6 +472,7 @@ def allRemovedViolations():
             FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
             dict_removedviolation = {
                 'ViolationId': violations.ViolationForm.ViolationId,
+                'SelfDate': violations.ViolationForm.SelfDate,
                 'Date': violations.ViolationForm.Date,
                 'Time': violations.ViolationForm.Time,
                 'IncidentName': violations.IncidentType.Name,

@@ -193,6 +193,7 @@ def changePassword():
             return redirect(url_for('studentLogin'))
     else:
         return render_template('404.html'), 404
+#----------------------------------------------------------------------------------------------------------------
 
 @student_api.route('/reporting', methods=['POST'])
 def reporting():
@@ -205,9 +206,20 @@ def reporting():
             location_id = request.form['location']
             student_id = request.form['student']
             description = request.form['description']
+            
+            # Get the current date in the desired format (MM/DD/YYYY)
+            current_date = datetime.now().strftime('%m/%d/%Y')
 
-            # Create an IncidentReport object and commit it to the database
-            incident = IncidentReport(Date=date, Time=time, LocationId=location_id, StudentId=student_id, ComplainantId=user.StudentId, Description=description)
+            # Create an IncidentReport object with the current date and commit it to the database
+            incident = IncidentReport(
+                SelfDate=current_date,
+                Date=date,
+                Time=time,
+                LocationId=location_id,
+                StudentId=student_id,
+                ComplainantId=user.StudentId,
+                Description=description
+            )
             db.session.add(incident)
             db.session.commit()
             
@@ -221,9 +233,9 @@ def reporting():
             print('An exception occurred:', e)
             return jsonify({'message': 'An error occurred while reporting the incident'}), 500
 
-    # Handle GET request or other methods gracefully
-    flash('Invalid request method', 'error')
-    return redirect(url_for('studentHome'))
+
+
+from datetime import datetime
 
 @student_api.route('/faculty-reporting', methods=['POST'])
 def facultyReporting():
@@ -236,9 +248,20 @@ def facultyReporting():
             location_id = request.form['location']
             faculty_id = request.form['faculty']
             description = request.form['description']
+            
+            # Get the current date in the desired format (MM/DD/YYYY)
+            current_date = datetime.now().strftime('%m/%d/%Y')
 
-            # Create an IncidentReport object and commit it to the database
-            incident = FacultyIncidentReport(Date=date, Time=time, LocationId=location_id, FacultyId=faculty_id, ComplainantId=user.StudentId, Description=description)
+            # Create a FacultyIncidentReport object with the current date and commit it to the database
+            incident = FacultyIncidentReport(
+                SelfDate=current_date,
+                Date=date,
+                Time=time,
+                LocationId=location_id,
+                FacultyId=faculty_id,
+                ComplainantId=user.StudentId,
+                Description=description
+            )
             db.session.add(incident)
             db.session.commit()
             
@@ -255,6 +278,7 @@ def facultyReporting():
     # Handle GET request or other methods gracefully
     flash('Invalid request method', 'error')
     return redirect(url_for('studentHome'))
+
     
 # fetch approved reports for student
 @student_api.route('/fetch/approved/reports', methods=['GET'])
@@ -272,6 +296,7 @@ def approvedReports():
                 FullName= report.Student.LastName + ", " + report.Student.FirstName
                 dict_reports = {
                     'IncidentId': report.IncidentReport.Id,
+                    'SelfDate': report.IncidentReport.SelfDate, # 'SelfDate': '2021-09-29',
                     'Date': report.IncidentReport.Date,
                     'Time': report.IncidentReport.Time,
                     'LocationName': report.Location.Name,
@@ -306,6 +331,7 @@ def approvedViolations():
                 FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
                 dict_violation = {
                 'ViolationId': violations.ViolationForm.ViolationId,
+                'SelfDate': violations.ViolationForm.SelfDate,
                 'Date': violations.ViolationForm.Date,
                 'Time': violations.ViolationForm.Time,
                 'IncidentName': violations.IncidentType.Name,

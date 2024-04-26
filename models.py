@@ -60,6 +60,7 @@ class ViolationForm(db.Model):
     __tablename__ = 'SCDSViolationForm'
     
     ViolationId = db.Column(db.Integer, primary_key=True, autoincrement=True) #ViolationFormID
+    SelfDate = db.Column(db.String(20), nullable=False) #DateofSubmission
     Date = db.Column(db.String(20), nullable=False) #Date
     Time = db.Column(db.String(20), nullable=False) #Time
     LocationId = db.Column(db.Integer, db.ForeignKey('SCDSLocation.LocationId', ondelete="CASCADE")) #LocationID
@@ -73,6 +74,7 @@ class ViolationForm(db.Model):
     def to_dict(self):
         return {
             'ViolationId': self.ViolationId,
+            'SelfDate': self.SelfDate, # 'DateofSubmission': '2021-09-01',
             'Date': self.Date,
             'Time': self.Time,
             'LocationId': self.LocationId,
@@ -88,7 +90,8 @@ class IncidentReport(db.Model):
     __tablename__ = 'SCDSIncidentReport'
     
     Id = db.Column(db.Integer, primary_key=True, nullable=False) #ReportID
-    Date = db.Column(db.String(20), nullable=False) #Date
+    SelfDate = db.Column(db.String(20), nullable=False) #DateofSubmission
+    Date = db.Column(db.String(20), nullable=False) #DateofIncident
     Time = db.Column(db.String(20), nullable=False) #Time
     LocationId = db.Column(db.Integer, db.ForeignKey('SCDSLocation.LocationId', ondelete="CASCADE")) #LocationID
     StudentId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #StudentID
@@ -101,6 +104,8 @@ class IncidentReport(db.Model):
     
     def to_dict(self):
         return {
+            'Id': self.Id, # 'ReportID': '1
+            'SelfDate': self.SelfDate, # 'DateofSubmission': '2021-09-01',
             'Date': self.Date,
             'Time': self.Time,
             'LocationId': self.LocationId,
@@ -117,6 +122,7 @@ class FacultyIncidentReport(db.Model):
     __tablename__ = 'SCDSFacultyIncidentReport'
     
     Id = db.Column(db.Integer, primary_key=True, nullable=False) #ReportID
+    SelfDate = db.Column(db.String(20), nullable=False) #DateofSubmission
     Date = db.Column(db.String(20), nullable=False) #Date
     Time = db.Column(db.String(20), nullable=False) #Time
     LocationId = db.Column(db.Integer, db.ForeignKey('SCDSLocation.LocationId', ondelete="CASCADE")) #LocationID
@@ -129,6 +135,7 @@ class FacultyIncidentReport(db.Model):
     
     def to_dict(self):
         return {
+            'SelfDate': self.SelfDate, # 'DateofSubmission': '2021-09-01',
             'Date': self.Date,
             'Time': self.Time,
             'LocationId': self.LocationId,

@@ -158,31 +158,51 @@ def manage_reports():
     except Exception as e:
         return {"message": "An error occurred", "status": 500}
 
+
 @faculty_api.route('/reporting-violation', methods=['POST'])
 def reportingViolation():
-   user = getCurrentUser()
-   if request.method == 'POST':
+    user = getCurrentUser()
+    if request.method == 'POST':
         try:
-        # Handle form submission logic here
+            # Handle form submission logic here
             date = request.form['date']
             time = request.form['time']
-            location_id = request.form['location']  # Use the selected location ID
+            location_id = request.form['location']
             student_id = request.form['student']
-            incident_type_id = request.form['incident']  # Use the selected incident type ID
+            incident_type_id = request.form['incident']
             description = request.form['description']
             
-            violation = ViolationForm(Date=date, Time=time, LocationId=location_id, StudentId=student_id, IncidentId=incident_type_id, ComplainantId=user.FacultyId, Description=description)
+            # Get the current date in the desired format (MM/DD/YYYY)
+            current_date = datetime.now().strftime('%m/%d/%Y')
+
+            # Create a ViolationForm object with the current date and commit it to the database
+            violation = ViolationForm(
+                SelfDate=current_date,
+                Date=date,
+                Time=time,
+                LocationId=location_id,
+                StudentId=student_id,
+                IncidentId=incident_type_id,
+                ComplainantId=user.FacultyId,
+                Description=description
+            )
             db.session.add(violation)
             db.session.commit()
             
             msg = Message('Violation Reported', sender=("SCDS", "scdspupqc.edu@gmail.com"), recipients=['david.ilustre@gmail.com'])
             msg.body = 'A Violation has been reported. Please check the system for details.'
             mail.send(msg)
+            
             return jsonify({'message': 'Violation reported successfully', 'success': True }), 200
         except Exception as e:
             # Log the exception and display an error message to the user
             print('An exception occurred:', e)
             return jsonify({'message': 'An error occurred while reporting the incident'}), 500
+
+    # Handle GET request or other methods gracefully
+    flash('Invalid request method', 'error')
+    return redirect(url_for('facultyHome'))
+
 
 @faculty_api.route('/all-reports', methods={'GET'})
 def allReports():    
@@ -200,6 +220,7 @@ def allReports():
             FullName= report.Student.LastName + ", " + report.Student.FirstName 
             dict_reports = {
                 'IncidentId': report.IncidentReport.Id,
+                'SelfDate': report.IncidentReport.SelfDate,
                 'Date': report.IncidentReport.Date,
                 'Time': report.IncidentReport.Time,
                 'LocationName': report.Location.Name,
@@ -231,6 +252,7 @@ def allapprovedReports():
             FullName= report.Student.LastName + ", " + report.Student.FirstName 
             dict_reports = {
                 'IncidentId': report.IncidentReport.Id,
+                'SelfDate': report.IncidentReport.SelfDate,
                 'Date': report.IncidentReport.Date,
                 'Time': report.IncidentReport.Time,
                 'LocationName': report.Location.Name,
