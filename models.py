@@ -333,28 +333,28 @@ def init_db(app):
 
 
 # def create_sample_data():
-#     for data in student_data:
-#         student = Student(**data)
-#         db.session.add(student)
+#     # for data in student_data:
+#     #     student = Student(**data)
+#     #     db.session.add(student)
 
-#     for data in faculty_data:
-#         faculty = Faculty(**data)
-#         db.session.add(faculty)
+#     # for data in faculty_data:
+#     #     faculty = Faculty(**data)
+#     #     db.session.add(faculty)
         
-#     for data in system_admin_data:
-#         admin = SystemAdmin(**data)
-#         db.session.add(admin)
+#     # for data in system_admin_data:
+#     #     admin = SystemAdmin(**data)
+#     #     db.session.add(admin)
         
-#     for data in course_data:
-#         course = Course(**data)
-#         db.session.add(course)
+#     # for data in course_data:
+#     #     course = Course(**data)
+#     #     db.session.add(course)
         
-#     for data in incidenttype_data:
-#         incidenttype = IncidentType(**data)
-#         db.session.add(incidenttype)
+#     # for data in incidenttype_data:
+#     #     incidenttype = IncidentType(**data)
+#     #     db.session.add(incidenttype)
         
-#     for data in location_data:
-#         location = Location(**data)
-#         db.session.add(location)
+#     # for data in location_data:
+#     #     location = Location(**data)
+#     #     db.session.add(location)
 
 #     db.session.commit()
