@@ -190,12 +190,12 @@ endblock title %} {% block styles %}
 
           // Get the container element where you want to render the data
           const outputContainer = document.getElementById('output-container');
+          outputContainer.innerHTML = '';
 
           // Loop through the consoleResponse array and create HTML elements for each object
           reportDetails.result.forEach(async (report) => {
-            // Create a tr element for each report
+            console.log('AttachmentName:', report.AttachmentName);
             const reportRow = document.createElement('tr');
-
             reportRow.setAttribute('id', `${report.CaseId}`);
 
             reportRow.innerHTML = `
@@ -214,7 +214,11 @@ endblock title %} {% block styles %}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column">
                     <button class="bg-green-600 p-2 text-white block mb-2" onclick="resolveFacultyCase(${report.CaseId})">Resolve Faculty Case</button>
-                    <button class="bg-red-600 p-2 text-white block mb-2" onclick="removeFacultyCase(${report.CaseId})">Remove Faculty Case</button>
+                    ${
+                report.AttachmentName
+                  ? `<button class="bg-blue-600 p-2 text-white block mb-2" onclick="downloadFile(${report.CaseId})">See Evidences</button>`
+                  : ''
+              }
                   </td>
                 `;
 
@@ -282,33 +286,26 @@ endblock title %} {% block styles %}
         }
       }
 
-      // Make a approved report function
-      async function removeFacultyCase(CaseId) {
-        console.log('removeFacultyCase', CaseId);
+      // Function to handle the click event on the download button
+      async function downloadFile(reportId) {
         try {
-          const response = await fetch(`${api_base_url}/remove-faculty-case`, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ CaseId }),
-          });
-
+          const response = await fetch(
+            `${api_base_url}/faculty/reporting/${reportId}/file`
+          );
+          const blob = await response.blob();
+    
+          // Check if the response is successful
           if (!response.ok) {
-            throw new Error('Failed to make accesible faculty case');
+            throw new Error(`HTTP error! status: ${response.status}`);
           }
-
-          const data = await response.json();
-          console.log(data);
-
-          if (data.result) {
-            notyf.success('Faculty Case is now Resolved');
-            document.getElementById(`status-${CaseId}`).innerHTML = 'removed';
-          } else if (data.error) {
-            notyf.error('Failed to resolve faculty case');
-          }
+    
+          // Create a new blob object with the appropriate MIME type
+          const blobUrl = window.URL.createObjectURL(blob);
+    
+          // Open the blob URL in a new tab/window
+          window.open(blobUrl, '_blank');
         } catch (error) {
-          console.error(error.message);
+          console.error('Error downloading file:', error);
         }
       }
 

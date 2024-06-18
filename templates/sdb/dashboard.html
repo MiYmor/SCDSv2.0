@@ -1,0 +1,123 @@
+{% extends "faculty/layout.html" %} {% block title %} SPS - Dashboard {%
+endblock title %} {% block styles %}
+<style>
+  .e-headertext {
+    color: white;
+    font-weight: bolder !important;
+    font-size: 16px !important;
+  }
+
+  th.e-headercell {
+    background-color: #6376eb !important;
+    color: white;
+  }
+
+  #response {
+    position: relative;
+    width: 100%; /* Set the width of the parent */
+    height: auto; /* Let the height adjust based on content */
+  }
+
+  #columnChartContainer {
+    position: relative;
+    width: 100%; /* Inherit the width of the parent */
+    height: 100%; /* Inherit the height of the parent */
+  }
+
+  .guideline p.title {
+    font-size: 16px; /* Adjusted font size */
+    color: black;
+    font-weight: bold;
+    margin-bottom: 0.5rem; /* Added margin bottom for spacing */
+  }
+
+  .guideline p.description {
+    font-size: 16px; /* Adjusted font size */
+    color: black;
+    line-height: 1.5; /* Added line height for readability */
+  }
+
+  .additional-content {
+    font-size: 16px;
+    color: black;
+    line-height: 1.5;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="p-4 md:ml-72">
+  <div class="border-2 border-gray-200 rounded-lg bg-white p-4">
+    <h2 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">
+      Violation Filing Guidelines
+    </h2>
+    <div class="guideline mt-4">
+      <p class="title">Date:</p>
+      <p class="description">
+        Please specify the date on which the violation occurred.
+      </p>
+    </div>
+
+    <div class="guideline mt-4">
+      <p class="title">Time of violation:</p>
+      <p class="description">Specify the time the violation occurred.</p>
+    </div>
+
+    <div class="guideline mt-4">
+      <p class="title">violation Type:</p>
+      <p class="description">
+        Please specify what kind of violation was done. This may encompass
+        various categories of misconduct, such as academic dishonesty, breaches
+        of conduct, policy infractions, or any actions deemed contrary to the
+        established rules, regulations, or ethical standards of the institution.
+      </p>
+    </div>
+
+    <div class="guideline mt-4">
+      <p class="title">Location:</p>
+      <p class="description">
+        Provide the location where the violation occurred or the context of the
+        report. Include any relevant details such as the school building or
+        specific place where the violation occurred.
+      </p>
+    </div>
+
+    <div class="guideline mt-4">
+      <p class="title">Party Involved:</p>
+      <p class="description">
+        Input the specific individual involved in the violation. This may
+        include students and faculty.
+      </p>
+    </div>
+
+    <div class="guideline mt-4">
+      <p class="title">Description:</p>
+      <p class="description">
+        Please provide a detailed description of the violation or issue. Include
+        all relevant information, such as specific actions, conversations, or
+        circumstances surrounding the complaint. Be as specific and clear as
+        possible.
+      </p>
+    </div>
+  </div>
+
+  <div class="bg-white mt-4 p-8 rounded-lg shadow-md additional-content">
+    <p>
+      Only PUP faculty members have the authority to submit violations that they
+      believe violate our Community Guidelines. When a violation report is
+      submitted, it doesn't automatically result in immediate action or
+      sanctions. Each reported violation is reviewed in accordance with the
+      following guidelines:
+    </p>
+    <p class="guideline mt-4">
+      Violations that contravene our School Guidelines and Student Code of
+      Conduct are subject to sanctions. Actions deemed inappropriate for the
+      entire campus community may result in disciplinary measures.
+    </p>
+    <p class="guideline mt-4">
+      Furthermore, PUP faculty members play a crucial role as investigators in
+      the review of cases or complaints, meticulously examining each matter and
+      proposing appropriate sanctions in strict adherence to institutional
+      regulations.
+    </p>
+  </div>
+</div>
+{% endblock content %}

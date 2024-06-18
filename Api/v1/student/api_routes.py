@@ -1,21 +1,21 @@
 # api/api_routes.py
-from flask import jsonify
-from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template, get_flashed_messages
-from sqlalchemy import desc
+from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
+from models import Student, db, IncidentReport, Location, IncidentType, ViolationForm, Faculty, FacultyIncidentReport
 from werkzeug.security import check_password_hash
-from models import Student, db, IncidentReport, Location, IncidentType , SystemAdmin, ViolationForm, Faculty, FacultyIncidentReport
-import os
-
+from werkzeug.utils import secure_filename
 from decorators.auth_decorators import role_required
 
-# FUNCTIONS IMPORT
-from .utils import getStudentData, updateStudentData, updatePassword, getCurrentUser, getLocation
-from werkzeug.security import generate_password_hash
+from .utils import getStudentData, updateStudentData, updatePassword, getCurrentUser
+
+import os
 
 from flask_mail import Message
-from mail import mail  # Import mail from the mail.py module
+from mail import mail
 import secrets
 from datetime import datetime, timedelta
+from werkzeug.security import generate_password_hash
+
+
 student_api_base_url = os.getenv("STUDENT_API_BASE_URL")
 student_api = Blueprint('student_api', __name__)
 # from app import create_app
@@ -194,6 +194,8 @@ def changePassword():
     else:
         return render_template('404.html'), 404
 #----------------------------------------------------------------------------------------------------------------
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'pdf'
 
 @student_api.route('/reporting', methods=['POST'])
 def reporting():
@@ -220,6 +222,16 @@ def reporting():
                 ComplainantId=user.StudentId,
                 Description=description
             )
+
+            file = request.files['file']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_data = file.read()  # Read the file data as binary
+                incident.AttachmentName = filename
+                incident.AttachmentData = file_data  # Store the binary data
+            else:
+                return jsonify({'message': 'Only PDF files are allowed', 'success': False}), 400
+
             db.session.add(incident)
             db.session.commit()
             
@@ -233,10 +245,7 @@ def reporting():
             print('An exception occurred:', e)
             return jsonify({'message': 'An error occurred while reporting the incident'}), 500
 
-
-
-from datetime import datetime
-
+#----------------------------------------------------------------------------------------------------------------
 @student_api.route('/faculty-reporting', methods=['POST'])
 def facultyReporting():
     user = getCurrentUser()
@@ -262,6 +271,16 @@ def facultyReporting():
                 ComplainantId=user.StudentId,
                 Description=description
             )
+            
+            file = request.files['file']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_data = file.read()  # Read the file data as binary
+                incident.AttachmentName = filename
+                incident.AttachmentData = file_data  # Store the binary data
+            else:
+                return jsonify({'message': 'Only PDF files are allowed', 'success': False}), 400
+            
             db.session.add(incident)
             db.session.commit()
             

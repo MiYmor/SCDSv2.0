@@ -182,23 +182,53 @@ endblock title %} {% block styles %}
         reportRow.setAttribute('id', `${report.IncidentId}`);
 
         reportRow.innerHTML = `
-                <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${report.IncidentId}</td>
-                <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.SelfDate}</td>
+                <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${
+                  report.IncidentId
+                }</td>
+                <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${
+                  report.SelfDate
+                }</td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   <p name ="Time"><strong>Time:</strong> ${report.Time}</p>
                   <p name ="Date"><strong>Date:</strong> ${report.Date}</p>
-                  <p name ="Location"><strong>Location:</strong> ${report.LocationName}</p>
-                  <p name ="Student"><strong>Complainee:</strong> ${report.StudentName}</p>
-                  <p name ="Investigator"><strong>Investigator:</strong> ${report.Investigator}</p>
-                  <p name ="Complainant"><strong>Submitted by:</strong> ${report.Complainant}</p>
-                  <p name ="Description"><strong>Description:</strong> ${report.Description}</p
-                  <p name ="Sanction"><strong>Sanction:</strong> ${report.Sanction}</p>
+                  <p name ="Location"><strong>Location:</strong> ${
+                    report.LocationName
+                  }</p>
+                  <p name ="Student"><strong>Complainee:</strong> ${
+                    report.StudentName
+                  }</p>
+                  <p name ="Investigator"><strong>SDB:</strong> ${
+                    report.Investigator
+                  }</p>
+                  <p name ="Complainant"><strong>Submitted by:</strong> ${
+                    report.Complainant
+                  }</p>
+                  <p name ="Description"><strong>Description:</strong> ${
+                    report.Description
+                  }</p
+                  <p name ="Sanction"><strong>Sanction:</strong> ${
+                    report.Sanction
+                  }</p>
                   <strong>Status:</strong>
-                  <p name ="status" id='status-${report.IncidentId}'> ${report.Status}</p>
+                  <p name ="status" id='status-${report.IncidentId}'> ${
+          report.Status
+        }</p>
                   <!-- Add other details as needed -->
                 </td>
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column">
-                  <button class="bg-red-600 p-2 text-white block mb-2" onclick="reopenReports(${report.IncidentId})">Reopen Case</button>
+                  <button class="bg-blue-600 p-2 text-white block mb-2" onclick="reopenReports(${
+                    report.IncidentId
+                  })">Reopen Case</button>
+                  ${
+                    report.AttachmentName
+                      ? `<button class="bg-red-600 p-2 text-white block mb-2" onclick="downloadFile(${report.IncidentId})">See Evidences</button>`
+                      : ''
+                  }
+                  ${
+                    report.FinalAssessmentName
+                      ? `<button class="bg-green-600 p-2 text-white block mb-2" onclick="downloadFinalAssessment(${report.IncidentId})">See Final Assessment</button>`
+                      : ''
+                  }
                 </td>
                   `;
 
@@ -263,6 +293,52 @@ endblock title %} {% block styles %}
       }
     } catch (error) {
       console.error(error.message);
+    }
+  }
+
+  // Function to handle the click event on the download button
+  async function downloadFile(reportId) {
+    try {
+      const response = await fetch(
+        `${api_base_url}/reporting/${reportId}/file`
+      );
+      const blob = await response.blob();
+
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Create a new blob object with the appropriate MIME type
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Open the blob URL in a new tab/window
+      window.open(blobUrl, '_blank');
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  }
+
+  // Function to handle the click event on the download button
+  async function downloadFinalAssessment(reportId) {
+    try {
+      const response = await fetch(
+        `${api_base_url}/final/assessment/${reportId}/file`
+      );
+      const blob = await response.blob();
+
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Create a new blob object with the appropriate MIME type
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Open the blob URL in a new tab/window
+      window.open(blobUrl, '_blank');
+    } catch (error) {
+      console.error('Error downloading file:', error);
     }
   }
   fetchReport();

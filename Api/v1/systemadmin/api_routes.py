@@ -1,5 +1,5 @@
 # api/api_routes.py
-from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
+from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template, make_response
 from flask_mail import Message, Mail
 from mail import mail
 from models import SystemAdmin, db, IncidentReport, Student, Location, IncidentType, Faculty, ViolationForm, FacultyIncidentReport
@@ -12,6 +12,7 @@ from decorators.auth_decorators import role_required
 
 from .utils import getCurrentUser
 
+import base64
 import os
 
 system_admin_api = Blueprint('system_admin_api',__name__)
@@ -185,19 +186,135 @@ def manage_violations():
         return {"message": "An error occurred", "status": 500}
 
 
-# fetch all the student case that are available
+# Fetch reports CSV from external source and directly send it as attachment
+
+def fetch_report_binary_data(report_id):
+    # Assuming you have a model named Report
+    report = db.session.query(IncidentReport).filter_by(id=report_id).first()
+    if report:
+        # Assuming the binary data is stored in a column named 'binary_data'
+        return report.binary_data
+    else:
+        return None
+
+
+
+@system_admin_api.route('/reporting/<int:report_id>/file', methods=['GET'])
+def download_report_file(report_id):
+    try:
+        # Fetch the binary report data from the database based on report_id
+        report = db.session.query(IncidentReport).get(report_id)
+        if report and report.AttachmentData:
+            # Set the appropriate MIME type for a PDF file
+            response = make_response(report.AttachmentData)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+            return response
+        else:
+            return {"message": "Failed to fetch report or report not found", "status": 404}
+    except Exception as e:
+        return {"message": "An error occurred while downloading the file", "status": 500}
+
+# Fetch reports CSV from external source and directly send it as attachment
+
+def fetch_faculty_report_binary_data(report_id):
+    # Assuming you have a model named Report
+    report = db.session.query(FacultyIncidentReport).filter_by(id=report_id).first()
+    if report:
+        # Assuming the binary data is stored in a column named 'binary_data'
+        return report.binary_data
+    else:
+        return None
+
+@system_admin_api.route('/faculty/reporting/<int:report_id>/file', methods=['GET'])
+def download_faculty_report_file(report_id):
+    try:
+        # Fetch the binary report data from the database based on report_id
+        report = db.session.query(FacultyIncidentReport).get(report_id)
+        if report and report.AttachmentData:
+            # Set the appropriate MIME type for a PDF file
+            response = make_response(report.AttachmentData)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+            return response
+        else:
+            return {"message": "Failed to fetch report or report not found", "status": 404}
+    except Exception as e:
+        return {"message": "An error occurred while downloading the file", "status": 500}
+
+def fetch_violation_binary_data(violation_id):
+    # Assuming you have a model named Report
+    violations = db.session.query(ViolationForm).filter_by(id=violation_id).first()
+    if violations:
+        # Assuming the binary data is stored in a column named 'binary_data'
+        return violations.binary_data
+    else:
+        return None
+
+@system_admin_api.route('/violation/<int:violation_id>/file', methods=['GET'])
+def download_violation_file(violation_id):
+    try:
+        # Fetch the binary report data from the database based on report_id
+        violations = db.session.query(ViolationForm).get(violation_id)
+        if violations and violations.AttachmentData:
+            # Set the appropriate MIME type for a PDF file
+            response = make_response(violations.AttachmentData)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+            return response
+        else:
+            return {"message": "Failed to fetch report or report not found", "status": 404}
+    except Exception as e:
+        return {"message": "An error occurred while downloading the file", "status": 500}
+
+#================================================================================================
+#Assessment File Donwload
+@system_admin_api.route('/assessment/<int:report_id>/file', methods=['GET'])
+def download_initial_assessment_file(report_id):
+    try:
+        # Fetch the binary report data from the database based on report_id
+        report = db.session.query(IncidentReport).get(report_id)
+        if report and report.InitialAssessmentData:
+            # Set the appropriate MIME type for a PDF file
+            response = make_response(report.InitialAssessmentData)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+            return response
+        else:
+            return {"message": "Failed to fetch report or report not found", "status": 404}
+    except Exception as e:
+        return {"message": "An error occurred while downloading the file", "status": 500}
+    
+@system_admin_api.route('/final/assessment/<int:report_id>/file', methods=['GET'])
+def download_final_assessment_file(report_id):
+    try:
+        # Fetch the binary report data from the database based on report_id
+        report = db.session.query(IncidentReport).get(report_id)
+        if report and report.FinalAssessmentData:
+            # Set the appropriate MIME type for a PDF file
+            response = make_response(report.FinalAssessmentData)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+            return response
+        else:
+            return {"message": "Failed to fetch report or report not found", "status": 404}
+    except Exception as e:
+        return {"message": "An error occurred while downloading the file", "status": 500}
+    
+#================================================================================================
 @system_admin_api.route('/all-reports', methods={'GET'})
 def allReports():
-    #.filter = multiple queries .filter_by = single query
     allReports = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == False, IncidentReport.Status == 'pending').order_by(IncidentReport.Date).all()
     list_reports=[]
-    print (allReports)
     if allReports:
         for report in allReports:
-            # make a dictionary for reports
             complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= report.Student.LastName + ", " + report.Student.FirstName
+            # Check if the report has an attachment
+            has_attachment = bool(report.IncidentReport.AttachmentName)
+            initial_assessment = bool(report.IncidentReport.FinalAssessmentName)
+            final_assessment = bool(report.IncidentReport.FinalAssessmentName)
             dict_reports = {
                 'IncidentId': report.IncidentReport.Id,
                 'SelfDate': report.IncidentReport.SelfDate,
@@ -208,12 +325,17 @@ def allReports():
                 'Complainant': FullNameComplainant,
                 'Description': report.IncidentReport.Description,
                 'Status': report.IncidentReport.Status,
-                'Acessibility': report.IncidentReport.IsAccessible
-
+                'Acessibility': report.IncidentReport.IsAccessible,
+                'AttachmentName': report.IncidentReport.AttachmentName,  # Include the attachment name
+                'HasAttachment': has_attachment,  # Include whether the report has an attachment
+                'InitialAssessmentName': report.IncidentReport.InitialAssessmentName,
+                'InitialAssementData': initial_assessment,
+                'FinalAssessmentName': report.IncidentReport.FinalAssessmentName,
+                'FinalAssessmentData': final_assessment
             }
-            # append the dictionary to the list
             list_reports.append(dict_reports)
         return jsonify({'result': list_reports})
+
 
 # fetch all the faculty case that are available
 @system_admin_api.route('/all-faculty-case', methods={'GET'})
@@ -227,6 +349,8 @@ def allFacultyCase():
             complainant = db.session.query(Student).filter(Student.StudentId == report.FacultyIncidentReport.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= report.Faculty.LastName + ", " + report.Faculty.FirstName
+            # Check if the report has an attachment
+            has_attachment = bool(report.FacultyIncidentReport.AttachmentName)
             dict_reports = {
                 'CaseId': report.FacultyIncidentReport.Id,
                 'SelfDate': report.FacultyIncidentReport.SelfDate,
@@ -237,7 +361,9 @@ def allFacultyCase():
                 'Complainant': FullNameComplainant,
                 'Description': report.FacultyIncidentReport.Description,
                 'Status': report.FacultyIncidentReport.Status,
-                'Acessibility': report.FacultyIncidentReport.IsAccessible
+                'Acessibility': report.FacultyIncidentReport.IsAccessible,
+                'AttachmentName': report.FacultyIncidentReport.AttachmentName,  # Include the attachment name
+                'HasAttachment': has_attachment  # Include whether the report has an attachment
 
             }
             # append the dictionary to the list
@@ -256,6 +382,7 @@ def allViolations():
             complainant = db.session.query(Faculty).filter(Faculty.FacultyId == violations.ViolationForm.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
+            has_attachment = bool(violations.ViolationForm.AttachmentName)
             dict_violation = {
                 'ViolationId': violations.ViolationForm.ViolationId,
                 'SelfDate': violations.ViolationForm.SelfDate,
@@ -267,7 +394,10 @@ def allViolations():
                 'Complainant': FullNameComplainant,
                 'Description': violations.ViolationForm.Description,
                 'Status': violations.ViolationForm.Status,
-                'Acessibility': violations.ViolationForm.IsAccessible
+                'Acessibility': violations.ViolationForm.IsAccessible,
+                'AttachmentName': violations.ViolationForm.AttachmentName, # Include the attachment name
+                'HasAttachment': has_attachment  # Include whether the report has an attachment
+
             }
             # append the dictionary to the list
             list_violations.append(dict_violation)
@@ -292,7 +422,10 @@ def allClosedCase():
                 FullNameInvestigator = investigator.LastName + ", " + investigator.FirstName
                 complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
                 FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
-                FullName= report.Student.LastName + ", " + report.Student.FirstName 
+                FullName= report.Student.LastName + ", " + report.Student.FirstName
+                has_attachment = bool(report.IncidentReport.AttachmentName)
+                initial_assessment = bool(report.IncidentReport.FinalAssessmentName)
+                final_assessment = bool(report.IncidentReport.FinalAssessmentName) 
                 dict_closedcase = {
                     'IncidentId': report_id,
                     'SelfDate': report.IncidentReport.SelfDate,
@@ -305,7 +438,13 @@ def allClosedCase():
                     'Description': report.IncidentReport.Description,
                     'Sanction': report.IncidentReport.Sanction,
                     'Status': report.IncidentReport.Status,
-                    'Acessibility': report.IncidentReport.IsAccessible
+                    'Acessibility': report.IncidentReport.IsAccessible,
+                    'AttachmentName': report.IncidentReport.AttachmentName,  # Include the attachment name
+                    'HasAttachment': has_attachment,  # Include whether the report has an attachment
+                    'InitialAssessmentName': report.IncidentReport.InitialAssessmentName,
+                    'InitialAssementData': initial_assessment,
+                    'FinalAssessmentName': report.IncidentReport.FinalAssessmentName,
+                    'FinalAssessmentData': final_assessment
                 }
                 list_closedcase.append(dict_closedcase)
         return jsonify({'result': list_closedcase})  # Move this line outside the loop
@@ -317,61 +456,61 @@ def allClosedCase():
 # get all the case that are closed
 @system_admin_api.route('/resolved-case', methods=['GET'])
 def allResolvedCase():
-    allResolvedCase = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.IsAccessible == True, IncidentReport.Status =='approved').order_by(IncidentReport.Date).all()
-    list_resolvedcase=[]
+    allResolvedCase = db.session.query(IncidentReport, Student, Location) \
+        .join(Student, Student.StudentId == IncidentReport.StudentId) \
+        .join(Location, Location.LocationId == IncidentReport.LocationId) \
+        .filter(IncidentReport.IsAccessible == True, IncidentReport.Status != 'pending') \
+        .order_by(IncidentReport.Date).all()
+    
+    list_resolvedcase = []
+
     if allResolvedCase:
-            for report in allResolvedCase:
-                # make a dictionary for reports
-                investigator = db.session.query(Faculty).filter(Faculty.FacultyId == report.IncidentReport.InvestigatorId).first()
+        for report in allResolvedCase:
+            # Fetch investigator
+            investigator = db.session.query(Faculty).filter(Faculty.FacultyId == report.IncidentReport.InvestigatorId).first()
+            if investigator:
                 FullNameInvestigator = investigator.LastName + ", " + investigator.FirstName
-                complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
-                FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
-                FullName= report.Student.LastName + ", " + report.Student.FirstName 
-                dict_resolvedcase = {
-                    'IncidentId': report.IncidentReport.Id,
-                    'SelfDate': report.IncidentReport.SelfDate,
-                    'Date': report.IncidentReport.Date,
-                    'Time': report.IncidentReport.Time,
-                    'LocationName': report.Location.Name,
-                    'StudentName': FullName,
-                    'Investigator': FullNameInvestigator,
-                    'Complainant': FullNameComplainant,
-                    'Description': report.IncidentReport.Description,
-                    'Sanction': report.IncidentReport.Sanction,
-                    'Status': report.IncidentReport.Status,
-                    'Acessibility': report.IncidentReport.IsAccessible
+            else:
+                FullNameInvestigator = "None"
 
-                }
-                # append the dictionary to the list
-                list_resolvedcase.append(dict_resolvedcase)
-            return jsonify({'result': list_resolvedcase})
-        
-@system_admin_api.route('/resolved-pre-case', methods=['GET'])
-def allResolvedPreCase():
-    allResolvedPreCase = db.session.query(IncidentReport, Student, Location).join(Student, Student.StudentId == IncidentReport.StudentId).join(Location, Location.LocationId == IncidentReport.LocationId).filter(IncidentReport.Status=='resolved').order_by(IncidentReport.Date).all()
-    list_precase=[]
-    if allResolvedPreCase:
-            for report in allResolvedPreCase:
-                # make a dictionary for reports
-                complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
+            # Fetch complainant
+            complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
+            if complainant:
                 FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
-                FullName= report.Student.LastName + ", " + report.Student.FirstName 
-                dict_precase = {
-                    'IncidentId': report.IncidentReport.Id,
-                    'SelfDate': report.IncidentReport.SelfDate,
-                    'Date': report.IncidentReport.Date,
-                    'Time': report.IncidentReport.Time,
-                    'LocationName': report.Location.Name,
-                    'StudentName': FullName,
-                    'Complainant': FullNameComplainant,
-                    'Description': report.IncidentReport.Description,
-                    'Status': report.IncidentReport.Status,
-                    'Acessibility': report.IncidentReport.IsAccessible
+            else:
+                FullNameComplainant = "Complainant not found"
 
-                }
-                # append the dictionary to the list
-                list_precase.append(dict_precase)
-            return jsonify({'result': list_precase})
+            # Student's full name
+            FullName = report.Student.LastName + ", " + report.Student.FirstName
+            has_attachment = bool(report.IncidentReport.AttachmentName)
+            initial_assessment = bool(report.IncidentReport.FinalAssessmentName)
+            final_assessment = bool(report.IncidentReport.FinalAssessmentName)
+            # Create a dictionary for the report
+            dict_resolvedcase = {
+                'IncidentId': report.IncidentReport.Id,
+                'SelfDate': report.IncidentReport.SelfDate,
+                'Date': report.IncidentReport.Date,
+                'Time': report.IncidentReport.Time,
+                'LocationName': report.Location.Name,
+                'StudentName': FullName,
+                'Investigator': FullNameInvestigator,
+                'Complainant': FullNameComplainant,
+                'Description': report.IncidentReport.Description,
+                'Sanction': report.IncidentReport.Sanction,
+                'Status': report.IncidentReport.Status,
+                'Acessibility': report.IncidentReport.IsAccessible,
+                'AttachmentName': report.IncidentReport.AttachmentName,  # Include the attachment name
+                'HasAttachment': has_attachment,  # Include whether the report has an attachment
+                'InitialAssessmentName': report.IncidentReport.InitialAssessmentName,
+                'InitialAssementData': initial_assessment,
+                'FinalAssessmentName': report.IncidentReport.FinalAssessmentName,
+                'FinalAssessmentData': final_assessment
+            }
+
+            # Append the dictionary to the list
+            list_resolvedcase.append(dict_resolvedcase)
+
+    return jsonify({'result': list_resolvedcase})
         
 #================================================================================================
 @system_admin_api.route('/all-resolved-faculty-case', methods={'GET'})
@@ -385,6 +524,7 @@ def allResolvedFacultyCase():
             complainant = db.session.query(Student).filter(Student.StudentId == report.FacultyIncidentReport.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= report.Faculty.LastName + ", " + report.Faculty.FirstName
+            has_attachment = bool(report.FacultyIncidentReport.AttachmentName)
             dict_reports = {
                 'CaseId': report.FacultyIncidentReport.Id,
                 'SelfDate': report.FacultyIncidentReport.SelfDate,
@@ -395,8 +535,9 @@ def allResolvedFacultyCase():
                 'Complainant': FullNameComplainant,
                 'Description': report.FacultyIncidentReport.Description,
                 'Status': report.FacultyIncidentReport.Status,
-                'Acessibility': report.FacultyIncidentReport.IsAccessible
-
+                'Acessibility': report.FacultyIncidentReport.IsAccessible,
+                'AttachmentName': report.FacultyIncidentReport.AttachmentName,  # Include the attachment name
+                'HasAttachment': has_attachment  # Include whether the report has an attachment
             }
             # append the dictionary to the list
             list_reports.append(dict_reports)
@@ -441,6 +582,7 @@ def allClosedViolations():
             complainant = db.session.query(Faculty).filter(Faculty.FacultyId == violations.ViolationForm.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= violations.Student.LastName + ", " + violations.Student.FirstName 
+            has_attachment = bool(violations.ViolationForm.AttachmentName)
             dict_closedviolation = {
                 'ViolationId': violations.ViolationForm.ViolationId,
                 'SelfDate': violations.ViolationForm.SelfDate,
@@ -452,7 +594,9 @@ def allClosedViolations():
                 'Complainant': FullNameComplainant,
                 'Description': violations.ViolationForm.Description,
                 'Status': violations.ViolationForm.Status,
-                'Acessibility': violations.ViolationForm.IsAccessible
+                'Acessibility': violations.ViolationForm.IsAccessible,
+                'AttachmentName': violations.ViolationForm.AttachmentName, # Include the attachment name
+                'HasAttachment': has_attachment  # Include whether the report has an attachment
             }
             # append the dictionary to the list
             list_closedviolations.append(dict_closedviolation)
@@ -525,51 +669,76 @@ def accessReports():
         return jsonify({'error': 'failed', 'message': 'Report not found'})
 
 # to close the case 
-@system_admin_api.route('/remove-access-report', methods={'POST'})
+@system_admin_api.route('/remove-access-report', methods=['POST'])
 def removeAccessReports():
-     # Assuming the incoming data is JSON
+    # Assuming the incoming data is JSON
     data = request.get_json()
     # Extract incidentId from the JSON payload
     incident_id = data.get('IncidentId')
-    # Your logic to handle the incidentId
-    print('Received incidentId:', incident_id)
-    # make a querry calling the incidentreport table
+    
+    # Query the IncidentReport table for the incident with given ID
     incident = IncidentReport.query.filter_by(Id=incident_id).first()
-    # if the incident is found
+
+    # If the incident is found
     if incident:
-        # change the status to approved
+        # Update the incident attributes
         incident.IsAccessible = False
-        # commit the changes
+        incident.Sanction = 'pending'
+        incident.Status = 'pending'
+        incident.InvestigatorId = None
+        incident.InitialAssessmentName = None
+        incident.InitialAssessmentData = None
+        incident.FinalAssessmentName = None
+        incident.FinalAssessmentData = None
+
+        # Commit the changes to the database
         db.session.commit()
-        # return a message
-        return jsonify({'result': 'success', 'message': 'Case approved'})
+        
+        # Return success message
+        return jsonify({'result': 'success', 'message': 'Access report removed successfully'})
     else:
-        # return a message
-        return jsonify({'error': 'failed', 'message': 'Case not found'})
+        # Return error message if incident is not found
+        return jsonify({'error': 'failed', 'message': 'Incident not found'})
+
     
 
-@system_admin_api.route('/resolved-precase', methods={'POST'})
-def resolvePreCase():    
-     # Assuming the incoming data is JSON
-    data = request.get_json()
-    # Extract incidentId from the JSON payload
-    incident_id = data.get('IncidentId')
-    # Your logic to handle the incidentId
-    print('Received incidentId:', incident_id)
-    # make a querry calling the incidentreport table
-    incident = IncidentReport.query.filter_by(Id=incident_id).first()
-    # if the incident is found
-    if incident:
-        # change the status to approved
-        incident.Sanction = 'none'
-        incident.Status = 'resolved'
-        # commit the changes
-        db.session.commit()
-        # return a message
-        return jsonify({'result': 'success', 'message': 'Report approved'})
-    else:
-        # return a message
-        return jsonify({'error': 'failed', 'message': 'Report not found'})
+@system_admin_api.route('/resolved-precase', methods=['POST'])
+def resolvePrecase():
+    try:
+        # Check if the form data includes a file
+        if 'file' not in request.files:
+            return jsonify({'error': 'failed', 'message': 'No file part'})
+        file = request.files['file']
+        # Validate that the file is a PDF
+        if file.filename == '':
+            return jsonify({'error': 'failed', 'message': 'No selected file'})
+        
+        if file and not file.filename.lower().endswith('.pdf'):
+            return jsonify({'error': 'failed', 'message': 'Invalid file type. Only PDFs are allowed'})
+        # Read file data
+        file_data = file.read()
+        # Assuming the other incoming data is in form data format
+        incident_id = request.form.get('incidentId')
+        # Query the incident report
+        report = IncidentReport.query.filter_by(Id=incident_id).first()
+        # Check if the incident report is found
+        if report:
+            # Update FinalAssessmentName and FinalAssessmentData
+            report.IsAccessible = True
+            report.Sanction = 'None'
+            report.Status = 'resolved'
+            report.FinalAssessmentName = file.filename
+            report.FinalAssessmentData = file_data
+            
+            db.session.commit()
+            return jsonify({'result': 'success', 'message': 'Final assessment uploaded successfully'})
+        else:
+            return jsonify({'error': 'failed', 'message': 'Incident report not found'})
+    except Exception as e:
+        # Handle the exception here
+        print(e)
+        return jsonify({'error': 'failed', 'message': 'An error occurred'})
+
 
 @system_admin_api.route('/resolve-faculty-case', methods={'POST'})
 def resolveFacultyCase():    
@@ -585,28 +754,6 @@ def resolveFacultyCase():
     if incident:
         # change the status to approved
         incident.Status = 'approved'
-        # commit the changes
-        db.session.commit()
-        # return a message
-        return jsonify({'result': 'success', 'message': 'Report approved'})
-    else:
-        # return a message
-        return jsonify({'error': 'failed', 'message': 'Report not found'})
-    
-@system_admin_api.route('/remove-faculty-case', methods={'POST'})
-def removeFacultyCase():    
-     # Assuming the incoming data is JSON
-    data = request.get_json()
-    # Extract incidentId from the JSON payload
-    case_id = data.get('CaseId')
-    # Your logic to handle the incidentId
-    print('Received CaseId:', case_id)
-    # make a querry calling the incidentreport table
-    incident = FacultyIncidentReport.query.filter_by(Id=case_id).first()
-    # if the incident is found
-    if incident:
-        # change the status to approved
-        incident.Status = 'removed'
         # commit the changes
         db.session.commit()
         # return a message
@@ -652,8 +799,14 @@ def reopenReports():
     # if the incident is found
     if incident:
         # change the status to approved
+        incident.IsAccessible = False
         incident.Sanction = 'pending'
         incident.Status = 'pending'
+        incident.InvestigatorId = None
+        incident.InitialAssessmentName = None
+        incident.InitialAssessmentData = None
+        incident.FinalAssessmentName = None
+        incident.FinalAssessmentData = None
         # commit the changes
         db.session.commit()
         # return a message
@@ -858,17 +1011,28 @@ def getViolationType(ViolationId):
 
  
 # to assign investigator on cases
-@system_admin_api.route('/assign-faculty', methods={'POST'})
+@system_admin_api.route('/assign-faculty', methods=['POST'])
 def assignFaculty():
     try:
-        # Assuming the incoming data is JSON
-        data = request.get_json()
-        # Extract incidentId and assignedFaculty from the JSON payload
-        incident_id = data.get('incidentId')
-        print('Received incidentId:', incident_id)
-        
-        assigned_faculty = data.get('assignedFaculty')
-        print('Received assignedFaculty:', assigned_faculty)
+        # Check if the form data includes a file
+        if 'file' not in request.files:
+            return jsonify({'error': 'failed', 'message': 'No file part'})
+
+        file = request.files['file']
+
+        # Validate that the file is a PDF
+        if file.filename == '':
+            return jsonify({'error': 'failed', 'message': 'No selected file'})
+
+        if file and not file.filename.lower().endswith('.pdf'):
+            return jsonify({'error': 'failed', 'message': 'Invalid file type. Only PDFs are allowed'})
+
+        # Read file data
+        file_data = file.read()
+
+        # Assuming the other incoming data is in form data format
+        incident_id = request.form.get('incidentId')
+        assigned_faculty = request.form.get('assignedFaculty')
 
         # Query the incident report
         report = IncidentReport.query.filter_by(Id=incident_id).first()
@@ -877,17 +1041,40 @@ def assignFaculty():
         if report:
             # Update InvestigatorId with assigned_faculty
             report.InvestigatorId = assigned_faculty
+            # Change the status to approved
+            report.IsAccessible = True
+            # Update InitialAssessmentName and InitialAssessmentData
+            report.InitialAssessmentName = file.filename
+            report.InitialAssessmentData = file_data
+
             # Commit the changes to the database
             db.session.commit()
-            # Return a success message
-            return jsonify({'result': 'success', 'message': 'Report approved'})
+
+            try:
+                # Compose the email message
+                msg = Message(
+                    'Notification of Case Assignment: Investigation of Student Matter',
+                    sender=("SCDS", "scdspupqc.edu@gmail.com"),
+                    recipients=['david.ilustre@gmail.com']
+                )
+                msg.html = render_template('email_templates/faculty_notyf_case.html', caseId=incident_id)
+                # Send the email
+                mail.send(msg)
+                # Return a success response
+                return jsonify({'result': 'success', 'message': 'Faculty assigned, case approved, and email notification sent'})
+            except Exception as e:
+                # Log the exception and return an error response
+                print('An error occurred while sending the email notification:', e)
+                return jsonify({'error': 'failed', 'message': 'Faculty assigned, case approved, but email notification failed'}), 500
         else:
             # Return an error message if the incident report is not found
             return jsonify({'error': 'failed', 'message': 'Report not found'})
     except Exception as e:
-        print('error',e) 
         # Return an error message if an exception occurs
+        print('error', e)
         return jsonify({'error': 'failed', 'message': str(e)})
+
+
 
 @system_admin_api.route('/manage-sanction', methods={'POST'})
 def manageSanction():

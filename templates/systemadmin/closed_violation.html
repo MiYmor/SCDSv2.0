@@ -193,22 +193,45 @@ endblock title %} {% block styles %}
         violationRow.setAttribute('id', `${violation.ViolationId}`);
 
         violationRow.innerHTML = `
-                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${violation.ViolationId}</td>
-                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${violation.SelfDate}</td>
+                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${
+                    violation.ViolationId
+                  }</td>
+                  <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${
+                    violation.SelfDate
+                  }</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <p name="Time"><strong>Time:</strong> ${violation.Time}</p>
                     <p name="Date"><strong>Date:</strong> ${violation.Date}</p>
-                    <p name="ViolationType"><strong>Violation Type:</strong> ${violation.IncidentName}</p>
-                    <p name="Location"><strong>Location:</strong> ${violation.LocationName}</p>
-                    <p name="Student"><strong>Violator:</strong> ${violation.StudentName}</p>
-                    <p name="Complainant"><strong>Submitted by:</strong> ${violation.Complainant}</p>
-                    <p name="Description"><strong>Description:</strong> ${violation.Description}</p>
+                    <p name="ViolationType"><strong>Violation Type:</strong> ${
+                      violation.IncidentName
+                    }</p>
+                    <p name="Location"><strong>Location:</strong> ${
+                      violation.LocationName
+                    }</p>
+                    <p name="Student"><strong>Violator:</strong> ${
+                      violation.StudentName
+                    }</p>
+                    <p name="Complainant"><strong>Submitted by:</strong> ${
+                      violation.Complainant
+                    }</p>
+                    <p name="Description"><strong>Description:</strong> ${
+                      violation.Description
+                    }</p>
                     <strong>Sanction:</strong>
-                    <p name="Status" id='status-${violation.ViolationId}'> ${violation.Status}</p>
+                    <p name="Status" id='status-${violation.ViolationId}'> ${
+          violation.Status
+        }</p>
                     <!-- Add other details as needed -->
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column">
-                    <button class="bg-red-600 p-2 text-white block mb-2" onclick="removeAccessViolations(${violation.ViolationId})">Reopen Violation</button>
+                    <button class="bg-blue-600 p-2 text-white block mb-2" onclick="removeAccessViolations(${
+                      violation.ViolationId
+                    })">Reopen Violation</button>
+                    ${
+                      violation.AttachmentName
+                        ? `<button class="bg-red-600 p-2 text-white block mb-2" onclick="downloadFile(${violation.ViolationId})">See Evidences</button>`
+                        : ''
+                    }
                         </td>
                       `;
 
@@ -274,6 +297,30 @@ endblock title %} {% block styles %}
       console.error(error.message);
     }
   }
+
+  // Function to handle the click event on the download button
+  async function downloadFile(violation_id) {
+    try {
+      const response = await fetch(
+        `${api_base_url}/violation/${violation_id}/file`
+      );
+      const blob = await response.blob();
+
+      // Check if the response is successful
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      // Create a new blob object with the appropriate MIME type
+      const blobUrl = window.URL.createObjectURL(blob);
+
+      // Open the blob URL in a new tab/window
+      window.open(blobUrl, '_blank');
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  }
+
   fetchViolations();
 </script>
 {% endblock script %}

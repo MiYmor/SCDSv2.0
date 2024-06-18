@@ -1,7 +1,7 @@
 {% extends "systemadmin/layout.html" %} {% block title %} SCDS - Profile {%
 endblock title %} {% block styles %}
 <style>
-  //* Apply bold style to the header cells */
+  /* Apply bold style to the header cells */
   .e-headertext {
     color: white;
     font-weight: bolder !important;
@@ -77,32 +77,78 @@ endblock title %} {% block styles %}
 
 <!-- Modal container -->
 <div
-  id="statusModal"
+  id="approveModal"
   class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
 >
-  <div class="modal-content bg-white p-8 rounded-lg">
+  <div class="modal-content bg-white p-8 rounded-lg relative">
+    <!-- Move the close button inside the modal content -->
     <span
       class="close text-2xl absolute top-2 right-2 cursor-pointer"
       onclick="closeModal()"
       >&times;</span
     >
-    <input type="hidden" id="incidentId" />
-    <h2 class="text-2xl font-bold mb-4">Assign Investigator</h2>
-    <label for="statusDropdown" class="block mb-2">Select Investigator:</label>
-    <select id="statusDropdown" class="w-full p-2 mb-4 border rounded-md">
-      {% for Faculty in faculty|sort(attribute='LastName')%}
-      <option value="{{ Faculty.FacultyId }}">
-        {{ Faculty.LastName }}, {{ Faculty.FirstName }}, {{ Faculty.MiddleName
-        }}
-      </option>
-      {%endfor %}
-    </select>
-    <button
-      onclick="assignInvestigator()"
-      class="bg-blue-500 text-white px-4 py-2 rounded-md"
+    <form id="approvedForm">
+      <input type="hidden" id="approvedIncidentId" />
+      <h2 class="text-2xl font-bold mb-4">Assign SDB</h2>
+      <label for="statusDropdown" class="block mb-2">Select SDB:</label>
+      <select id="statusDropdown" class="w-full p-2 mb-4 border rounded-md">
+        {% for Faculty in faculty|sort(attribute='LastName') %}
+        <option value="{{ Faculty.FacultyId }}">
+          {{ Faculty.LastName }}, {{ Faculty.FirstName }}, {{ Faculty.MiddleName
+          }}
+        </option>
+        {% endfor %}
+      </select>
+      <input
+        type="file"
+        id="initial-assessment-input"
+        name="initial-assessment"
+        class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+      />
+      <p class="text-c4 text-sm">Only PDF files are accepted.</p>
+      <p id="error-file" class="text-c4 text-sm"></p>
+      <button
+        type="button"
+        onclick="assignInvestigator()"
+        class="bg-blue-500 text-white px-4 py-2 rounded-md"
+      >
+        Approve
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Modal container -->
+<div
+  id="resolvedModal"
+  class="modal hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+>
+  <div class="modal-content bg-white p-8 rounded-lg relative">
+    <!-- Move the close button inside the modal content -->
+    <span
+      class="close text-2xl absolute top-2 right-2 cursor-pointer"
+      onclick="closeModal()"
+      >&times;</span
     >
-      Assign
-    </button>
+    <form id="resolvedForm">
+      <input type="hidden" id="resolvedIncidentId" />
+      <h2 class="text-2xl font-bold mb-4">Resolve Pre-Case</h2>
+      <input
+        type="file"
+        id="final-assessment-input"
+        name="final assessment"
+        class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
+      />
+      <p class="text-c4 text-sm">Only PDF files are accepted.</p>
+      <p id="error-file" class="text-c4 text-sm"></p>
+      <button
+        type="button"
+        onclick="resolvedPreCase()"
+        class="bg-blue-500 text-white px-4 py-2 rounded-md"
+      >
+        Resolve
+      </button>
+    </form>
   </div>
 </div>
 
@@ -171,8 +217,6 @@ endblock title %} {% block styles %}
                     <p>
                       <strong>Submitted by:</strong> {{ report.complainant }}
                     </p>
-
-                    <!-- Add other details as needed -->
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                     <button
@@ -181,6 +225,31 @@ endblock title %} {% block styles %}
                     >
                       Edit Report
                     </button>
+                  </td>
+                  <td
+                    class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column"
+                  >
+                    <button
+                      class="bg-green-600 p-2 text-white block mb-2"
+                      onclick="openModal({{ report.IncidentId }})"
+                    >
+                      Approve Case
+                    </button>
+                    <button
+                      class="bg-red-600 p-2 text-white block mb-2"
+                      onclick="openResolvedModal({{ report.IncidentId }})"
+                    >
+                      Resolve Pre-Case
+                    </button>
+
+                    {% if report.AttachmentName %}
+                    <button
+                      class="bg-blue-600 p-2 text-white block mb-2"
+                      onclick="downloadFile({{ report.IncidentId }})"
+                    >
+                      See Evidences
+                    </button>
+                    {% endif %}
                   </td>
                 </tr>
                 {% endfor %}
@@ -194,10 +263,8 @@ endblock title %} {% block styles %}
 </div>
 {% endblock content %} {% block script %}
 <script>
-  // Fetch location and incident types
   async function fetchReport() {
     try {
-      // Fetch location data
       const reportResponse = await fetch(`${api_base_url}/all-reports`);
 
       if (!reportResponse.ok) {
@@ -207,39 +274,47 @@ endblock title %} {% block styles %}
       const reportDetails = await reportResponse.json();
       console.log(reportDetails);
 
-      // Get the container element where you want to render the data
       const outputContainer = document.getElementById('output-container');
       outputContainer.innerHTML = '';
 
-      // Loop through the consoleResponse array and create HTML elements for each object
-      reportDetails.result.forEach(async (report) => {
-        // Create a tr element for each report
+      reportDetails.result.forEach((report) => {
         const reportRow = document.createElement('tr');
-
         reportRow.setAttribute('id', `${report.IncidentId}`);
 
         reportRow.innerHTML = `
-              <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${report.IncidentId}</td>
-              <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${report.SelfDate}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <p name ="Time"><strong>Time:</strong> ${report.Time}</p>
-                <p name ="Date"><strong>Date:</strong> ${report.Date}</p>
-                <p name ="Location"><strong>Location:</strong> ${report.LocationName}</p>
-                <p name ="Student"><strong>Complainee:</strong> ${report.StudentName}</p>
-                <p name ="Complainant"><strong>Submitted by:</strong> ${report.Complainant}</p>
-                <p name ="Description"><strong>Description:</strong> ${report.Description}</p>
-                <strong>Status:</strong>
-                <p name ="status" id='status-${report.IncidentId}'> ${report.Status}</p>
-                <!-- Add other details as needed -->
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column">
-                <button class="bg-blue-600 p-2 text-white block mb-2" onclick="openModal(${report.IncidentId})">Assign Investigator</button>
-                <button class="bg-green-600 p-2 text-white block mb-2" onclick="accessReports(${report.IncidentId})">Approve Case</button>
-                <button class="bg-red-600 p-2 text-white block" onclick="resolvePreCase(${report.IncidentId})">Resolve Pre-Case</button>
-            </td>            
-            `;
+            <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">Case ${
+              report.IncidentId
+            }</td>
+            <td class="px-6 py-4 text-center font-medium whitespace-nowrap text-sm text-gray-500">${
+              report.SelfDate
+            }</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <p><strong>Time:</strong> ${report.Time}</p>
+              <p><strong>Date:</strong> ${report.Date}</p>
+              <p><strong>Location:</strong> ${report.LocationName}</p>
+              <p><strong>Complainee:</strong> ${report.StudentName}</p>
+              <p><strong>Submitted by:</strong> ${report.Complainant}</p>
+              <p><strong>Description:</strong> ${report.Description}</p>
+              <strong>Status:</strong>
+              <p name="status" id='status-${report.IncidentId}'> ${
+          report.Status
+        }</p>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 actions-column">
+              <button class="bg-blue-600 p-2 text-white block mb-2" onclick="openModal(${
+                report.IncidentId
+              })">Approve Case</button>
+              <button class="bg-red-600 p-2 text-white block mb-2" onclick="openResolvedModal(${
+                report.IncidentId
+              })">Resolve Pre-Case</button>
+              ${
+                report.AttachmentName
+                  ? `<button class="bg-green-600 p-2 text-white block mb-2" onclick="downloadFile(${report.IncidentId})">See Evidences</button>`
+                  : ''
+              }
+            </td>
+          `;
 
-        // Append the reportRow to the outputContainer
         outputContainer.appendChild(reportRow);
       });
     } catch (error) {
@@ -265,126 +340,145 @@ endblock title %} {% block styles %}
         }
       }
       // Toggle row display based on search result
-      if (found) {
-        tr[i].style.display = '';
-      } else {
-        tr[i].style.display = 'none';
-      }
+      tr[i].style.display = found ? '' : 'none';
     }
   }
 
-  // Make a approved report function
-  async function accessReports(IncidentId, name) {
-    console.log('accessReports', IncidentId);
-    try {
-      const response = await fetch(`${api_base_url}/access-report`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ IncidentId: IncidentId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to make accesible report');
-      }
-
-      const data = await response.json();
-      console.log(data);
-
-      if (data.result) {
-        notyf.success('Case is now approved');
-        document.getElementById(`status-${IncidentId}`).innerHTML = 'approved';
-      } else if (data.error) {
-        notyf.error('Failed to open case');
-      }
-    } catch (error) {
-      console.error(error.message);
-    }
-  }
-  // Make a approved report function
-  async function resolvePreCase(IncidentId) {
-    console.log('resolvePreCase', IncidentId);
-    try {
-      const response = await fetch(`${api_base_url}/resolved-precase`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ IncidentId }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to make accesible report');
-      }
-
-      const data = await response.json();
-      console.log(data);
-
-      if (data.result) {
-        notyf.success('PreCase is now Resolved');
-        document.getElementById(`status-${IncidentId}`).innerHTML = 'resolved';
-      } else if (data.error) {
-        notyf.error('Failed to close case');
-      }
-    } catch (error) {
-      console.error(error.message);
-    }
-  }
-
-  // Function to open the modal
   function openModal(incidentId) {
-    // Set the caseId input field in the modal
-    document.getElementById('incidentId').value = incidentId;
-
-    // Show the modal
-    const modal = document.getElementById('statusModal');
+    document.getElementById('approvedIncidentId').value = incidentId;
+    const modal = document.getElementById('approveModal'); // Corrected modal ID
     modal.classList.remove('hidden');
   }
 
-  // Function to close the modal
+  function openResolvedModal(incidentId) {
+    document.getElementById('resolvedIncidentId').value = incidentId;
+    const modal = document.getElementById('resolvedModal');
+    modal.classList.remove('hidden');
+  }
+
   function closeModal() {
-    const modal = document.getElementById('statusModal');
-    modal.classList.add('hidden');
+    const approveModal = document.getElementById('approveModal');
+    const resolvedModal = document.getElementById('resolvedModal');
+
+    if (approveModal) {
+      approveModal.classList.add('hidden');
+    }
+
+    if (resolvedModal) {
+      resolvedModal.classList.add('hidden');
+    }
   }
 
-  // Function to update the status
-  function assignInvestigator() {
-    // Open the modal and set the caseId input field
-    // get the caseId from the hidden input field
-    const incidentId = document.getElementById('incidentId').value;
-    console.log('incident value:', incidentId);
+  async function resolvedPreCase() {
+    console.log('Resolving pre-case...');
+    console.log(
+      'resolvedIncidentId:',
+      document.getElementById('resolvedIncidentId').value
+    );
+    const incidentId = document.getElementById('resolvedIncidentId').value;
+    const fileInput = document.getElementById('final-assessment-input');
+    const errorFile = document.getElementById('error-file');
+    const file = fileInput.files[0];
 
-    openModal(incidentId);
-    // Rest of your code...
-    const assignedFaculty = document.getElementById('statusDropdown').value;
-    console.log('assigned faculty:', assignedFaculty);
+    if (file && file.type !== 'application/pdf') {
+      errorFile.textContent = 'Please upload a PDF file.';
+      return;
+    }
 
-    // make a post request
-    fetch(`${api_base_url}/assign-faculty`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ incidentId: incidentId, assignedFaculty }),
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        if (data.result) {
-          notyf.success('Investigator assigned');
-        } else if (data.error) {
-          notyf.error('Failed to assign investigator');
-        }
-      })
-      .catch((error) => {
-        console.error(error.message);
-      })
-      .finally(() => {
-        closeModal();
+    const formData = new FormData();
+    formData.append('incidentId', incidentId);
+    if (file) {
+      formData.append('file', file);
+      console.log('Form Data:', formData); // Check formData before sending
+    }
+
+    try {
+      const response = await fetch(`${api_base_url}/resolved-precase`, {
+        method: 'POST',
+        body: formData,
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('Response Data:', data); // Check response data
+
+      if (data.result) {
+        notyf.success('Pre-case resolved successfully');
+      } else if (data.error) {
+        document.getElementById(`status-${incidentId}`).textContent =
+          'resolved';
+        notyf.error('Failed to resolve pre-case');
+      }
+    } catch (error) {
+      console.error(error.message);
+    } finally {
+      closeModal(); // Close modal regardless of success or failure
+    }
   }
 
-  fetchReport();
+  async function assignInvestigator() {
+    const incidentId = document.getElementById('approvedIncidentId').value;
+    const assignedFaculty = document.getElementById('statusDropdown').value;
+    const fileInput = document.getElementById('initial-assessment-input');
+    const errorFile = document.getElementById('error-file');
+    const file = fileInput.files[0];
+
+    if (file && file.type !== 'application/pdf') {
+      errorFile.textContent = 'Please upload a PDF file.';
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('incidentId', incidentId);
+    formData.append('assignedFaculty', assignedFaculty);
+    if (file) {
+      formData.append('file', file);
+      console.log('Form Data:', formData); // Check formData before sending
+    }
+
+    try {
+      const response = await fetch(`${api_base_url}/assign-faculty`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+      console.log(data);
+
+      if (data.result) {
+        notyf.success('SDB assigned');
+      } else if (data.error) {
+        notyf.error('Failed to assign SDB');
+      }
+    } catch (error) {
+      console.error(error.message);
+    } finally {
+      closeModal();
+    }
+  }
+
+  async function downloadFile(reportId) {
+    try {
+      const response = await fetch(
+        `${api_base_url}/reporting/${reportId}/file`
+      );
+      const blob = await response.blob();
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const blobUrl = window.URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } catch (error) {
+      console.error('Error downloading file:', error);
+    }
+  }
+
+  fetchReport(); // Ensure to call fetchReport or any initialization function as needed
 </script>
+
 {% endblock script %}

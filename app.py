@@ -24,19 +24,13 @@ from decorators.auth_decorators import preventAuthenticated, role_required
 from datetime import  timedelta
 from mail import mail  # Import mail from the mail.py module
 
-class IncidentReportForm(FlaskForm):
-    date = StringField('Date', validators=[DataRequired()])
-    time = StringField('Time', validators=[DataRequired()])
-    location = StringField('Location', validators=[DataRequired()])
-    parties_involved = StringField('Parties Involved')
-    description = TextAreaField('Description', validators=[DataRequired()])
-
 
 def create_app():
     load_dotenv()  # Load environment variables from .env file
     app = Flask(__name__)
 
     if __name__ == '__main__':
+        app = create_app()
         app.run(debug=True)
     
     # SETUP YOUR POSTGRE DATABASE HERE
@@ -74,6 +68,9 @@ def create_app():
     mail = Mail(app)
     # app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER')
     mail.init_app(app)
+    
+    app.config['UPLOAD_FOLDER'] = 'path/to/upload/folder'
+
     # The Api Key is static for development mode. The Api key in future must refresh in order to secure the api endpoint of the application
     # student_api_key = os.getenv('STUDENT_API_KEY')
     # faculty_api_key = os.getenv('FACULTY_API_KEY')
@@ -113,6 +110,15 @@ def create_app():
     def home():
         return render_template('main/index.html')
 
+    @app.route('/case-filing')
+    @preventAuthenticated
+    def fileCase():
+        return render_template('main/index_case.html')
+    
+    @app.route('/case-manage')
+    @preventAuthenticated
+    def manageCase():
+        return render_template('main/index_manage.html')
 
     @app.route('/logout')
     def logout():
@@ -194,13 +200,21 @@ def create_app():
     
 
     # ========================================================================
-
-
     # ALL FACULTY ROUTES HERE
     @app.route('/faculty')
     @preventAuthenticated
     def facultyLogin():
         return render_template('faculty/login.html')
+    
+    @app.route('/sdb')
+    @preventAuthenticated
+    def sdbLogin():
+        return render_template('faculty/login_sdb.html')
+    
+    @app.route('/sdb/dashboard')
+    @role_required('faculty')
+    def sdbHome():
+        return render_template('faculty/dashboard_sdb.html', faculty_api_base_url=faculty_api_base_url, current_page="sdb-dashboard")
 
 
     @app.route('/faculty/dashboard')
@@ -240,8 +254,6 @@ def create_app():
     @role_required('faculty')
     def facultyChangePassword():
         return render_template('faculty/change_password.html', faculty_api_base_url=faculty_api_base_url, current_page="change-password")
-    
-    
 
     # ========================================================================
     # ALL SYSTEM ADMIN ROUTES HERE

@@ -1,5 +1,6 @@
 {% extends "student/layout.html" %} {% block style %}
 <style>
+  /* Apply bold style to the header cells */
   .e-headertext {
     color: white;
     font-weight: bolder !important;
@@ -58,6 +59,10 @@
   .invalid-field {
     border: 2px solid #ff0000 !important;
   }
+
+  .spacing-bottom {
+    margin-bottom: 1.5rem; /* Adjust this value as needed */
+  }
 </style>
 {% endblock %} {% block content %}
 <div class="lg:px-40 md:px-16 py-4 w-screen px-8 mb-8">
@@ -111,6 +116,7 @@
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
                 required
               >
+                <option value="" disabled selected>Select Location</option>
                 {% for location in locations %}
                 <option value="{{ location.LocationId }}">
                   {{ location.Name }}
@@ -124,7 +130,7 @@
               <label
                 for="faculty-input"
                 class="block mb-2 text-c1 font-extrabold"
-                >Select Complainee</label
+                >Complainee</label
               >
               <select
                 id="faculty-input"
@@ -132,6 +138,7 @@
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
                 required
               >
+                <option value="" disabled selected>Select Faculty</option>
                 {% for Faculty in faculty|sort(attribute='LastName') %}
                 <option value="{{ Faculty.FacultyId }}">
                   {{ Faculty.LastName }}, {{ Faculty.FirstName }}
@@ -141,21 +148,39 @@
               <p id="error-faculty" class="text-c4 text-sm"></p>
             </div>
 
-            <div>
+            <div class="md:col-span-2">
               <label
                 for="description-input"
                 class="block mb-2 text-c1 font-extrabold"
                 >Description</label
               >
-              <input
+              <textarea
                 type="text"
                 id="description-input"
                 name="description"
+                placeholder="Enter Description"
+                rows="6"
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
                 required
-              />
+              ></textarea>
               <p id="error-description" class="text-c4 text-sm"></p>
             </div>
+          </div>
+
+          <div class="spacing-bottom">
+            <label for="file-input" class="block mb-2 text-c1 font-extrabold"
+              >Attach File</label
+            >
+            <input
+              type="file"
+              id="file-input"
+              name="file"
+              class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-half px-2 py-1"
+            />
+            <p class="text-c4 text-sm block px-3 py-1">
+              Only PDF files are accepted.
+            </p>
+            <p id="error-file" class="text-c4 text-sm"></p>
           </div>
 
           <!-- Submit button -->

@@ -1,9 +1,10 @@
 # api/api_routes.py
-from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template
+from flask import Blueprint, jsonify, request, redirect, url_for, flash, session, render_template, make_response
 from models import Faculty, db, IncidentReport, Student, Location, ViolationForm
 import pandas as pd
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash
+from werkzeug.utils import secure_filename
 from decorators.auth_decorators import role_required
 import logging
 from .utils import updateFacultyData, getFacultyData, updatePassword, getCurrentUser
@@ -12,8 +13,7 @@ import os
 
 from flask_mail import Message
 from mail import mail  # Import mail from the mail.py module
-import secrets
-from datetime import datetime, timedelta
+from datetime import datetime
 faculty_api_base_url = os.getenv("FACULTY_API_BASE_URL")
 faculty_api = Blueprint('faculty_api', __name__)
 
@@ -37,6 +37,21 @@ def login():
             flash('Invalid email or password', 'danger')
             return redirect(url_for('facultyLogin'))
 
+@faculty_api.route('/sdb', methods=['GET', 'POST'])
+def sdbLogin():
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+
+        teacher = Faculty.query.filter_by(Email=email).first()
+        if teacher and check_password_hash(teacher.Password, password):
+            # Successfully authenticated
+            session['user_id'] = teacher.FacultyId
+            session['user_role'] = 'faculty'
+            return redirect(url_for('sdbHome'))
+        else:
+            flash('Invalid email or password', 'danger')
+            return redirect(url_for('sdbLogin'))
 
 # ===================================================
 # TESTING AREA
@@ -158,6 +173,10 @@ def manage_reports():
     except Exception as e:
         return {"message": "An error occurred", "status": 500}
 
+#----------------------------------------------------------------------------------------------------------------
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() == 'pdf'
 
 @faculty_api.route('/reporting-violation', methods=['POST'])
 def reportingViolation():
@@ -186,6 +205,16 @@ def reportingViolation():
                 ComplainantId=user.FacultyId,
                 Description=description
             )
+            
+            file = request.files['file']
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_data = file.read()  # Read the file data as binary
+                violation.AttachmentName = filename
+                violation.AttachmentData = file_data  # Store the binary data
+            else:
+                return jsonify({'message': 'Only PDF files are allowed', 'success': False}), 400
+            
             db.session.add(violation)
             db.session.commit()
             
@@ -204,6 +233,51 @@ def reportingViolation():
     return redirect(url_for('facultyHome'))
 
 
+
+# Fetch reports CSV from external source and directly send it as attachment
+
+def fetch_report_binary_data(report_id):
+    # Assuming you have a model named Report
+    report = db.session.query(IncidentReport).filter_by(id=report_id).first()
+    if report:
+        # Assuming the binary data is stored in a column named 'binary_data'
+        return report.binary_data
+    else:
+        return None
+
+@faculty_api.route('/reporting/<int:report_id>/file', methods=['GET'])
+def download_report_file(report_id):
+    try:
+        # Fetch the binary report data from the database based on report_id
+        report = db.session.query(IncidentReport).get(report_id)
+        if report and report.AttachmentData:
+            # Set the appropriate MIME type for a PDF file
+            response = make_response(report.AttachmentData)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+            return response
+        else:
+            return {"message": "Failed to fetch report or report not found", "status": 404}
+    except Exception as e:
+        return {"message": "An error occurred while downloading the file", "status": 500}
+    
+@faculty_api.route('/assessment/<int:report_id>/file', methods=['GET'])
+def download_initial_assessment_file(report_id):
+    try:
+        # Fetch the binary report data from the database based on report_id
+        report = db.session.query(IncidentReport).get(report_id)
+        if report and report.InitialAssessmentData:
+            # Set the appropriate MIME type for a PDF file
+            response = make_response(report.InitialAssessmentData)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = 'attachment; filename=report.pdf'
+            return response
+        else:
+            return {"message": "Failed to fetch report or report not found", "status": 404}
+    except Exception as e:
+        return {"message": "An error occurred while downloading the file", "status": 500}
+    
+#================================================================================================================
 @faculty_api.route('/all-reports', methods={'GET'})
 def allReports():    
      #.filter = multiple queries .filter_by = single query
@@ -218,6 +292,9 @@ def allReports():
             complainant = db.session.query(Student).filter(Student.StudentId == report.IncidentReport.ComplainantId).first()
             FullNameComplainant = complainant.LastName + ", " + complainant.FirstName
             FullName= report.Student.LastName + ", " + report.Student.FirstName 
+            has_attachment = bool(report.IncidentReport.AttachmentName)
+            initial_assessment = bool(report.IncidentReport.FinalAssessmentName)
+            final_assessment = bool(report.IncidentReport.FinalAssessmentName)
             dict_reports = {
                 'IncidentId': report.IncidentReport.Id,
                 'SelfDate': report.IncidentReport.SelfDate,
@@ -230,7 +307,13 @@ def allReports():
                 'Description': report.IncidentReport.Description,
                 'Sanction': report.IncidentReport.Sanction,
                 'Status': report.IncidentReport.Status,
-                'Acessibility': report.IncidentReport.IsAccessible
+                'Acessibility': report.IncidentReport.IsAccessible,
+                'AttachmentName': report.IncidentReport.AttachmentName,  # Include the attachment name
+                'HasAttachment': has_attachment,  # Include whether the report has an attachment
+                'InitialAssessmentName': report.IncidentReport.InitialAssessmentName,
+                'InitialAssementData': initial_assessment,
+                'FinalAssessmentName': report.IncidentReport.FinalAssessmentName,
+                'FinalAssessmentData': final_assessment
             }
             # append the dictionary to the list
             list_reports.append(dict_reports)
@@ -268,35 +351,32 @@ def allapprovedReports():
             list_reports.append(dict_reports)
         return jsonify({'result': list_reports})
 
-
-@faculty_api.route('/assign-sanction', methods={'POST'})
-def assignSanction():
+@faculty_api.route('/assign-sanction', methods=['POST'])
+def assign_sanction():
     try:
-        # Assuming the incoming data is JSON
-        data = request.get_json()
-        # Extract incidentId and assignedFaculty from the JSON payload
-        incident_id = data.get('incidentId')
-        print('Received incidentId:', incident_id)
-        
-        manage_sanction = data.get('assignSanction')
-        print('Received Sabction:', manage_sanction)
+        incident_id = request.form.get('incidentId')
+        sanction_description = request.form.get('sanction')
+        file = request.files.get('finalAssessment')
 
-        # Query the incident report
-        report = IncidentReport.query.filter_by(Id=incident_id).first()
+        if not incident_id or not sanction_description:
+            return jsonify({'error': True, 'message': 'Incident ID and sanction description are required.'}), 400
 
-        # Check if the incident report is found
-        if report:
-            # Update InvestigatorId with assigned_faculty
-            report.Sanction = manage_sanction
-            # Commit the changes to the database
-            db.session.commit()
-            # Return a success message
-            return jsonify({'result': 'success', 'message': 'Report approved'})
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file_data = file.read()
+
+            incident_report = db.session.query(IncidentReport).get(incident_id)
+            if incident_report:
+                incident_report.Sanction = sanction_description
+                incident_report.FinalAssessmentName = filename
+                incident_report.FinalAssessmentData = file_data
+                db.session.commit()
+
+                return jsonify({'result': True, 'message': 'Sanction assigned successfully'}), 200
+            else:
+                return jsonify({'error': True, 'message': 'Incident not found'}), 404
         else:
-            # Return an error message if the incident report is not found
-            return jsonify({'error': 'failed', 'message': 'Report not found'})
+            return jsonify({'error': True, 'message': 'Invalid file type. Only PDF files are allowed.'}), 400
+
     except Exception as e:
-        print('error',e) 
-        # Return an error message if an exception occurs
-        return jsonify({'error': 'failed', 'message': str(e)})
-    
+        return jsonify({'error': True, 'message': str(e)}), 500

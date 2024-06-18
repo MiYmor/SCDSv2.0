@@ -11,8 +11,8 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
     />
+
     <title>{% block title %} {% endblock title %}</title>
-    <!-- DESIGN STANDARDS -->
     <script>
       tailwind.config = {
         theme: {
@@ -37,50 +37,6 @@
     </script>
 
     <style>
-      .e-toolbar-item,
-      #Grid_toolbarItems,
-      .e-toolbar .e-toolbar-items .e-toolbar-item .e-tbar-btn.e-btn,
-      .e-toolbar .e-toolbar-items,
-      .e-pager .e-currentitem,
-      .e-pager .e-currentitem:hover {
-        background-color: #9d1d1d;
-        font-weight: bold;
-      }
-
-      .e-input-group:not(.e-float-icon-left):not(.e-float-input)::before,
-      .e-input-group:not(.e-float-icon-left):not(.e-float-input)::after,
-      .e-input-group.e-float-icon-left:not(.e-float-input)
-        .e-input-in-wrap::before,
-      .e-input-group.e-float-icon-left:not(.e-float-input)
-        .e-input-in-wrap::after,
-      .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(
-          .e-float-input
-        )::before,
-      .e-input-group.e-control-wrapper:not(.e-float-icon-left):not(
-          .e-float-input
-        )::after,
-      .e-input-group.e-control-wrapper.e-float-icon-left:not(.e-float-input)
-        .e-input-in-wrap::before,
-      .e-input-group.e-control-wrapper.e-float-icon-left:not(.e-float-input)
-        .e-input-in-wrap::after {
-        background-color: #9d1d1d;
-      }
-
-      .e-toolbar .e-toolbar-items .e-toolbar-item .e-tbar-btn-text,
-      .e-toolbar
-        .e-toolbar-items
-        .e-toolbar-item
-        .e-tbar-btn.e-btn.e-tbtn-txt
-        .e-icons.e-btn-icon {
-        color: white;
-      }
-
-      .e-headertext {
-        font-size: 14px;
-        color: #191d21;
-        font-weight: bolder;
-      }
-
       .notyf {
         margin-top: 80px;
       }
@@ -107,23 +63,13 @@
           <div>
             <div class="w-full flex items-center">
               <p class="font-extrabold text-c1 md:text-2xl text-md">
-                Welcome Back, &nbsp;
-              </p>
-              <p
-                class="font-semibold text-c1 flex text-md md:text-2xl"
-                id="user-name"
-              >
-                <span class="md:hidden">&nbsp;</span>
-                <!-- <img
-                  src="{{ url_for('static', filename='images/wave.png') }}"
-                  alt=""
-                  class="h-[24px] w-[24px] md:h-[30px] md:w-[30px]"
-                /> -->
+                Welcome Back
               </p>
             </div>
+
             <div>
               <p class="text-start text-sm text-c2 font-semibold opacity-75">
-                PUPQC Professor
+                PUPQC SDB
               </p>
             </div>
           </div>
@@ -187,10 +133,7 @@
             </button>
 
             <div class="flex items-center md:mt-0 mt-2">
-              <a
-                href="{{ url_for('systemAdminHome') }}"
-                class="my-2 flex items-center"
-              >
+              <a href="{{ url_for('sdbHome') }}" class="my-2 flex items-center">
                 <img
                   class="w-auto h-14"
                   src="{{ url_for('static', filename='images/pup.png') }}"
@@ -206,77 +149,107 @@
               <ul class="text-base">
                 <li>
                   <a
-                    href="{{ url_for('reportManagementAdmin') }}"
+                    href="{{ url_for('sdbHome') }}"
+                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'sdb-dashboard' else 'hover:bg-gray-100 hover:text-c1' }}"
+                  >
+                    <svg
+                      class="w-5 h-5 transition duration-75 group-hover:text-c1 {{ 'text-white' if current_page == 'dashboard' else 'text-gray-500' }}"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 22 21"
+                    >
+                      <path
+                        d="M16.975 11H10V4.025a1 1 0 0 0-1.066-.998 8.5 8.5 0 1 0 9.039 9.039.999.999 0 0 0-1-1.066h.002Z"
+                      />
+                      <path
+                        d="M12.5 0c-.157 0-.311.01-.565.027A1 1 0 0 0 11 1.02V10h8.975a1 1 0 0 0 1-.935c.013-.188.028-.374.028-.565A8.51 8.51 0 0 0 12.5 0Z"
+                      />
+                    </svg>
+                    <span class="flex-1 ml-3 whitespace-nowrap">Home</span>
+                  </a>
+                </li>
+
+                <li>
+                  <a
+                    href="{{ url_for('reportManagement') }}"
                     class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'manage-reports' else 'hover:bg-gray-100 hover:text-c1' }}"
                   >
+                    <svg
+                      class="flex-shrink-0 w-5 h-5 transition duration-75 group-hover:text-c1 {{ 'text-white' if current_page == 'profile' else 'text-gray-500' }}"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 19"
+                    >
+                      <path
+                        d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"
+                      />
+                      <path
+                        d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z"
+                      />
+                      <path
+                        d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z"
+                      />
+                    </svg>
                     <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Student Case Management</span
+                      >Manage Cases</span
                     >
                   </a>
                 </li>
 
                 <li>
                   <a
-                    href="{{ url_for('closedCase') }}"
-                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'close-case' else 'hover:bg-gray-100 hover:text-c1' }}"
+                    href="{{ url_for('approvedReports') }}"
+                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'approved-reports' else 'hover:bg-gray-100 hover:text-c1' }}"
                   >
+                    <svg
+                      class="flex-shrink-0 w-5 h-5 transition duration-75 group-hover:text-c1 {{ 'text-white' if current_page == 'profile' else 'text-gray-500' }}"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 19"
+                    >
+                      <path
+                        d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"
+                      />
+                      <path
+                        d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z"
+                      />
+                      <path
+                        d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z"
+                      />
+                    </svg>
                     <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Approved Student Case</span
+                      >Resolved Cases</span
                     >
                   </a>
                 </li>
 
                 <li>
                   <a
-                    href="{{ url_for('resolvedCase') }}"
-                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'resolved-case' else 'hover:bg-gray-100 hover:text-c1' }}"
+                    href="{{ url_for('facultyChangePassword') }}"
+                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'change-password' else 'hover:bg-gray-100 hover:text-c1' }}"
                   >
-                    <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Resolved Student Case</span
+                    <svg
+                      class="flex-shrink-0 w-5 h-5 transition duration-75 group-hover:text-c1 {{ 'text-white' if current_page == 'change-password' else 'text-gray-500' }}"
+                      aria-hidden="true"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
                     >
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    href="{{ url_for('facultyReportManagementAdmin') }}"
-                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'manage-faculty-case' else 'hover:bg-gray-100 hover:text-c1' }}"
-                  >
+                      <path
+                        d="M5 5V.13a2.96 2.96 0 0 0-1.293.749L.879 3.707A2.96 2.96 0 0 0 .13 5H5Z"
+                      />
+                      <path
+                        d="M6.737 11.061a2.961 2.961 0 0 1 .81-1.515l6.117-6.116A4.839 4.839 0 0 1 16 2.141V2a1.97 1.97 0 0 0-1.933-2H7v5a2 2 0 0 1-2 2H0v11a1.969 1.969 0 0 0 1.933 2h12.134A1.97 1.97 0 0 0 16 18v-3.093l-1.546 1.546c-.413.413-.94.695-1.513.81l-3.4.679a2.947 2.947 0 0 1-1.85-.227 2.96 2.96 0 0 1-1.635-3.257l.681-3.397Z"
+                      />
+                      <path
+                        d="M8.961 16a.93.93 0 0 0 .189-.019l3.4-.679a.961.961 0 0 0 .49-.263l6.118-6.117a2.884 2.884 0 0 0-4.079-4.078l-6.117 6.117a.96.96 0 0 0-.263.491l-.679 3.4A.961.961 0 0 0 8.961 16Zm7.477-9.8a.958.958 0 0 1 .68-.281.961.961 0 0 1 .682 1.644l-.315.315-1.36-1.36.313-.318Zm-5.911 5.911 4.236-4.236 1.359 1.359-4.236 4.237-1.7.339.341-1.699Z"
+                      />
+                    </svg>
                     <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Faculty Case Management</span
-                    >
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    href="{{ url_for('resolvedFacultyCase') }}"
-                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'resolved-faculty-case' else 'hover:bg-gray-100 hover:text-c1' }}"
-                  >
-                    <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Resolved Faculty Case</span
-                    >
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    href="{{ url_for('violationManagementAdmin') }}"
-                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'manage-violations' else 'hover:bg-gray-100 hover:text-c1' }}"
-                  >
-                    <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Violation Management</span
-                    >
-                  </a>
-                </li>
-
-                <li>
-                  <a
-                    href="{{ url_for('closedViolation') }}"
-                    class="flex items-center px-4 py-4 text-gray-600 transition-colors duration-300 transform rounded-lg {{ 'bg-warning text-white font-bold py-2 px-4 rounded shadow-md' if current_page == 'close-violation' else 'hover:bg-gray-100 hover:text-c1' }}"
-                  >
-                    <span class="flex-1 ml-3 whitespace-nowrap"
-                      >Resolved Violation</span
+                      >Change Password</span
                     >
                   </a>
                 </li>
@@ -310,7 +283,66 @@
           </div>
         </div>
       </aside>
+
+      <!-- CONTENT -->
       {% block content %} {% endblock content %}
+
+      <script>
+        const api_base_url = '{{ faculty_api_base_url | default("") }}';
+
+        async function fetchFacultyDetails2() {
+          const response = await fetch(`${api_base_url}/`);
+
+          if (!response.ok) {
+            throw new Error(
+              `Failed to fetch data. Try to contact the admin to resolve the issue.`
+            );
+          }
+
+          const data_faculty_details = await response.json();
+          displayDetails(data_faculty_details);
+        }
+
+        function displayDetails(data) {
+          const text_user_name = document.getElementById('user-name');
+
+          text_user_name.innerHTML = data.Name;
+        }
+
+        fetchFacultyDetails2();
+      </script>
+
+      <script>
+        // Function to open the sidebar
+        function openSidebar() {
+          const sidebar = document.getElementById('default-sidebar');
+          const overlay = document.getElementById('sidebar-overlay');
+
+          sidebar.classList.remove('-translate-x-full');
+          sidebar.classList.add('translate-x-0');
+          overlay.classList.remove('hidden');
+        }
+
+        // Function to close the sidebar
+        function closeSidebar() {
+          const sidebar = document.getElementById('default-sidebar');
+          const overlay = document.getElementById('sidebar-overlay');
+
+          sidebar.classList.remove('translate-x-0');
+          sidebar.classList.add('translate-x-full');
+          overlay.classList.add('hidden');
+        }
+
+        // Add event listener to open the sidebar
+        document
+          .querySelector('[data-drawer-open="default-sidebar"]')
+          .addEventListener('click', openSidebar);
+
+        // Add event listener to close the sidebar
+        document
+          .querySelector('[data-drawer-close="default-sidebar"]')
+          .addEventListener('click', closeSidebar);
+      </script>
 
       <div class="bg-white lg:px-40 shadow-md md:ml-64 md:px-8 lg:px-0 mt-auto">
         <footer class="items-center justify-between mx-auto lg:px-0 px-8 py-8">
@@ -335,6 +367,8 @@
         </footer>
       </div>
     </div>
+
+    <!-- NOTYF -->
     <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
     <script>
       const notyf = new Notyf({
@@ -360,10 +394,7 @@
       });
     </script>
 
-    <script>
-      const api_base_url = '{{ system_admin_api_base_url | default("") }}';
-    </script>
-
+    <!-- SCRIPTS -->
     {% block script %} {% endblock script %}
   </body>
 </html>

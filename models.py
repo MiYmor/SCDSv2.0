@@ -68,6 +68,8 @@ class ViolationForm(db.Model):
     IncidentId = db.Column(db.Integer, db.ForeignKey('SCDSIncidentType.IncidentTypeId', ondelete="CASCADE")) #IncidentTypeID
     ComplainantId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE")) #ComplainantID
     Description = db.Column(db.Text, nullable=False) #Description
+    AttachmentName = db.Column(db.String(255), nullable=True) # Field to store filename of uploaded file
+    AttachmentData = db.Column(db.LargeBinary, nullable=True) # FilePath for uploaded files
     Status = db.Column(db.String(512), nullable=False, default='pending') #Status
     IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
         
@@ -82,6 +84,8 @@ class ViolationForm(db.Model):
             'IncidentID': self.IncidentID,
             'ComplainantID': self.ComplainantID,
             'Description': self.Description,
+            'AttachmentName': self.AttachmentName, # 'FileName': 'sample.pdf
+            'AttachmentData': self.AttachmentName,
             'Status': self.Status,
             'IsAccessible': self.IsAccessible
         }
@@ -98,6 +102,12 @@ class IncidentReport(db.Model):
     ComplainantId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #ComplainantID
     InvestigatorId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE"), nullable=True) #InvestigatorID
     Description = db.Column(db.Text, nullable=False) #Description
+    AttachmentName = db.Column(db.String(255), nullable=True) # Field to store filename of uploaded file
+    AttachmentData = db.Column(db.LargeBinary, nullable=True) # FilePath for uploaded files
+    InitialAssessmentName = db.Column(db.String(255), nullable=True) #InitialAssessment
+    InitialAssessmentData = db.Column(db.LargeBinary, nullable=True) #InitialAssessment
+    FinalAssessmentName = db.Column(db.String(255), nullable=True) #FinalAssessment
+    FinalAssessmentData = db.Column(db.LargeBinary, nullable=True) #FinalAssessment
     Sanction = db.Column(db.Text, nullable=False, default='pending') #Sanction
     Status = db.Column(db.String(20), nullable=False, default='pending') #Status
     IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
@@ -113,6 +123,12 @@ class IncidentReport(db.Model):
             'ComplainantID': self.ComplainantID,
             'InvestigatorId': self.InvestigatorId,
             'Description': self.Description, 
+            'AttachmentName': self.AttachmentName, # 'FileName': 'sample.pdf
+            'AttachmentData': self.AttachmentName,
+            'InitialAssessmentName': self.InitialAssessmentName, # 'FileName': 'sample.pdf
+            'InitialAssessmentData': self.InitialAssessmentData,
+            'FinalAssessmentName': self.FinalAssessmentName, # 'FileName': 'sample.pdf
+            'FinalAssessmentData': self.FinalAssessmentData,
             'Sanction': self.Sanction,
             'Status': self.Status,
             'IsAccessible': self.IsAccessible
@@ -129,6 +145,8 @@ class FacultyIncidentReport(db.Model):
     FacultyId = db.Column(db.Integer, db.ForeignKey('FISFaculty.FacultyId', ondelete="CASCADE")) #StudentID
     ComplainantId = db.Column(db.Integer, db.ForeignKey('SPSStudent.StudentId', ondelete="CASCADE")) #ComplainantID
     Description = db.Column(db.Text, nullable=False) #Description
+    AttachmentName = db.Column(db.String(255), nullable=True) # Field to store filename of uploaded file
+    AttachmentData = db.Column(db.LargeBinary, nullable=True) # FilePath for uploaded files
     Sanction = db.Column(db.Text, nullable=False, default='pending') #Sanction
     Status = db.Column(db.String(20), nullable=False, default='pending') #Status
     IsAccessible = db.Column(db.Boolean, nullable=False, default=False) #IsAccessible
@@ -142,6 +160,8 @@ class FacultyIncidentReport(db.Model):
             'StudentId': self.StudentId,
             'ComplainantID': self.ComplainantID,
             'Description': self.Description, 
+            'AttachmentName': self.AttachmentName, # 'FileName': 'sample.pdf
+            'AttachmentData': self.AttachmentName,
             'Sanction': self.Sanction,
             'Status': self.Status,
             'IsAccessible': self.IsAccessible
@@ -333,28 +353,28 @@ def init_db(app):
 
 
 # def create_sample_data():
-#     # for data in student_data:
-#     #     student = Student(**data)
-#     #     db.session.add(student)
+#     for data in student_data:
+#         student = Student(**data)
+#         db.session.add(student)
 
-#     # for data in faculty_data:
-#     #     faculty = Faculty(**data)
-#     #     db.session.add(faculty)
+#     for data in faculty_data:
+#         faculty = Faculty(**data)
+#         db.session.add(faculty)
         
-#     # for data in system_admin_data:
-#     #     admin = SystemAdmin(**data)
-#     #     db.session.add(admin)
+#     for data in system_admin_data:
+#         admin = SystemAdmin(**data)
+#         db.session.add(admin)
         
-#     # for data in course_data:
-#     #     course = Course(**data)
-#     #     db.session.add(course)
+#     for data in course_data:
+#         course = Course(**data)
+#         db.session.add(course)
         
-#     # for data in incidenttype_data:
-#     #     incidenttype = IncidentType(**data)
-#     #     db.session.add(incidenttype)
+#     for data in incidenttype_data:
+#         incidenttype = IncidentType(**data)
+#         db.session.add(incidenttype)
         
-#     # for data in location_data:
-#     #     location = Location(**data)
-#     #     db.session.add(location)
+#     for data in location_data:
+#         location = Location(**data)
+#         db.session.add(location)
 
 #     db.session.commit()

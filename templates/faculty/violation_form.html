@@ -95,7 +95,7 @@ endblock title %} {% block styles %}
         class="rounded-sm border border-stroke bg-white p-4 md:p-6 xl:p-7.5 shadow-sm"
       >
         <h3 class="text-2xl font-bold text-c4 mb-3 px-4" id="name-number">
-          Violation Form
+          Student Violation Form
         </h3>
         <hr class="mx-2" />
 
@@ -134,7 +134,7 @@ endblock title %} {% block styles %}
               <label
                 for="incident-input"
                 class="block mb-2 text-c1 font-extrabold"
-                >Violation Type</label
+                >Violation</label
               >
               <select
                 id="incident-input"
@@ -142,6 +142,9 @@ endblock title %} {% block styles %}
                 class="select2 bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
                 required
               >
+                <option value="" disabled selected>
+                  Select Violation Type
+                </option>
                 {% for incident_type in incident_types|sort(attribute='Name') %}
                 <option value="{{ incident_type.IncidentTypeId }}">
                   {{ incident_type.Name }}
@@ -163,7 +166,10 @@ endblock title %} {% block styles %}
                 class="select2 bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
                 required
               >
-                {% for location in locations %}
+                <option value="" disabled selected>
+                  Select Location {% for location in locations %}
+                </option>
+
                 <option value="{{ location.LocationId }}">
                   {{ location.Name }}
                 </option>
@@ -176,7 +182,7 @@ endblock title %} {% block styles %}
               <label
                 for="student-input"
                 class="block mb-2 text-c1 font-extrabold"
-                >Select Violator</label
+                >Violator</label
               >
               <select
                 id="student-input"
@@ -184,7 +190,11 @@ endblock title %} {% block styles %}
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
                 required
               >
-                {% for Student in students|sort(attribute='LastName') %}
+                <option value="" disabled selected>
+                  Select Student {% for Student in
+                  students|sort(attribute='LastName') %}
+                </option>
+
                 <option value="{{ Student.StudentId }}">
                   {{ Student.LastName }}, {{ Student.FirstName }} {{
                   Student.MiddleName }}
@@ -194,21 +204,38 @@ endblock title %} {% block styles %}
               <p id="error-student" class="text-c4 text-sm"></p>
             </div>
 
-            <div>
+            <div class="md:col-span-2">
               <label
                 for="description-input"
                 class="block mb-2 text-c1 font-extrabold"
                 >Description</label
               >
-              <input
-                type="text"
+              <textarea
                 id="description-input"
                 name="description"
+                placeholder="Enter Description"
+                rows="6"
                 class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-full px-2 py-1"
                 required
-              />
+              ></textarea>
               <p id="error-description" class="text-c4 text-sm"></p>
             </div>
+          </div>
+
+          <div class="spacing-bottom">
+            <label for="file-input" class="block mb-2 text-c1 font-extrabold"
+              >Attach File</label
+            >
+            <input
+              type="file"
+              id="file-input"
+              name="file"
+              class="bg-gray-50 border border-gray-300 font-normal text-c1 text-sm focus:ring-primary focus:border-secondary block w-half px-2 py-1"
+            />
+            <p class="text-c4 text-sm block px-3 py-1">
+              Only PDF files are accepted.
+            </p>
+            <p id="error-file" class="text-c4 text-sm"></p>
           </div>
 
           <button
