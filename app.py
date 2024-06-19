@@ -330,7 +330,7 @@ def create_app():
     app.register_blueprint(faculty_api, url_prefix=faculty_api_base_url)
     app.register_blueprint(student_api, url_prefix=student_api_base_url)
 
-
+    #new changes
     @app.route('/page_not_found')  # Define an actual route
     def page_not_found():
         return handle_404_error(None)
