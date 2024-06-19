@@ -1,45 +1,44 @@
 {% extends "main/base.html" %} {% block content %}
+
 <div
-  class="flex h-screen items-center justify-center px-4 md:px-6 py-10 md:py-20"
+  class="flex flex-col h-screen w-screen items-center justify-center mx-auto"
 >
-  <div class="bg-black bg-opacity-80 p-6 md:p-10 text-center rounded-lg">
+  <div
+    class="bg-white shadow-lg p-10 text-center rounded-lg border-2 border-gray-100 z-10 w-11/12 md:w-[36rem]"
+  >
     <div>
-      <img
-        src="{{ url_for('static', filename='images/pup.png') }}"
-        alt="Logo"
-        class="w-12 md:w-24 mx-auto mb-3 md:mb-4"
-      />
       <h1
-        class="text-white font-poppins text-xl md:text-2xl font-bold mt-2 md:mt-4"
+        class="text-accent1 font-poppins text-4xl font-extrabold mt-3 md:text-4xl md:mt-8"
       >
-        Welcome PUPian!
+        PUP-SCDS
       </h1>
-      <p class="text-white text-sm md:text-md font-poppins mt-2 mb-4">
-        Please click or tap your your category.
+      <p
+        class="text-gray-800 text-2xl md:text-3xl font-semibold font-poppins mt-3 mb-3 opacity-60"
+      >
+        Log In As
       </p>
     </div>
-    <div>
-      <a href="{{ url_for('studentLogin') }}" class="block">
+
+    <div class="">
+      <a href="{{ url_for('studentLogin') }}">
         <button
-          class="bg-sky-600 text-white w-full rounded-md py-2 mt-2 md:mt-4"
+          class="bg-primary text-white w-full rounded-md py-3 mt-3 rounded-lg font-bold"
         >
           Student
         </button>
       </a>
-      <a href="{{ url_for('facultyLogin') }}" class="block">
+      <a href="{{ url_for('facultyLogin') }}">
         <button
-          class="bg-red-700 text-white w-full rounded-md py-2 mt-2 md:mt-4"
+          class="bg-primary text-white w-full rounded-md py-3 mt-3 md:mt-4 rounded-lg font-bold"
         >
           Faculty
         </button>
       </a>
     </div>
-    <div>
-      <p class="text-xs md:text-sm text-white mt-3">
-        By using this service, you understand and agree to the PUP Online
-        Services Terms of Use and Privacy Statement
-      </p>
-    </div>
   </div>
+  <p class="z-10 text-accent1 opacity-60 absolute bottom-10">
+    myPUPQC © <span id="year"></span>
+  </p>
 </div>
+
 {% endblock content %}

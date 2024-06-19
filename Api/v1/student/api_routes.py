@@ -101,7 +101,7 @@ def resetPassword(token):
 
 # ===================================================
 # Student User Log in
-@student_api.route('/login', methods=['POST'])
+@student_api.route('/login',  methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         email = request.form['email']
@@ -114,12 +114,10 @@ def login():
             # refresh_token = create_refresh_token(identity=student.StudentId)
             session['user_id'] = student.StudentId
             session['user_role'] = 'student'
-            
-            # session['student_id'] = student.StudentId
-            return jsonify({"message": "Login successful"}), 200
+            return redirect(url_for('studentHome'))
         else:
-            return jsonify({"message": "Invalid email or password"}), 401
-    return jsonify({"message": "Method not allowed"}), 405
+            flash('Invalid email or password', 'danger')
+            return redirect(url_for('studentLogin'))
 
 
 

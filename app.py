@@ -32,7 +32,8 @@ def create_app():
     if __name__ == '__main__':
         app = create_app()
         app.run(debug=True)
-    
+
+    app.config['WTF_CSRF_ENABLED'] = False
     # SETUP YOUR POSTGRE DATABASE HERE
     app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -159,12 +160,6 @@ def create_app():
     @role_required('student')
     def changePassword():
         return render_template('student/change_password.html', student_api_base_url=student_api_base_url,  current_page="change-password")
-    
-    #old code might be useful down the road
-    # @app.route('/student/incident-report', methods=['GET', 'POST'])
-    # def studentIncidentReport():
-    #     return render_template('student/incident_report_form.html', student_api_base_url=student_api_base_url,  current_page="incident-report")
-
 
     @app.route('/student/view-cases')
     @role_required('student')

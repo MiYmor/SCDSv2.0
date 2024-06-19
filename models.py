@@ -345,10 +345,10 @@ class Course(db.Model):
 
 def init_db(app):
     db.init_app(app)
-#     with app.app_context():
-#         inspector = inspect(db.engine)
-#         if not inspector.has_table('Students'):
-#             db.create_all()
+    # with app.app_context():
+    #     inspector = inspect(db.engine)
+    #     if not inspector.has_table('Students'):
+    #         db.create_all()
 #             create_sample_data()
 
 

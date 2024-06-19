@@ -7,18 +7,23 @@
       href="{{ url_for('static', filename='css/styles.css') }}"
       rel="stylesheet"
     />
+    <link
+      rel="icon"
+      href="{{ url_for('static', filename='images/pup2.png') }}"
+      sizes="16x16 32x32"
+      type="image/png"
+    />
+
+    <!-- CDN TAILWIND -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              c1: '#2b2d42',
-              c2: '#8d99ae',
-              c3: '#edf2f4',
-              c4: '#ef233c',
-              c5: '#d90429',
-              primary: '#6376EB',
+              primary: '#700001',
+              accent1: '#000000',
+              accent2: '#656363',
               secondary: '#CDD3D8',
               info: '#29BAF2',
               success: '#5EEE82',
@@ -35,42 +40,40 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css"
     />
-    <style>
-      /* html, body { max-width: 100%; overflow-x: hidden; } */
-      .notyf {
-        margin-top: 20px;
-      }
     </style>
+
     <title>
       {% block title %}Polytechnic University of the Philippines{% endblock %}
     </title>
   </head>
-  <body style="background-color: #8d99ae">
-    <div class="flex items-center justify-center h-screen w-screen">
-      <main class="text-white">{% block content %}{% endblock %}</main>
-    </div>
-    <!-- NOTYF -->
-    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
-    <script>
-      const notyf = new Notyf({
-        duration: 5000,
-        position: { x: 'right', y: 'top' },
-        types: [
-          {
-            type: 'success',
-            background: '#5EEE82',
-            duration: 5000,
-            dismissible: true,
-          },
-          {
-            type: 'error',
-            background: '#ef233c',
-            duration: 5000,
-            dismissible: true,
-          },
-        ],
-      });
-    </script>
-    {% block script %}{% endblock script %}
+  <body class="overflow-x-hidden">
+    <main class="text-black">
+      <img
+        src="{{ url_for('static', filename='images/login/my-pupqc.png') }}"
+        alt="Logo"
+        class="object-cover object-center rounded-lg mx-auto w-32 md:w-28 lg:w-32 absolute top-10 left-10 md:top-20 md:left-20 z-10"
+      />
+      <img
+        src="{{ url_for('static', filename='images/login/bg.jpg') }}"
+        alt="Logo"
+        class="object-cover h-screen w-screen absolute z-0"
+      />
+      <img
+        src="{{ url_for('static', filename='images/login/1.png') }}"
+        alt="Logo"
+        class="object-cover top-0 right-[-20px] z-0 absolute w-48 md:w-auto"
+      />
+      <img
+        src="{{ url_for('static', filename='images/login/3.png') }}"
+        alt="Logo"
+        class="object-cover bottom-20 left-20 z-0 absolute"
+      />
+      <img
+        src="{{ url_for('static', filename='images/login/2.png') }}"
+        alt="Logo"
+        class="object-cover bottom-40 right-20 z-0 absolute"
+      />
+      {% block content %} {% endblock %}
+    </main>
   </body>
 </html>
